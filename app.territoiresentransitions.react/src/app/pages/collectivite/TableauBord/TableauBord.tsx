@@ -63,33 +63,29 @@ const useIndicateurCounts = (
 ): IndicateurCounts => {
   const collectiviteId = useCollectiviteId();
 
-  if (collectiviteId === null)
-    return {
-      nbOfIndicateurswithValue: 0,
-      nbOfIndicateurs: 0,
-    };
-
   const [countIndicateurWithValue, setCountIndicateurWithValue] = useState(0);
   useEffect(() => {});
   const indicateurs = useAllIndicateurDefinitionsForGroup(indicateurGroup);
 
   useEffect(() => {
-    Promise.all(
-      indicateurs.map(indicateur =>
-        indicateurResultatRepository.fetchIndicateurValuesForId({
-          collectiviteId,
-          indicateurId: indicateur.id,
-        })
-      )
-    ).then(indicateursValues => {
-      const countIndicateurWithValue = indicateursValues.filter(
-        indicateurValues => {
-          return indicateurValues.length > 0;
-        }
-      );
-      setCountIndicateurWithValue(countIndicateurWithValue.length);
-    });
-  }, [indicateurs.length]);
+    if (collectiviteId) {
+      Promise.all(
+        indicateurs.map(indicateur =>
+          indicateurResultatRepository.fetchIndicateurValuesForId({
+            collectiviteId,
+            indicateurId: indicateur.id,
+          })
+        )
+      ).then(indicateursValues => {
+        const countIndicateurWithValue = indicateursValues.filter(
+          indicateurValues => {
+            return indicateurValues.length > 0;
+          }
+        );
+        setCountIndicateurWithValue(countIndicateurWithValue.length);
+      });
+    }
+  }, [indicateurs.length, collectiviteId]);
   return {
     nbOfIndicateurswithValue: countIndicateurWithValue,
     nbOfIndicateurs: indicateurs.length,
@@ -405,7 +401,7 @@ export const TableauBord = ({
   );
 };
 
-export default () => {
+const TableauBordConnected = () => {
   const eci_actions = useReferentielDownToAction('eci');
   const cae_actions = useReferentielDownToAction('cae');
 
@@ -438,3 +434,5 @@ export default () => {
     />
   );
 };
+
+export default TableauBordConnected;

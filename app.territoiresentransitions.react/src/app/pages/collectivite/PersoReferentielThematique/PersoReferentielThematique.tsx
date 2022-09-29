@@ -8,7 +8,7 @@ import {useChangeReponseHandler} from '../PersoPotentielModal/useChangeReponseHa
 import {useNextThematiqueId} from './useNextThematiqueId';
 import {useCarteIdentite} from './useCarteIdentite';
 
-export default () => {
+const PersoReferentielThematique = () => {
   const collectivite = useCurrentCollectivite();
   const {collectivite_id, nom} = collectivite || {};
   const {thematiqueId} = useParams<{thematiqueId: string | undefined}>();
@@ -16,7 +16,7 @@ export default () => {
   const [qr, refetch] = useThematiqueQR(collectivite_id, thematiqueId);
   const nextThematiqueId = useNextThematiqueId(collectivite_id, thematiqueId);
   const identite = useCarteIdentite(collectivite_id);
-  const [handleChange, renderToast] = useChangeReponseHandler(
+  const [handleChange] = useChangeReponseHandler(
     collectivite_id || null,
     refetch
   );
@@ -41,8 +41,9 @@ export default () => {
           }
           onChange={handleChange}
         />
-        {renderToast()}
       </main>
     </>
   );
 };
+
+export default PersoReferentielThematique;

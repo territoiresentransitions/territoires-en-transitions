@@ -30,6 +30,8 @@ import {
   useReferentielId,
 } from 'core-logic/hooks/params';
 import HistoriqueListe from 'app/pages/collectivite/Historique/HistoriqueListe';
+import ScrollTopButton from 'ui/shared/ScrollTopButton';
+import ActionNav from './ActionNav';
 
 const useActionLinkedIndicateurDefinitions = (actionId: string) => {
   const [linkedIndicateurDefinitions, setLinkedIndicateurDefinitions] =
@@ -65,6 +67,15 @@ const TABS_INDEX: Record<ActionVueParamOption, number> = {
   historique: 2,
 };
 
+const useIsFullyRenseigne = (action: ActionDefinitionSummary): boolean => {
+  const actionScore = useActionScore(action.id);
+  return (
+    !!actionScore &&
+    (actionScore.completed_taches_count === actionScore.total_taches_count ||
+      actionScore.desactive)
+  );
+};
+
 const Action = ({action}: {action: ActionDefinitionSummary}) => {
   const [showOnlyActionWithData, setShowOnlyActionWithData] = useState(false);
   const children = useActionSummaryChildren(action);
@@ -73,20 +84,12 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
   const collectiviteId = useCollectiviteId();
   const referentielId = useReferentielId() as ReferentielParamOption;
 
-  const isFullyRenseigne = (action: ActionDefinitionSummary): boolean => {
-    const actionScore = useActionScore(action.id);
-    return (
-      !!actionScore &&
-      (actionScore.completed_taches_count === actionScore.total_taches_count ||
-        actionScore.desactive)
-    );
-  };
+  const actionLinkedIndicateurDefinitions =
+    useActionLinkedIndicateurDefinitions(action?.id);
 
   if (!action) {
     return <Link to="./referentiels" />;
   }
-  const actionLinkedIndicateurDefinitions =
-    useActionLinkedIndicateurDefinitions(action.id);
 
   const activeTab = actionVue ? TABS_INDEX[actionVue] : TABS_INDEX['suivi'];
 
@@ -162,19 +165,13 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
                 }}
               />
             </div>
-            {children.map(action => {
-              if (showOnlyActionWithData && isFullyRenseigne(action)) {
-                return null;
-              }
-              return (
-                <ActionReferentielAvancementRecursiveCard
-                  action={action}
-                  key={action.id}
-                  displayAddFicheActionButton={true}
-                  displayProgressStat={true}
-                />
-              );
-            })}
+            {children.map(action => (
+              <ActionAvancement
+                action={action}
+                key={action.id}
+                showOnlyActionWithData={showOnlyActionWithData}
+              />
+            ))}
           </section>
         </Tab>
         <Tab label="Indicateurs">
@@ -195,8 +192,34 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
           <HistoriqueListe actionId={action.id} />
         </Tab>
       </Tabs>
+      <ActionNav actionId={action.id} />
+      <div className="mt-8">
+        <ScrollTopButton />
+      </div>
     </div>
   );
 };
 
 export default Action;
+
+const ActionAvancement = ({
+  action,
+  showOnlyActionWithData,
+}: {
+  action: ActionDefinitionSummary;
+  showOnlyActionWithData: boolean;
+}) => {
+  const isFullyRenseigne = useIsFullyRenseigne(action);
+
+  if (showOnlyActionWithData && isFullyRenseigne) {
+    return null;
+  }
+
+  return (
+    <ActionReferentielAvancementRecursiveCard
+      action={action}
+      displayAddFicheActionButton={true}
+      displayProgressStat={true}
+    />
+  );
+};

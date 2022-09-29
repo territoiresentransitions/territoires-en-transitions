@@ -63,6 +63,10 @@ const Modal = ({
   const mobileClassnames = 'absolute inset-x-0 bottom-0 mt-8 max-h-full';
   const aboveMobileClassnames = 'sm:relative sm:m-0 max-h-80vh';
 
+  const handleCloseClick = () => {
+    setExternalOpen ? setExternalOpen(false) : setOpen(false);
+  };
+
   return (
     <>
       {children &&
@@ -89,9 +93,9 @@ const Modal = ({
                   className: classNames(
                     `${mobileClassnames} ${aboveMobileClassnames} flex flex-col w-full p-4 md:px-8 bg-white overflow-y-auto`,
                     {
-                      ['max-w-sm']: size === 'sm',
-                      ['max-w-xl']: size === 'md',
-                      ['max-w-3xl']: size === 'lg',
+                      'max-w-sm': size === 'sm',
+                      'max-w-xl': size === 'md',
+                      'max-w-3xl': size === 'lg',
                     }
                   ),
                   'aria-labelledby': labelId,
@@ -99,9 +103,7 @@ const Modal = ({
                 })}
               >
                 <button
-                  onClick={() =>
-                    setExternalOpen ? setExternalOpen(false) : setOpen(false)
-                  }
+                  onClick={handleCloseClick}
                   className="flex items-center ml-auto mb-2 px-2 py-2 md:-mr-4 fr-btn--secondary !shadow-none"
                 >
                   <span className="-mt-1">Fermer</span>

@@ -1,0 +1,114 @@
+import * as Yup from 'yup';
+import {Field, Form, Formik, FormikHandlers} from 'formik';
+
+import {Spacer} from 'ui/shared/Spacer';
+import LabeledTextField from 'ui/forms/LabeledTextField';
+
+import {useAuth, UserData} from 'core-logic/api/auth/AuthProvider';
+import {useUpdateDCP} from 'core-logic/api/auth/useUpdateDCP';
+import {useState} from 'react';
+import ModifierEmailModal from './ModifierEmailModal';
+
+interface ModifierCompteData {
+  prenom: string;
+  nom: string;
+  email: string;
+}
+
+const validation = Yup.object({
+  prenom: Yup.string().required('Champ requis'),
+  nom: Yup.string().required('Champ requis'),
+  email: Yup.string()
+    .email("Cette adresse email n'est pas valide")
+    .required('Champ requis'),
+});
+
+export const MonCompte = ({user}: {user: UserData}) => {
+  const {handleUpdateDCP} = useUpdateDCP(user.id);
+
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+
+  return (
+    <div data-test="MonCompte">
+      <h1 className="!mb-8 md:!mb-14">Mon compte</h1>
+      <div
+        data-test="modification-compte-formulaire"
+        className="p-4 md:p-14 lg:px-24 bg-gray-100"
+      >
+        <p className="text-sm">Information requises</p>
+        <Formik<ModifierCompteData>
+          initialValues={{
+            prenom: user.prenom!,
+            nom: user.nom!,
+            email: user.email!,
+          }}
+          validationSchema={validation}
+          onSubmit={() => undefined}
+        >
+          {({values, isValid, handleBlur, resetForm}) => (
+            <Form>
+              <Field
+                data-test="prenom"
+                id="prenom"
+                name="prenom"
+                label="Prénom"
+                type="text"
+                component={LabeledTextField}
+                onBlur={(evt: FormikHandlers['handleBlur']) => {
+                  handleBlur(evt);
+                  isValid &&
+                    user.prenom !== values.prenom &&
+                    handleUpdateDCP({prenom: values.prenom});
+                }}
+              />
+              <Spacer size={3} />
+              <Field
+                data-test="nom"
+                id="nom"
+                name="nom"
+                label="Nom"
+                type="text"
+                component={LabeledTextField}
+                onBlur={(evt: FormikHandlers['handleBlur']) => {
+                  handleBlur(evt);
+                  isValid &&
+                    user.nom !== values.nom &&
+                    handleUpdateDCP({nom: values.nom});
+                }}
+              />
+              <Spacer size={3} />
+              <Field
+                data-test="email"
+                id="email"
+                name="email"
+                label="Email"
+                type="text"
+                component={LabeledTextField}
+                onBlur={(evt: FormikHandlers['handleBlur']) => {
+                  handleBlur(evt);
+                  isValid &&
+                    user.email !== values.email &&
+                    setIsEmailModalOpen(true);
+                }}
+              />
+              <ModifierEmailModal
+                isOpen={isEmailModalOpen}
+                setOpen={setIsEmailModalOpen}
+                resetEmail={() =>
+                  resetForm({values: {...values, email: user.email!}})
+                }
+                email={values.email}
+              />
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </div>
+  );
+};
+
+export default () => {
+  const {user} = useAuth();
+
+  return user && <MonCompte user={user} />;
+};

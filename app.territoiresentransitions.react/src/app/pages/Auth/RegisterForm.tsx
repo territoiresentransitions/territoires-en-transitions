@@ -119,7 +119,7 @@ const RegistrationForm = () => {
         Le compte n'a pas pu être créé. Un compte existe peut-être déjà avec la
         même adresse email, essayez de vous connecter et/ou de renouveler votre
         mot de passe. Si le problème persiste,&nbsp;
-        <a href="mailto:contact@territoiresentransitions.fr" target="_blank">
+        <a href="mailto:contact@territoiresentransitions.fr" target="_blank" rel="noreferrer">
           contactez-nous
         </a>
         .
@@ -135,7 +135,7 @@ const RegistrationForm = () => {
         <p>Votre compte a bien été créé ! </p>
         <Spacer />
         <div>
-          <Link to={signInPath} className="fr-btn">
+          <Link to={signInPath} className="fr-btn" data-test="SeConnecter">
             Se connecter
           </Link>
         </div>

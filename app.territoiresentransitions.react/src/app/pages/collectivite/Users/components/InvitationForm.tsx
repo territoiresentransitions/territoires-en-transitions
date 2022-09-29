@@ -206,8 +206,8 @@ const SelectField = (props: SelectFieldProps) => (
 
       return (
         <div
-          className={classNames('fr-select-group md:flex-grow', {
-            ['fr-select-group--error']: isError,
+          className={classNames('fr-select-group md:grow', {
+            'fr-select-group--error': isError,
           })}
         >
           <label className="fr-label" htmlFor={props.label}>
@@ -215,7 +215,7 @@ const SelectField = (props: SelectFieldProps) => (
           </label>
           <select
             className={classNames('fr-select', {
-              ['fr-select--error']: isError,
+              'fr-select--error': isError,
             })}
             id={props.label}
             {...field}
@@ -250,8 +250,8 @@ const InvitationEmailInput = (
 
   return (
     <div
-      className={classNames('fr-input-group md:flex-grow', {
-        ['fr-input-group--error']: isError,
+      className={classNames('fr-input-group md:grow', {
+        'fr-input-group--error': isError,
       })}
     >
       <label htmlFor={props.field.name} className="fr-label">
@@ -260,7 +260,7 @@ const InvitationEmailInput = (
       <input
         id={props.field.name}
         type={inputType}
-        className={classNames('fr-input', {['fr-input--error']: isError})}
+        className={classNames('fr-input', {'fr-input--error': isError})}
         {...props.field}
       />
       {isError && <p className="fr-error-text">{errorMessage}</p>}
