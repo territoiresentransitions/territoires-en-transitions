@@ -52,6 +52,7 @@ export const ActionReferentielAvancementCard = ({
 }) => {
   const isLeaf = action.children.length === 0;
   const myRef = useScrollIntoView(action.id);
+  const isSubAction = action.type === 'sous-action';
 
   return (
     <div className="pt-8 flex flex-row justify-between" ref={myRef}>
@@ -61,7 +62,7 @@ export const ActionReferentielAvancementCard = ({
         <ActionReferentielDescription action={action} />
         {action.have_questions && <PersoPotentiel actionDef={action} />}
         {action.have_exemples && <ActionExemplesExpandPanel action={action} />}
-        {action.have_preuve && <ActionPreuvesExpandPanel action={action} />}
+        {isSubAction && <ActionPreuvesExpandPanel action={action} />}
         <ActionCommentaire action={action} />
       </div>
       <div className="w-2/8 pl-4">

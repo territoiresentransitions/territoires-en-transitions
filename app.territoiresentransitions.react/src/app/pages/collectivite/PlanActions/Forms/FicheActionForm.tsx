@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import * as Yup from 'yup';
 import {Field, Form, Formik, useFormikContext} from 'formik';
-import LabeledTextField from 'ui/forms/LabeledTextField';
 import {ActionsField} from 'app/pages/collectivite/PlanActions/Forms/ActionsField';
 import {IndicateursField} from 'app/pages/collectivite/PlanActions/Forms/IndicateursField';
 import {IndicateursPersonnalisesField} from 'app/pages/collectivite/PlanActions/Forms/IndicateursPersonnalisesField';
@@ -20,6 +19,7 @@ import {useAllIndicateurDefinitions} from 'core-logic/hooks/indicateur_definitio
 import {useCollectiviteId} from 'core-logic/hooks/params';
 import {useActionTitleList} from 'core-logic/hooks/referentiel';
 import {ExpensiveActionReferentielAvancementCard} from 'ui/referentiels/ExpensiveActionReferentielAvancementCard';
+import FormInput from 'ui/shared/form/FormInput';
 
 /**
  * Stores both plan and category uid, represents the user's selection of a
@@ -215,89 +215,50 @@ export const FicheActionForm = (props: FicheActionFormProps) => {
       {() => (
         <Form className="fiche-action">
           <div className="max-w-2xl">
-            <Field
+            <FormInput
               name="numerotation"
               label="Numérotation de l'action"
               hint="ex: 1.2.3, A.1.a, 1.1 permet le classement"
-              component={LabeledTextField}
             />
+            <FormInput name="titre" label="Titre *" hint="Champ requis" />
             <Spacer />
-
-            <Field
-              name="titre"
-              label="Titre *"
-              hint="Champ requis"
-              component={LabeledTextField}
-            />
-            <Spacer />
-
             <Field
               name="planCategories"
               label="plans d'action"
               ficheUid={props.fiche.uid}
               component={PlanCategoriesSelectionField}
             />
-
             <Spacer />
-
-            <Field
-              name="description"
-              label="Description"
-              type="area"
-              component={LabeledTextField}
-            />
+            <FormInput type="area" name="description" label="Description" />
             <Spacer />
-
             <Field
               name="avancement"
               label="Avancement"
               component={AvancementRadioField}
             />
-
             <Spacer />
-
             <label>
               <Field type="checkbox" name="en_retard" />
               <span className="ml-2">Action en retard</span>
             </label>
             <Spacer />
 
-            <Field
-              name="structure_pilote"
-              label="Structure pilote"
-              component={LabeledTextField}
-            />
+            <FormInput name="structure_pilote" label="Structure pilote" />
+            <Spacer />
+            <FormInput name="personne_referente" label="Personne référente" />
+            <Spacer />
+            <FormInput name="elu_referent" label="Élu référent" />
             <Spacer />
 
-            <Field
-              name="personne_referente"
-              label="Personne référente"
-              component={LabeledTextField}
-            />
+            <FormInput name="partenaires" label="Partenaires" />
             <Spacer />
 
-            <Field
-              name="elu_referent"
-              label="Élu référent"
-              component={LabeledTextField}
-            />
-            <Spacer />
-
-            <Field
-              name="partenaires"
-              label="Partenaires"
-              component={LabeledTextField}
-            />
-            <Spacer />
-
-            <Field
+            <FormInput
               name="budget_global"
               label="Budget global"
               hint="Ce champ ne doit comporter que des chiffres sans espaces"
-              component={LabeledTextField}
             />
             <Spacer />
-
             <fieldset className="flex flex-row">
               <div className="flex flex-col mr-5">
                 <label className="fr-label mb-2" htmlFor="fiche_create_debut">

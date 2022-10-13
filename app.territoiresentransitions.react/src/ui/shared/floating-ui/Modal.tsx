@@ -29,12 +29,14 @@ export type ModalProps = {
   setExternalOpen?: Dispatch<SetStateAction<boolean>>;
   /* max-width prédéfinies dans le DSFR, valeur par défaut "md" */
   size?: 'sm' | 'md' | 'lg';
+  /** désactive la fermeture lors du clic sur le fond */
+  disableDismiss?: boolean;
 };
 
 /*
  * Basic modal
  * floating-ui doc: https://floating-ui.com/docs/react-dom-interactions
- * if you provide an externalOpen boolean, don't forget to add the corresponding setState function
+ * If you provide externalOpen you must add the corresponding setState function.
  */
 const Modal = ({
   render,
@@ -42,6 +44,7 @@ const Modal = ({
   externalOpen,
   setExternalOpen,
   size = 'md',
+  disableDismiss,
 }: ModalProps) => {
   const [open, setOpen] = useState(false);
 
@@ -57,11 +60,11 @@ const Modal = ({
   const {getReferenceProps, getFloatingProps} = useInteractions([
     useClick(context),
     useRole(context),
-    useDismiss(context),
+    useDismiss(context, {enabled: !disableDismiss}),
   ]);
 
   const mobileClassnames = 'absolute inset-x-0 bottom-0 mt-8 max-h-full';
-  const aboveMobileClassnames = 'sm:relative sm:m-0 max-h-80vh';
+  const aboveMobileClassnames = 'sm:relative sm:m-0 max-h-90vh';
 
   const handleCloseClick = () => {
     setExternalOpen ? setExternalOpen(false) : setOpen(false);
@@ -95,7 +98,7 @@ const Modal = ({
                     {
                       'max-w-sm': size === 'sm',
                       'max-w-xl': size === 'md',
-                      'max-w-3xl': size === 'lg',
+                      'max-w-4xl': size === 'lg',
                     }
                   ),
                   'aria-labelledby': labelId,

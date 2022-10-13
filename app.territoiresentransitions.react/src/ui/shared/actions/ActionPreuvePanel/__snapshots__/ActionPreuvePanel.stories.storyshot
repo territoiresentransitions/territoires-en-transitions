@@ -1,36 +1,44 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Storyshots ui/shared/actions/ActionPreuvePanel Default 1`] = `
-Array [
+<div
+  data-test="preuves-eci_1.1.1"
+>
   <p
-    className="text-sm text-grey425"
+    className="fr-text--sm"
   >
-    Toutes les preuves ajoutées seront visibles par les membres de la communauté Territoires en Transitions.
-  </p>,
-  <div
+    Il n'y a pas de preuve attendue pour cette
+     
+    sous-action
+     du référentiel.
+  </p>
+  <h5>
+    Preuves complémentaires
+  </h5>
+  <button
+    aria-expanded="false"
+    aria-haspopup="dialog"
+    className="fr-btn fr-btn--sm fr-btn--secondary fr-btn--icon-left fr-fi-add-line"
+    data-test="AddPreuveComplementaire"
     onClick={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onPointerDown={[Function]}
   >
-    <button
-      className="fr-btn fr-btn--sm"
-      data-test="AddPreuveButton"
-      onClick={[Function]}
-    >
-      + Ajouter
-    </button>
-  </div>,
-  <hr
-    className="mt-4"
-  />,
-  <h6>
-    Liste des preuves requises pour cette action
-  </h6>,
+    Ajouter une preuve complémentaire
+  </button>
   <div
-    className="content"
-    dangerouslySetInnerHTML={
-      Object {
-        "__html": "...",
-      }
-    }
-  />,
-]
+    className="mt-2 divide-y divide-[#ddd]"
+    data-test="complementaires"
+  />
+  <div
+    className="border-solid border-t-[1px] border-[#FCC63A] my-4"
+  />
+  <p
+    className="text-xs grey625"
+  >
+    Toutes les preuves ajoutées seront visibles par les membres de la communauté Territoires en Transitions
+  </p>
+</div>
 `;

@@ -32,6 +32,9 @@ import {
 import HistoriqueListe from 'app/pages/collectivite/Historique/HistoriqueListe';
 import ScrollTopButton from 'ui/shared/ScrollTopButton';
 import ActionNav from './ActionNav';
+import ActionPreuvePanel from 'ui/shared/actions/ActionPreuvePanel/ActionPreuvePanel';
+import {DownloadDocs} from './DownloadDocs';
+import DOMPurify from 'dompurify';
 
 const useActionLinkedIndicateurDefinitions = (actionId: string) => {
   const [linkedIndicateurDefinitions, setLinkedIndicateurDefinitions] =
@@ -63,8 +66,9 @@ const useActionLinkedIndicateurDefinitions = (actionId: string) => {
 // index des onglets de la page Action
 const TABS_INDEX: Record<ActionVueParamOption, number> = {
   suivi: 0,
-  indicateurs: 1,
-  historique: 2,
+  preuves: 1,
+  indicateurs: 2,
+  historique: 3,
 };
 
 const useIsFullyRenseigne = (action: ActionDefinitionSummary): boolean => {
@@ -142,7 +146,9 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
           <div
             className="htmlContent"
             dangerouslySetInnerHTML={{
-              __html: addTargetToContentAnchors(action.description ?? ''),
+              __html: DOMPurify.sanitize(
+                addTargetToContentAnchors(action.description ?? '')
+              ),
             }}
           />
           <DescriptionContextAndRessourcesDialogButton action={action} />
@@ -172,6 +178,12 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
                 showOnlyActionWithData={showOnlyActionWithData}
               />
             ))}
+          </section>
+        </Tab>
+        <Tab label="Preuves">
+          <section>
+            <ActionPreuvePanel withSubActions showWarning action={action} />
+            <DownloadDocs action={action} />
           </section>
         </Tab>
         <Tab label="Indicateurs">

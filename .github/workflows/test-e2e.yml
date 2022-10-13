@@ -54,6 +54,9 @@ jobs:
       - name: Launch docker
         run: docker-compose up -d
         working-directory: ${{env.project-docker-directory}}
+        env:
+          # pour que les urls téléchargées depuis le serveur node (front) soit ré-écrites
+          ZIP_ORIGIN_OVERRIDE: http://kong:8000
 
       # Wait for the rest container
       - name: Wait for rest
@@ -67,7 +70,8 @@ jobs:
 
       # run tests into electron
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        # utilise la v3 pour être en node 16 et cypress v9
+        uses: cypress-io/github-action@v3
         with:
           working-directory: ${{env.e2e-directory}}
         env:

@@ -1,13 +1,12 @@
+import React, {useState} from 'react';
+import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
-import {Field, Form, Formik, FormikHandlers} from 'formik';
 
-import {Spacer} from 'ui/shared/Spacer';
-import LabeledTextField from 'ui/forms/LabeledTextField';
+import FormInput from 'ui/shared/form/FormInput';
+import ModifierEmailModal from './ModifierEmailModal';
 
 import {useAuth, UserData} from 'core-logic/api/auth/AuthProvider';
 import {useUpdateDCP} from 'core-logic/api/auth/useUpdateDCP';
-import {useState} from 'react';
-import ModifierEmailModal from './ModifierEmailModal';
 
 interface ModifierCompteData {
   prenom: string;
@@ -47,44 +46,33 @@ export const MonCompte = ({user}: {user: UserData}) => {
         >
           {({values, isValid, handleBlur, resetForm}) => (
             <Form>
-              <Field
+              <FormInput
                 data-test="prenom"
-                id="prenom"
                 name="prenom"
                 label="Prénom"
-                type="text"
-                component={LabeledTextField}
-                onBlur={(evt: FormikHandlers['handleBlur']) => {
+                onBlur={(evt: React.FocusEvent) => {
                   handleBlur(evt);
                   isValid &&
                     user.prenom !== values.prenom &&
                     handleUpdateDCP({prenom: values.prenom});
                 }}
               />
-              <Spacer size={3} />
-              <Field
+              <FormInput
                 data-test="nom"
-                id="nom"
                 name="nom"
                 label="Nom"
-                type="text"
-                component={LabeledTextField}
-                onBlur={(evt: FormikHandlers['handleBlur']) => {
+                onBlur={(evt: React.FocusEvent) => {
                   handleBlur(evt);
                   isValid &&
                     user.nom !== values.nom &&
                     handleUpdateDCP({nom: values.nom});
                 }}
               />
-              <Spacer size={3} />
-              <Field
+              <FormInput
                 data-test="email"
-                id="email"
                 name="email"
                 label="Email"
-                type="text"
-                component={LabeledTextField}
-                onBlur={(evt: FormikHandlers['handleBlur']) => {
+                onBlur={(evt: React.FocusEvent) => {
                   handleBlur(evt);
                   isValid &&
                     user.email !== values.email &&
@@ -107,8 +95,10 @@ export const MonCompte = ({user}: {user: UserData}) => {
   );
 };
 
-export default () => {
+const MonCompteConnected = () => {
   const {user} = useAuth();
 
   return user && <MonCompte user={user} />;
 };
+
+export default MonCompteConnected;

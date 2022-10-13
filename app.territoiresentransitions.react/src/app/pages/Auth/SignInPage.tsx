@@ -1,6 +1,5 @@
-import {Field, Form, Formik} from 'formik';
+import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
-import LabeledTextField from 'ui/forms/LabeledTextField';
 import {ValiderButton} from 'ui/shared/ValiderButton';
 import {Spacer} from 'ui/shared/Spacer';
 import {Link} from 'react-router-dom';
@@ -8,6 +7,7 @@ import {signUpPath} from 'app/paths';
 import {ErrorMessage} from 'ui/forms/ErrorMessage';
 import {PasswordRecovery} from './PasswordRecovery';
 import {useAuth} from 'core-logic/api/auth/AuthProvider';
+import FormInput from 'ui/shared/form/FormInput';
 
 export interface SignInCredentials {
   email: string;
@@ -39,22 +39,10 @@ export const SignInPage = () => {
         >
           {({values}) => (
             <Form>
-              <Field
-                name="email"
-                label="Email"
-                type="text"
-                component={LabeledTextField}
-              />
-              <Spacer size={2} />
-              <Field
-                name="password"
-                label="Mot de passe"
-                type="password"
-                component={LabeledTextField}
-              />
-              <Spacer size={2} />
+              <FormInput name="email" label="Email" />
+              <FormInput type="password" name="password" label="Mot de passe" />
               <PasswordRecovery email={values.email} />
-              <Spacer size={4} />
+              <Spacer size={3} />
               <AuthError message={authError} />
               <div className="flex flex-row-reverse justify-between">
                 <ValiderButton />
