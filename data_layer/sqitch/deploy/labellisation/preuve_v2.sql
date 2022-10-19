@@ -204,7 +204,7 @@ select 'labellisation',
                    )),
        null
 from labellisation.demande d
-         left join preuve_labellisation p on p.demande_id = d.id
+         join preuve_labellisation p on p.demande_id = d.id
          left join labellisation.bibliotheque_fichier_snippet fs on fs.id = p.fichier_id
 
 union all
@@ -248,5 +248,10 @@ from ref r
          left join preuve_labellisation pd on ld.id = pd.demande_id
 group by r.referentiel;
 $$ language sql;
+
+-- Archive les contenus des utilisateurs
+alter table labellisation_preuve_fichier set schema archive;
+alter table  preuve_lien set schema archive;
+alter table  preuve_fichier set schema archive;
 
 COMMIT;

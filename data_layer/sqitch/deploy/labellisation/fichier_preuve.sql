@@ -19,11 +19,6 @@ drop view action_labellisation_preuve_fichier;
 drop trigger remove_labellisation_preuve_fichier_before_file_delete on storage.objects;
 drop function remove_labellisation_preuve_fichier;
 
--- todo : enlever le contenu une fois la migration résolue.
---- drop table labellisation_preuve_fichier; -- labellisation
---- drop table preuve_lien;                  -- referentiel
---- drop table preuve_fichier;               -- referentiel
-
 
 create table labellisation.bibliotheque_fichier
 (
