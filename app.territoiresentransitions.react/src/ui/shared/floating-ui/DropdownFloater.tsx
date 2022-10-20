@@ -16,12 +16,14 @@ type DropdownFloaterProps = {
   children: JSX.Element;
   render: (data: {close: () => void}) => React.ReactNode;
   placement?: Placement;
+  'data-test'?: string;
 };
 
 const DropdownFloater = ({
   render,
   children,
   placement,
+  'data-test': dataTest,
 }: DropdownFloaterProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -58,7 +60,8 @@ const DropdownFloater = ({
         <FloatingPortal>
           <FloatingFocusManager context={context}>
             <div
-              className="w-max bg-white shadow-md z-40"
+              data-test={dataTest}
+              className="w-max bg-white shadow-md z-50"
               {...getFloatingProps({
                 ref: floating,
                 style: {

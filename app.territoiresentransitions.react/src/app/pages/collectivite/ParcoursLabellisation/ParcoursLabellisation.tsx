@@ -2,7 +2,7 @@ import {Link} from 'react-router-dom';
 import {useCollectiviteId, useReferentielId} from 'core-logic/hooks/params';
 import {referentielToName} from 'app/labels';
 import {CriteresLabellisation} from './CriteresLabellisation';
-import {usePreuves} from './usePreuves';
+import {usePreuves} from 'ui/shared/preuves/Bibliotheque/usePreuves';
 import {useParcoursLabellisation} from './useParcoursLabellisation';
 import {Header} from './Header';
 import {ReferentielOfIndicateur} from 'types/litterals';
@@ -10,12 +10,15 @@ import {
   makeCollectiviteReferentielUrl,
   ReferentielParamOption,
 } from 'app/paths';
+import {TPreuveLabellisation} from 'ui/shared/preuves/Bibliotheque/types';
 
-export default () => {
+const ParcoursLabellisation = () => {
   const collectiviteId = useCollectiviteId();
   const referentiel = useReferentielId();
   const {parcours, demande} = useParcoursLabellisation(referentiel);
-  const preuves = usePreuves(demande?.id);
+  const preuves = usePreuves({
+    demande_id: demande?.id,
+  }) as TPreuveLabellisation[];
 
   // cas particulier : le référentiel n'est pas du tout renseigné
   if (!parcours) {
@@ -64,7 +67,10 @@ export default () => {
         Référentiel {referentielToName[parcours.referentiel]}
       </p>
       <Header parcours={parcours} demande={demande} preuves={preuves} />
-      <main className="fr-container mt-9 mb-16">
+      <main
+        className="fr-container mt-9 mb-16"
+        data-test={`labellisation-${parcours.referentiel}`}
+      >
         <CriteresLabellisation
           collectiviteId={collectiviteId}
           parcours={parcours}
@@ -83,3 +89,5 @@ export default () => {
     <div>...</div>
   );
 };
+
+export default ParcoursLabellisation;

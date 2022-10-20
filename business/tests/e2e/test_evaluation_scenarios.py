@@ -17,13 +17,13 @@ from business.evaluation.domain.use_cases.compute_referentiel_scores_for_collect
     ComputeReferentielScoresForCollectivite,
 )
 from business.personnalisation.models import ActionPersonnalisationConsequence, Reponse
-from business.referentiel.adapters.supabase_referentiel_repo import (
+from business.evaluation.adapters.supabase_referentiel_repo import (
     SupabaseReferentielRepository,
 )
 from business.personnalisation.ports.personnalisation_repo import (
     InMemoryPersonnalisationRepository,
 )
-from business.utils.action_id import ActionId
+from business.utils.models.actions import ActionId
 from business.utils.config import Config
 from business.utils.domain_message_bus import InMemoryDomainMessageBus
 from business.utils.environment_variables import EnvironmentVariables
@@ -371,3 +371,21 @@ def test_cae_335_with_score_taken_into_account():
     assert math.isclose(cae_scores_by_id["cae_1.2.3"].point_fait, 2.25)
     assert math.isclose(cae_scores_by_id["cae_3.3.5"].point_potentiel, 2)
     assert math.isclose(cae_scores_by_id["cae_3.3.5"].point_fait, 0)
+
+    # Cas 4 :  Si EPCI et non concernée à la 3.3.5, la règle n'a pas de conséquence
+    # -----------------------------------------------------------------------------
+    taches_cae_335 = (
+        [ActionId(f"cae_3.3.5.1.{k}") for k in range(1, 7)]
+        + [ActionId(f"cae_3.3.5.2.{k}") for k in range(1, 10)]
+        + [ActionId(f"cae_3.3.5.3.{k}") for k in range(1, 5)]
+    )
+    _, cae_scores_by_id = execute_scenario_collectivite_updates_reponse(
+        epci_id,
+        [Reponse("dechets_2", "NON"), Reponse("dechets_4", 0.1)],
+        [
+            ActionStatut(tache_id, DetailedAvancement(0, 0, 0), False)
+            for tache_id in taches_cae_335
+        ],
+    )
+    assert cae_scores_by_id["cae_3.3.5"].concerne is False
+    assert cae_scores_by_id["cae_3.3.5"].point_potentiel == 0

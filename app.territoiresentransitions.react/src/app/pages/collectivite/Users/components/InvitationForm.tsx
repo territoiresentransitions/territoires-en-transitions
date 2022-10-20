@@ -1,15 +1,6 @@
 import {useMemo, useRef, useState} from 'react';
-import {
-  Field,
-  FieldAttributes,
-  FieldInputProps,
-  FieldProps,
-  Form,
-  Formik,
-  FormikProps,
-} from 'formik';
+import {Form, Formik, FormikProps} from 'formik';
 import * as Yup from 'yup';
-import classNames from 'classnames';
 import {UserData} from 'core-logic/api/auth/AuthProvider';
 import {CurrentCollectivite} from 'core-logic/hooks/useCurrentCollectivite';
 import InvitationMessage from 'app/pages/collectivite/Users/components/InvitationMessage';
@@ -18,6 +9,8 @@ import {
   AddUserToCollectiviteRequest,
   AddUserToCollectiviteResponse,
 } from 'app/pages/collectivite/Users/useAddUserToCollectivite';
+import FormInput from 'ui/shared/form/FormInput';
+import FormSelect from 'ui/shared/form/FormSelect';
 
 type AccesOption = {
   value: NiveauAcces;
@@ -110,8 +103,11 @@ const InvitationForm = ({
             resetAddUser();
           }}
         >
-          <Field name="email" type="text" component={InvitationEmailInput} />
-          <SelectField
+          <FormInput
+            name="email"
+            label="Adresse email de la personne à inviter"
+          />
+          <FormSelect
             name="acces"
             label="Niveau d’accès pour cette collectivité"
             options={accesOptions}
@@ -181,89 +177,3 @@ const AddUserResponse = ({
 };
 
 export default InvitationForm;
-
-type SelectFieldProps = FieldAttributes<{
-  label: string;
-  options: AccesOption[];
-}>;
-
-const SelectField = (props: SelectFieldProps) => (
-  <Field {...props}>
-    {({
-      field,
-      form,
-    }: {
-      field: FieldInputProps<string>;
-      form: FormikProps<FormProps>;
-    }) => {
-      const errorMessage = (form.errors as Record<string, string | undefined>)[
-        field.name
-      ];
-      const isTouched = (form.touched as Record<string, boolean | undefined>)[
-        field.name
-      ];
-      const isError = errorMessage && isTouched;
-
-      return (
-        <div
-          className={classNames('fr-select-group md:flex-grow', {
-            ['fr-select-group--error']: isError,
-          })}
-        >
-          <label className="fr-label" htmlFor={props.label}>
-            {props.label}
-          </label>
-          <select
-            className={classNames('fr-select', {
-              ['fr-select--error']: isError,
-            })}
-            id={props.label}
-            {...field}
-          >
-            <option value="" disabled hidden>
-              Sélectionnez une option
-            </option>
-            {props.options.map((option: AccesOption) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          {isError && <p className="fr-error-text">{errorMessage}</p>}
-        </div>
-      );
-    }}
-  </Field>
-);
-
-type InvitationEmailInputProps = {
-  type?: string;
-};
-
-const InvitationEmailInput = (
-  props: InvitationEmailInputProps & FieldProps
-) => {
-  const errorMessage = props.form.errors[props.field.name];
-  const isTouched = props.form.touched[props.field.name];
-  const isError = errorMessage && isTouched;
-  const inputType = props.type ?? 'text';
-
-  return (
-    <div
-      className={classNames('fr-input-group md:flex-grow', {
-        ['fr-input-group--error']: isError,
-      })}
-    >
-      <label htmlFor={props.field.name} className="fr-label">
-        Adresse email de la personne à inviter
-      </label>
-      <input
-        id={props.field.name}
-        type={inputType}
-        className={classNames('fr-input', {['fr-input--error']: isError})}
-        {...props.field}
-      />
-      {isError && <p className="fr-error-text">{errorMessage}</p>}
-    </div>
-  );
-};

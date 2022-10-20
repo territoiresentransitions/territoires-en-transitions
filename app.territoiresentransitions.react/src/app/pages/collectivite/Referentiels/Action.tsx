@@ -30,6 +30,11 @@ import {
   useReferentielId,
 } from 'core-logic/hooks/params';
 import HistoriqueListe from 'app/pages/collectivite/Historique/HistoriqueListe';
+import ScrollTopButton from 'ui/shared/ScrollTopButton';
+import ActionNav from './ActionNav';
+import ActionPreuvePanel from 'ui/shared/actions/ActionPreuvePanel/ActionPreuvePanel';
+import {DownloadDocs} from './DownloadDocs';
+import DOMPurify from 'dompurify';
 
 const useActionLinkedIndicateurDefinitions = (actionId: string) => {
   const [linkedIndicateurDefinitions, setLinkedIndicateurDefinitions] =
@@ -61,8 +66,18 @@ const useActionLinkedIndicateurDefinitions = (actionId: string) => {
 // index des onglets de la page Action
 const TABS_INDEX: Record<ActionVueParamOption, number> = {
   suivi: 0,
-  indicateurs: 1,
-  historique: 2,
+  preuves: 1,
+  indicateurs: 2,
+  historique: 3,
+};
+
+const useIsFullyRenseigne = (action: ActionDefinitionSummary): boolean => {
+  const actionScore = useActionScore(action.id);
+  return (
+    !!actionScore &&
+    (actionScore.completed_taches_count === actionScore.total_taches_count ||
+      actionScore.desactive)
+  );
 };
 
 const Action = ({action}: {action: ActionDefinitionSummary}) => {
@@ -73,20 +88,12 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
   const collectiviteId = useCollectiviteId();
   const referentielId = useReferentielId() as ReferentielParamOption;
 
-  const isFullyRenseigne = (action: ActionDefinitionSummary): boolean => {
-    const actionScore = useActionScore(action.id);
-    return (
-      !!actionScore &&
-      (actionScore.completed_taches_count === actionScore.total_taches_count ||
-        actionScore.desactive)
-    );
-  };
+  const actionLinkedIndicateurDefinitions =
+    useActionLinkedIndicateurDefinitions(action?.id);
 
   if (!action) {
     return <Link to="./referentiels" />;
   }
-  const actionLinkedIndicateurDefinitions =
-    useActionLinkedIndicateurDefinitions(action.id);
 
   const activeTab = actionVue ? TABS_INDEX[actionVue] : TABS_INDEX['suivi'];
 
@@ -139,7 +146,9 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
           <div
             className="htmlContent"
             dangerouslySetInnerHTML={{
-              __html: addTargetToContentAnchors(action.description ?? ''),
+              __html: DOMPurify.sanitize(
+                addTargetToContentAnchors(action.description ?? '')
+              ),
             }}
           />
           <DescriptionContextAndRessourcesDialogButton action={action} />
@@ -162,19 +171,19 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
                 }}
               />
             </div>
-            {children.map(action => {
-              if (showOnlyActionWithData && isFullyRenseigne(action)) {
-                return null;
-              }
-              return (
-                <ActionReferentielAvancementRecursiveCard
-                  action={action}
-                  key={action.id}
-                  displayAddFicheActionButton={true}
-                  displayProgressStat={true}
-                />
-              );
-            })}
+            {children.map(action => (
+              <ActionAvancement
+                action={action}
+                key={action.id}
+                showOnlyActionWithData={showOnlyActionWithData}
+              />
+            ))}
+          </section>
+        </Tab>
+        <Tab label="Preuves">
+          <section>
+            <ActionPreuvePanel withSubActions showWarning action={action} />
+            <DownloadDocs action={action} />
           </section>
         </Tab>
         <Tab label="Indicateurs">
@@ -195,8 +204,34 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
           <HistoriqueListe actionId={action.id} />
         </Tab>
       </Tabs>
+      <ActionNav actionId={action.id} />
+      <div className="mt-8">
+        <ScrollTopButton />
+      </div>
     </div>
   );
 };
 
 export default Action;
+
+const ActionAvancement = ({
+  action,
+  showOnlyActionWithData,
+}: {
+  action: ActionDefinitionSummary;
+  showOnlyActionWithData: boolean;
+}) => {
+  const isFullyRenseigne = useIsFullyRenseigne(action);
+
+  if (showOnlyActionWithData && isFullyRenseigne) {
+    return null;
+  }
+
+  return (
+    <ActionReferentielAvancementRecursiveCard
+      action={action}
+      displayAddFicheActionButton={true}
+      displayProgressStat={true}
+    />
+  );
+};

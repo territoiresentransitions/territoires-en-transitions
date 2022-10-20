@@ -6,7 +6,15 @@ export const Views = {
   'Toutes les collectivités': {
     route: '/toutes_collectivites',
     selector: '[data-test=ToutesLesCollectivites]',
-  }
+  },
+  'Mon compte': {
+    route: '/profil/mon-compte',
+    selector: '[data-test=MonCompte]',
+  },
+  'Rejoindre une collectivité': {
+    route: 'profil/rejoindre-une-collectivite',
+    selector: '[data-test=RejoindreUneCollectivite]',
+  },
 };
 
 export const CollectivitePages = {
@@ -17,5 +25,13 @@ export const CollectivitePages = {
   'Tableau de bord': {
     route: 'tableau_bord',
     selector: '[data-test=TableauBord]',
+  },
+  'Bibliothèque de documents': {
+    route: 'bibliotheque',
+    selector: '[data-test=BibliothequeDocs]',
+  },
+  'Labellisation CAE': {
+    route: 'labellisation/cae',
+    selector: '[data-test=labellisation-cae]',
   },
 };

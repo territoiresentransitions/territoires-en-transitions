@@ -9,6 +9,11 @@ export const invitationPath = '/invitation';
 export const invitationIdParam = 'invitationId';
 export const invitationLandingPath = `${invitationPath}/:${invitationIdParam}`;
 
+export const profilPath = '/profil';
+export const monComptePath = `${profilPath}/mon-compte`;
+export const mesCollectivitesPath = `${profilPath}/mes-collectivites`;
+export const rejoindreUneCollectivitePath = `${profilPath}/rejoindre-une-collectivite`;
+
 export const allCollectivitesPath = '/toutes_collectivites';
 
 // Utilisé après le login ou lorsqu'on clique sur le logo en étant connecté.
@@ -31,7 +36,11 @@ export type ReferentielVueParamOption =
   | 'progression'
   | 'priorisation'
   | 'detail';
-export type ActionVueParamOption = 'suivi' | 'indicateurs' | 'historique';
+export type ActionVueParamOption =
+  | 'suivi'
+  | 'preuves'
+  | 'indicateurs'
+  | 'historique';
 
 export const collectivitePath = `/collectivite/:${collectiviteParam}`;
 export const collectiviteIndicateurPath = `${collectivitePath}/indicateurs/:${indicateurViewParam}`;
@@ -45,6 +54,7 @@ export const collectiviteFichePath = `${collectivitePath}/fiche/:${ficheParam}`;
 export const collectiviteUsersPath = `${collectivitePath}/users`;
 export const collectiviteAllCollectivitesPath = `${collectivitePath}/toutes_collectivites`;
 export const collectivitePersoRefPath = `${collectivitePath}/personnalisation`;
+export const collectiviteBibliothequePath = `${collectivitePath}/bibliotheque`;
 export const collectivitePersoRefThematiquePath = `${collectivitePersoRefPath}/:${thematiqueParam}`;
 export const collectiviteJournalPath = `${collectivitePath}/historique`;
 
@@ -194,6 +204,16 @@ export const makeCollectivitePersoRefUrl = ({
   collectiviteId: number;
 }) =>
   collectivitePersoRefPath.replace(
+    `:${collectiviteParam}`,
+    collectiviteId.toString()
+  );
+
+export const makeCollectiviteBibliothequeUrl = ({
+  collectiviteId,
+}: {
+  collectiviteId: number;
+}) =>
+  collectiviteBibliothequePath.replace(
     `:${collectiviteParam}`,
     collectiviteId.toString()
   );

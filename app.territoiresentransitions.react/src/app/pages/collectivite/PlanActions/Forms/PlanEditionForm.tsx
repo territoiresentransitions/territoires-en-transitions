@@ -8,7 +8,7 @@ import {IconButton} from '@material-ui/core';
 import {v4 as uuid} from 'uuid';
 import {planActionWriteEndpoint} from 'core-logic/api/endpoints/PlanActionWriteEndpoint';
 import {PlanActionRead} from 'generated/dataLayer/plan_action_read';
-import {LabeledTextInput} from 'ui/forms/LabeledTextInput';
+import {LabeledTextInput} from 'app/pages/collectivite/PlanActions/Forms/LabeledTextInput';
 
 /**
  * A title that is editable in place, as the title display is replaced with an
@@ -265,6 +265,7 @@ export const PlanEditionForm = (props: {plan: PlanActionRead}) => {
             planActionWriteEndpoint.save(plan);
           }}
           remove={(categorie: Categorie) => {
+            // eslint-disable-next-line no-restricted-globals
             if (confirm(categoryDeletionMessage(categorie))) {
               const plan = props.plan;
               plan.categories = plan.categories.filter(

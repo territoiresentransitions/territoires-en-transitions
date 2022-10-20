@@ -7,8 +7,8 @@ import {
   useState,
 } from 'react';
 import {User, UserCredentials} from '@supabase/supabase-js';
-import {supabaseClient} from '../supabase';
 import {useQuery} from 'react-query';
+import {supabaseClient} from '../supabase';
 
 // typage du contexte exposé par le fournisseur
 export type TAuthContext = {
@@ -19,7 +19,7 @@ export type TAuthContext = {
   isConnected: boolean;
 };
 export type UserData = User & DCP;
-type DCP = {nom?: string; prenom?: string};
+export type DCP = {nom?: string; prenom?: string};
 
 // crée le contexte
 export const AuthContext = createContext<TAuthContext | null>(null);
@@ -37,7 +37,7 @@ export const AuthProvider = ({children}: {children: ReactNode}) => {
   const [authError, setAuthError] = useState<string | null>(null);
 
   // charge les données associées à l'utilisateur courant
-  const dcp = useDCP(user?.id);
+  const {data: dcp} = useDCP(user?.id);
   const userData = useMemo(
     () => (user && dcp ? {...user, ...dcp} : null),
     [user, dcp]
@@ -127,7 +127,7 @@ const clearCrispUserData = () => {
   }
 };
 
-// lecture des dcp
+// lecture des DCP
 const fetchDCP = async (user_id: string) => {
   const {data} = await supabaseClient
     .from('dcp')
@@ -136,9 +136,13 @@ const fetchDCP = async (user_id: string) => {
 
   return data?.length ? data[0] : null;
 };
-const useDCP = (user_id?: string) => {
+
+// hook qui utilise les queries DCP
+export const useDCP = (user_id?: string) => {
+  // fetch
   const {data} = useQuery(['dcp', user_id], () =>
     user_id ? fetchDCP(user_id) : null
   );
-  return data;
+
+  return {data};
 };

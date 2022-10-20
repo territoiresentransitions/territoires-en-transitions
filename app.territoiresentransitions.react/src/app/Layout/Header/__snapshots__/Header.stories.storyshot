@@ -34,7 +34,7 @@ exports[`Storyshots app/Layout/Header Connected 1`] = `
             </div>
           </div>
           <div
-            className="fr-header__ademe flex-shrink-0"
+            className="fr-header__ademe shrink-0"
           >
             <img
               alt="logo ADEME"
@@ -83,6 +83,7 @@ exports[`Storyshots app/Layout/Header Connected 1`] = `
                 className="fr-link"
                 data-test="help"
                 href="https://aide.territoiresentransitions.fr/fr/"
+                rel="noreferrer"
                 target="_blank"
               >
                 <div
@@ -91,45 +92,35 @@ exports[`Storyshots app/Layout/Header Connected 1`] = `
                 Aide
               </a>
               <div
-                className="group relative"
-                data-test="connectedMenu"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onPointerDown={[Function]}
               >
                 <button
                   className="fr-link"
+                  data-test="connectedMenu"
+                  style={
+                    Object {
+                      "maxWidth": "15rem",
+                    }
+                  }
                 >
                   <div
                     className="fr-fi-account-line mr-2"
                   />
-                  Yolo
+                  <span
+                    className="line-clamp-1"
+                  >
+                    Yolo
+                  </span>
                   <div
-                    className="fr-fi-arrow-down-s-line ml-2 scale-90 group-focus-within:rotate-180"
+                    className="fr-fi-arrow-down-s-line ml-2 scale-90"
                   />
                 </button>
-                <nav
-                  className="bg-white invisible absolute inset-x-0 top-full transition-all opacity-0 drop-shadow-md group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-1 z-50"
-                >
-                  <ul>
-                    <li
-                      className="fr-nav__item border-b border-gray-200"
-                    />
-                    <li
-                      className="fr-nav__item"
-                    >
-                      <a
-                        className="fr-nav__link"
-                        data-test="logoutBtn"
-                        href="/auth/signup"
-                        onClick={[Function]}
-                      >
-                        <span
-                          className="px-3"
-                        >
-                          Déconnexion
-                        </span>
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
               </div>
             </ul>
           </div>
@@ -237,6 +228,7 @@ exports[`Storyshots app/Layout/Header Connected 1`] = `
         </div>
         <div
           className="flex ml-auto pl-2 w-full max-w-sm"
+          data-test="CollectiviteSwitchDropdown"
           onBlur={[Function]}
           onClick={[Function]}
           onFocus={[Function]}
@@ -307,7 +299,7 @@ exports[`Storyshots app/Layout/Header Not Connected 1`] = `
             </div>
           </div>
           <div
-            className="fr-header__ademe flex-shrink-0"
+            className="fr-header__ademe shrink-0"
           >
             <img
               alt="logo ADEME"
@@ -349,6 +341,7 @@ exports[`Storyshots app/Layout/Header Not Connected 1`] = `
                 className="fr-link"
                 data-test="help"
                 href="https://aide.territoiresentransitions.fr/fr/"
+                rel="noreferrer"
                 target="_blank"
               >
                 <div

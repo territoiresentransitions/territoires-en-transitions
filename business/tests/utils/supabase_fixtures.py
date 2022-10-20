@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import pytest
 from business.evaluation.adapters import supabase_names
-from business.referentiel.adapters.supabase_referentiel_repo import (
+from business.evaluation.adapters.supabase_referentiel_repo import (
     SupabaseReferentielRepository,
 )
 
@@ -56,6 +56,9 @@ def reset_supabase_client(supabase_client: SupabaseClient):
     )
     supabase_client.db.delete_by(
         supabase_names.tables.action_relation, {"parent": "like.test%"}
+    )
+    supabase_client.db.delete_by(
+        supabase_names.tables.preuve_definition, {"id": "like.test%"}
     )
 
 

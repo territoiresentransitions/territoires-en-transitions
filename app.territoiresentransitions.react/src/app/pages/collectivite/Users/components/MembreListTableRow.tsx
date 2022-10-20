@@ -4,7 +4,6 @@ import {pick} from 'ramda';
 import {MultiSelectDropdown, SelectDropdown} from 'ui/shared/SelectDropdown';
 import {
   Membre,
-  TMembreFonction,
   TNiveauAcces,
   TRemoveFromCollectivite,
   TUpdateMembre,
@@ -12,6 +11,7 @@ import {
 import {Referentiel} from 'types/litterals';
 import {referentielToName} from 'app/labels';
 import UpdateMemberAccesModal from 'app/pages/collectivite/Users/components/UpdateMembreAccesModal';
+import {MembreFonction} from 'generated/dataLayer/membres';
 
 export type TMembreListTableRowProps = {
   currentUserId: string;
@@ -21,7 +21,7 @@ export type TMembreListTableRowProps = {
   removeFromCollectivite: TRemoveFromCollectivite;
 };
 
-const membreFonctionLabels: Record<TMembreFonction, string> = {
+const membreFonctionLabels: Record<MembreFonction, string> = {
   referent: 'Référent·e',
   technique: 'Équipe technique',
   politique: 'Équipe politique',
@@ -172,7 +172,7 @@ const MembreListTableRow = ({
           ))
         )}
       </td>
-      <td className={cellClassNames}>
+      <td className={`w-96 ${cellClassNames}`}>
         {canUpdate ? (
           <div className="py-1 px-2 border border-gray-300">
             <DetailsFonctionTextarea
@@ -187,7 +187,7 @@ const MembreListTableRow = ({
             />
           </div>
         ) : (
-          <span title={details_fonction} className="w-72 line-clamp-3">
+          <span title={details_fonction} className="line-clamp-3">
             {details_fonction}
           </span>
         )}
@@ -235,9 +235,9 @@ const DetailsFonctionTextarea = ({
     <textarea
       data-test="details_fonction-textarea"
       value={value}
-      className=" w-60 resize-none"
+      className="w-full cursor-text resize-none"
       onChange={e => setValue(e.target.value)}
-      onMouseOut={() => save(value)}
+      onBlur={() => details_fonction !== value && save(value)}
     />
   );
 };
@@ -246,8 +246,8 @@ const FonctionDropdown = ({
   value,
   onChange,
 }: {
-  value?: TMembreFonction;
-  onChange: (value: TMembreFonction) => void;
+  value?: MembreFonction;
+  onChange: (value: MembreFonction) => void;
 }) => (
   <div data-test="fonction-dropdown">
     <SelectDropdown

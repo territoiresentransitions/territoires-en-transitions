@@ -25,6 +25,7 @@ export const Pagination = (props: TPaginationProps) => {
   const setSelectedPageAndScrollToTop = (page: number) => {
     setSelectedPage(page);
     window.scrollTo(0, 0);
+    props.onChange(page);
   };
 
   const range = (start: number, end: number) =>
@@ -72,8 +73,14 @@ export const Pagination = (props: TPaginationProps) => {
 
   useEffect(() => {
     setPageRangesToDisplay();
-    props.onChange(selectedPage);
   }, [selectedPage, props.nbOfPages]);
+
+  useEffect(() => {
+    if (selectedPage !== props.selectedPage) {
+      setPageRangesToDisplay();
+      setSelectedPage(props.selectedPage);
+    }
+  }, [props.selectedPage, selectedPage]);
 
   return (
     <nav role="navigation" className="fr-pagination" aria-label="Pagination">
@@ -146,23 +153,27 @@ export const PageSelector = (props: {
   isSelected: boolean;
   onClick: () => void;
 }) => {
-  if (props.isSelected)
+  const {number, isSelected, onClick} = props;
+  if (isSelected)
     return (
       <button
         className="fr-pagination__link"
         aria-current="page"
-        title={`Page ${props}`}
+        title={`Page ${number}`}
       >
-        {props.number}
+        {number}
       </button>
     );
   return (
     <button
       className="fr-pagination__link"
-      title={`Page ${props}`}
-      onClick={props.onClick}
+      title={`Page ${number}`}
+      onClick={e => {
+        e.preventDefault();
+        onClick();
+      }}
     >
-      {props.number}
+      {number}
     </button>
   );
 };

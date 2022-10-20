@@ -15,6 +15,8 @@ class tables:
     personnalisation = "personnalisation"
     personnalisation_regle = "personnalisation_regle"
     personnalisation_consequence = "personnalisation_consequence"
+    preuve_definition = "preuve_reglementaire_definition"
+    preuve_action = "preuve_reglementaire_action"
 
 
 @dataclass

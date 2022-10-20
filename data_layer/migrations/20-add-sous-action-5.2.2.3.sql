@@ -37,6 +37,14 @@ select private.move_action_data('cae_5.2.2.3.2', 'cae_5.2.2.4.2');
 select private.move_action_data('cae_5.2.2.3.3', 'cae_5.2.2.4.3');
 
 
+-- Move preuve fichiers 
+update preuve_fichier set action_id = 'cae_5.2.2.9' where action_id = 'cae_5.2.2.8';
+update preuve_fichier set action_id = 'cae_5.2.2.8' where action_id = 'cae_5.2.2.7';
+update preuve_fichier set action_id = 'cae_5.2.2.7' where action_id = 'cae_5.2.2.6';
+update preuve_fichier set action_id = 'cae_5.2.2.6' where action_id = 'cae_5.2.2.5';
+update preuve_fichier set action_id = 'cae_5.2.2.5' where action_id = 'cae_5.2.2.4';
+update preuve_fichier set action_id = 'cae_5.2.2.4' where action_id = 'cae_5.2.2.3';
+
 -- Remove definitions
 delete from action_definition where action_id in ('cae_5.2.2.5.3', 'cae_5.2.2.3.1', 'cae_5.2.2.3.2',  'cae_5.2.2.6.4', 'cae_5.2.2.6.5', 'cae_5.2.2.6.6', 'cae_5.2.2.6.7', 'cae_5.2.2.3.3', 'cae_5.2.2.8.1', 'cae_5.2.2.8.2'); 
 delete from action_computed_points where action_id in ('cae_5.2.2.5.3', 'cae_5.2.2.3.1', 'cae_5.2.2.3.2', 'cae_5.2.2.6.4', 'cae_5.2.2.6.5', 'cae_5.2.2.6.6', 'cae_5.2.2.6.7', 'cae_5.2.2.3.3', 'cae_5.2.2.8.1', 'cae_5.2.2.8.2'); 

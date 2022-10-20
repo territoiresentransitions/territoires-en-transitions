@@ -7,12 +7,9 @@
 import { Selectors } from './selectors';
 import { Expectations } from './expectations';
 
-beforeEach(() => {
+beforeEach(function () {
   cy.visit('/');
-  // on attends que l'appli expose un objet `e2e` permettant de la contrôler
-  cy.window({ log: false }).its('e2e.history').as('history');
-  cy.window({ log: false }).its('e2e.auth').as('auth');
-  cy.window({ log: false }).its('e2e.supabaseClient').as('supabaseClient');
+  waitForApp();
 
   // bouchon pour la fonction window.open
   const stub = cy.stub().as('open');
@@ -21,27 +18,42 @@ beforeEach(() => {
   });
 });
 
+// attends que l'appli expose un objet `e2e` permettant de la contrôler, il est
+// nécessaire de rappeler cette fonction si on veut que la promesse
+// `cy.get('@auth')` soit bien résolue une 2ème fois dans le même scénario
+// (utilisée avec le step "je me reconnecte en tant que ...")
+function waitForApp() {
+  cy.window({ log: false }).its('e2e.history').as('history');
+  cy.window({ log: false }).its('e2e.auth').as('auth');
+  cy.window({ log: false }).its('e2e.supabaseClient').as('supabaseClient');
+}
+
 Given("j'ouvre le site", () => {
   cy.get('[data-test=home]').should('be.visible');
 });
 
-const Users = {
-  yolo: {
-    email: 'yolo@dodo.com',
-    password: 'yolododo',
-  },
-  yulu: {
-    email: 'yulu@dudu.com',
-    password: 'yulududu',
-  },
+const genUser = (userName) => {
+  const letter = userName.slice(1, 2);
+  const dd = `d${letter}d${letter}`;
+  return {
+    email: `${userName}@${dd}.com`,
+    password: `${userName}${dd}`,
+  };
 };
+
 const SignInPage = Selectors['formulaire de connexion'];
-Given(/je suis connecté en tant que "([^"]*)"/, function (userName) {
-  const u = Users[userName];
-  assert(u, 'utilisateur non trouvé');
+Given(/je suis connecté en tant que "([^"]*)"/, login);
+function login(userName) {
+  const u = genUser(userName);
   cy.get('@auth').then((auth) => auth.connect(u));
   cy.get(SignInPage.selector).should('not.exist');
   cy.get('[data-test=connectedMenu]').should('be.visible');
+}
+
+Given('je me reconnecte en tant que {string}', function (userName) {
+  logout();
+  waitForApp();
+  login(userName);
 });
 
 Given('les droits utilisateur sont réinitialisés', () => {
@@ -49,17 +61,21 @@ Given('les droits utilisateur sont réinitialisés', () => {
 });
 
 Given(/l'utilisateur "([^"]*)" est supprimé/, (email) => {
-  cy.task('supabase_rpc', { name: 'test_remove_user', params: {'email': email} });
+  cy.task('supabase_rpc', {
+    name: 'test_remove_user',
+    params: { email: email },
+  });
 });
 
 Given('les informations des membres sont réinitialisées', () => {
   cy.task('supabase_rpc', { name: 'test_reset_membres' });
 });
 
-Given('je me déconnecte', () => {
+Given('je me déconnecte', logout);
+function logout() {
   cy.get('[data-test=connectedMenu]').click();
   cy.get('[data-test=logoutBtn]').click();
-});
+}
 
 // Met en pause le déroulement d'un scénario.
 // Associé avec le tag @focus cela permet de debugger facilement les tests.
@@ -113,10 +129,12 @@ Given(
 );
 Given(/le "([^"]*)" vérifie la condition "([^"]*)"/, verifyExpectation);
 Given(/^le "([^"]*)" est ([^"]*)$/, verifyExpectation);
+Given(/^le bouton "([^"]*)" est ([^"]*)$/, verifyExpectation);
 Given(
   /^le bouton "([^"]*)" du "([^"]*)" est ([^"]*)$/,
   childrenVerifyExpectation
 );
+
 function verifyExpectation(elem, expectation) {
   checkExpectation(resolveSelector(this, elem).selector, expectation);
 }
@@ -165,14 +183,56 @@ cy.get('button[type=submit]').click()
 );
 
 const transateTypes = {
-  "succès": "success",
-  "information": "info",
-  "erreur": "error",
-}
-Given(/une alerte de "([^"]*)" est affichée et contient "([^"]*)"/, (type, message) =>
-{
-  cy.get(`.fr-alert--${transateTypes[type]}`).should('be.visible')
-  cy.get(`.fr-alert--${transateTypes[type]}`).should('contain.text', message)
-}
+  succès: "success",
+  information: "info",
+  erreur: "error",
+};
+Given(
+  /une alerte de "([^"]*)" est affichée et contient "([^"]*)"/,
+  (type, message) => {
+    cy.get(`.fr-alert--${transateTypes[type]}`).should("be.visible");
+    cy.get(`.fr-alert--${transateTypes[type]}`).should("contain.text", message);
+  }
+);
 
+Given("je recharge la page", () => {
+  cy.reload();
+});
+
+// Le tableau des membres est utilisé dans plusieurs tests
+// pour valider la modification des informations des membres ou
+// les informations de l'utilisateur courant
+const tableauMembresSelector = Selectors["tableau des membres"];
+Given(
+  "le tableau des membres doit contenir les informations suivantes",
+  (dataTable) => {
+    cy.get(tableauMembresSelector.selector).within(() => {
+      // Attend la disparition du chargement.
+      cy.get("[data-test=Loading]").should("not.exist");
+      cy.wrap(dataTable.rows()).each(
+        (
+          [
+            nom,
+            mail,
+            // telephone,
+            fonction,
+            champ_intervention,
+            details_fonction,
+            acces,
+          ],
+          index
+        ) => {
+          cy.get(`tbody tr:nth(${index})`).within(() => {
+            cy.get("td:first").should("contain.text", nom);
+            cy.get("td:first").should("contain.text", mail);
+            // cy.get('td:nth(1)').should('contain.text', telephone);
+            cy.get("td:nth(1)").should("contain.text", fonction);
+            cy.get("td:nth(2)").should("contain.text", champ_intervention);
+            cy.get("td:nth(3)").should("contain.text", details_fonction);
+            cy.get("td:nth(4)").should("contain.text", acces);
+          });
+        }
+      );
+    });
+  }
 );

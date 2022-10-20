@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {Field, Form, Formik} from 'formik';
 import * as Yup from 'yup';
-import LabeledTextField from 'ui/forms/LabeledTextField';
 import {Link} from 'react-router-dom';
 import {
   InscriptionUtilisateur,
@@ -13,6 +12,7 @@ import {signInPath} from 'app/paths';
 import {Spacer} from 'ui/shared/Spacer';
 import {ValiderButton} from 'ui/shared/ValiderButton';
 import {PasswordStrengthMeter} from 'ui/forms/PasswordStrengthMeter';
+import FormInput from 'ui/shared/form/FormInput';
 
 type FormState = 'ready' | 'success' | 'failure';
 
@@ -56,31 +56,6 @@ const validation = Yup.object({
   vie_privee_conditions: Yup.boolean().isTrue('Champ requis'),
 });
 
-const textFieldLabels: Partial<Record<keyof InscriptionUtilisateur, string>> = {
-  prenom: 'Prénom',
-  nom: 'Nom',
-  email: 'Email',
-  password: 'Mot de passe',
-  telephone: 'Numéro de téléphone professionnel',
-};
-
-const RegistrationFormTextField = ({
-  fieldName,
-  type,
-}: {
-  fieldName: keyof InscriptionUtilisateur;
-  type?: string;
-}) => (
-  <div>
-    <Field
-      name={fieldName}
-      label={textFieldLabels[fieldName]}
-      component={LabeledTextField}
-      type={type}
-    />
-  </div>
-);
-
 const CGU = ({showWarning}: {showWarning?: boolean}) => (
   <label className="cgu">
     {showWarning && (
@@ -119,7 +94,7 @@ const RegistrationForm = () => {
         Le compte n'a pas pu être créé. Un compte existe peut-être déjà avec la
         même adresse email, essayez de vous connecter et/ou de renouveler votre
         mot de passe. Si le problème persiste,&nbsp;
-        <a href="mailto:contact@territoiresentransitions.fr" target="_blank">
+        <a href="mailto:contact@territoiresentransitions.fr" target="_blank" rel="noreferrer">
           contactez-nous
         </a>
         .
@@ -135,7 +110,7 @@ const RegistrationForm = () => {
         <p>Votre compte a bien été créé ! </p>
         <Spacer />
         <div>
-          <Link to={signInPath} className="fr-btn">
+          <Link to={signInPath} className="fr-btn" data-test="SeConnecter">
             Se connecter
           </Link>
         </div>
@@ -176,28 +151,29 @@ const RegistrationForm = () => {
 
             return (
               <Form>
-                <div className="flex flex-col gap-6">
-                  <RegistrationFormTextField fieldName="email" />
-                  <RegistrationFormTextField
-                    fieldName="password"
-                    type="password"
-                  />
-                  {result.score > 0 && (
-                    <PasswordStrengthMeter strength={result} className="pt-2" />
-                  )}
-                  <RegistrationFormTextField fieldName="prenom" />
-                  <RegistrationFormTextField fieldName="nom" />
-                  <RegistrationFormTextField fieldName="telephone" />
-                  <CGU
-                    showWarning={
-                      !!errors.vie_privee_conditions &&
-                      touched.vie_privee_conditions
-                    }
-                  />
-                  <Spacer size={2} />
-                  <div className="max-w-2xl flex flex-row-reverse">
-                    <ValiderButton />
-                  </div>
+                <FormInput name="email" label="Email" />
+                <FormInput
+                  type="password"
+                  name="password"
+                  label="Mot de passe"
+                />
+                {result.score > 0 && (
+                  <PasswordStrengthMeter strength={result} className="pt-2" />
+                )}
+                <FormInput name="prenom" label="Prénom" />
+                <FormInput name="nom" label="Nom" />
+                <FormInput
+                  name="telephone"
+                  label="Numéro de téléphone professionnel"
+                />
+                <CGU
+                  showWarning={
+                    !!errors.vie_privee_conditions &&
+                    touched.vie_privee_conditions
+                  }
+                />
+                <div className="max-w-2xl flex flex-row-reverse mt-12">
+                  <ValiderButton />
                 </div>
               </Form>
             );

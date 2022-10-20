@@ -3,12 +3,11 @@
  */
 import {LabellisationDemandeRead} from 'generated/dataLayer/labellisation_demande_read';
 import {LabellisationParcoursRead} from 'generated/dataLayer/labellisation_parcours_read';
-import {LabellisationPreuveFichierRead} from 'generated/dataLayer/labellisation_preuve_fichier_read';
 import {referentielToName} from 'app/labels';
-import {DocItem} from 'ui/shared/ResourceManager/DocItem';
-import {AddDocsButton} from './AddPreuvesButton';
+import PreuveDoc from 'ui/shared/preuves/Bibliotheque/PreuveDoc';
+import {AddDocsButton} from './AddDocsButton';
 import {CritereRempli} from './CritereRempli';
-import {useEditPreuves} from './useEditPreuves';
+import {TPreuveLabellisation} from 'ui/shared/preuves/Bibliotheque/types';
 
 const REGLEMENTS: {[k: string]: string} = {
   eci: '/Reglement_label_ECi_20220316.pdf',
@@ -18,7 +17,7 @@ const REGLEMENTS: {[k: string]: string} = {
 export type TCriterePreuvesProps = {
   collectiviteId: number;
   parcours: LabellisationParcoursRead;
-  preuves: LabellisationPreuveFichierRead[];
+  preuves: TPreuveLabellisation[];
   demande: LabellisationDemandeRead | null;
 };
 
@@ -55,7 +54,7 @@ export const CriterePreuves = (props: TCriterePreuvesProps) => {
           acte d’engagement
         </a>{' '}
         dans le programme affirmant votre adhésion{' '}
-        <a href={REGLEMENTS[referentiel]} target="_blank" rel="noopener">
+        <a href={REGLEMENTS[referentiel]} target="_blank" rel="noopener noreferrer">
           au règlement du label
         </a>
       </li>
@@ -72,7 +71,7 @@ export const CriterePreuves = (props: TCriterePreuvesProps) => {
  * Affiche les fichiers attachés à la demande
  */
 const LabellisationPreuves = (props: TCriterePreuvesProps) => {
-  const {preuves} = props;
+  const {preuves, demande} = props;
   if (!preuves.length) {
     return null;
   }
@@ -80,30 +79,13 @@ const LabellisationPreuves = (props: TCriterePreuvesProps) => {
   return (
     <div className="mt-2" data-test="LabellisationPreuves">
       {preuves.map(preuve => (
-        <PreuveFichierDetail key={preuve.filename} {...props} preuve={preuve} />
+        <PreuveDoc
+          key={`${preuve.id}`}
+          preuve={preuve}
+          readonly={!demande?.en_cours}
+          classComment="pb-0 mb-2"
+        />
       ))}
     </div>
-  );
-};
-
-/**
- * Affiche un fichier et gère l'édition de
- * commentaire, la suppression et le téléchargement
- */
-const PreuveFichierDetail = ({
-  preuve,
-  demande,
-}: TCriterePreuvesProps & {
-  preuve: LabellisationPreuveFichierRead;
-}) => {
-  const handlers = useEditPreuves(preuve, demande?.id || 0);
-
-  return (
-    <DocItem
-      doc={{...preuve, type: 'fichier'}}
-      readonly={!demande?.en_cours}
-      classComment="pb-0 mb-2"
-      handlers={handlers}
-    />
   );
 };
