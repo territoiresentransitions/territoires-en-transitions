@@ -35,6 +35,8 @@ import ActionNav from './ActionNav';
 import ActionPreuvePanel from 'ui/shared/actions/ActionPreuvePanel/ActionPreuvePanel';
 import {DownloadDocs} from './DownloadDocs';
 import DOMPurify from 'dompurify';
+import ActionAuditStatut from '../Audit/ActionAuditStatut';
+import {ActionAuditDetail} from '../Audit/ActionAuditDetail';
 
 const useActionLinkedIndicateurDefinitions = (actionId: string) => {
   const [linkedIndicateurDefinitions, setLinkedIndicateurDefinitions] =
@@ -135,6 +137,10 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
           <ActionProgressBar actionId={action.id} />
         </div>
       </div>
+      <ActionAuditStatut action={action} />
+      <div className="mt-4">
+        <ActionAuditDetail action={action} />
+      </div>
       <div className="mb-16">
         <div className="flex flex-col w-4/5">
           {action.have_questions && (
@@ -143,23 +149,24 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
               <Spacer size={2} />
             </>
           )}
-          <div
-            className="htmlContent"
-            dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(
-                addTargetToContentAnchors(action.description ?? '')
-              ),
-            }}
-          />
-          <DescriptionContextAndRessourcesDialogButton action={action} />
-          <Spacer size={1} />
-          <ActionCommentaire action={action} />
         </div>
       </div>
 
       <Tabs activeTab={activeTab} onChange={handleChange}>
         <Tab label="Suivi de l'action">
           <section>
+            <div
+              className="htmlContent"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(
+                  addTargetToContentAnchors(action.description ?? '')
+                ),
+              }}
+            />
+            <DescriptionContextAndRessourcesDialogButton action={action} />
+            <Spacer size={1} />
+            <ActionCommentaire action={action} />
+
             <div className="flex items-center fr-text--sm fr-m-0">
               Afficher uniquement les actions non-renseignées
               <Switch

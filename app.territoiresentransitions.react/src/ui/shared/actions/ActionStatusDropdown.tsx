@@ -16,6 +16,7 @@ import {toPercentString} from 'utils/score';
 import {CloseDialogButton} from '../CloseDialogButton';
 import {DetailedScore} from '../DetailedScore/DetailedScore';
 import {AvancementValues} from '../DetailedScore/DetailedScoreSlider';
+import {useAudit, useIsAuditeur} from 'app/pages/collectivite/Audit/useAudit';
 
 interface SelectableStatut {
   value: number;
@@ -110,6 +111,15 @@ export const ActionStatusDropdown = ({actionId}: {actionId: string}) => {
 
   const {saveActionStatut} = useSaveActionStatut(args);
 
+  // donnée liée à l'audit en cours (si il y en a un)
+  const {data: audit} = useAudit();
+  const isAuditeur = useIsAuditeur();
+
+  // détermine si l'édition du statut est désactivée
+  const disabled = Boolean(
+    collectivite?.readonly || score?.desactive || (audit && !isAuditeur)
+  );
+
   const handleChange: SelectInputProps['onChange'] = event => {
     const {avancement, concerne, avancement_detaille} = statutByValue(
       event.target.value as number
@@ -149,7 +159,7 @@ export const ActionStatusDropdown = ({actionId}: {actionId: string}) => {
         onChange={handleChange}
         displayEmpty
         inputProps={{'aria-label': 'Without label'}}
-        disabled={collectivite.readonly || score?.desactive}
+        disabled={disabled}
       >
         {selectables.map(({value, color, label}) => (
           <MenuItem key={value} value={value}>
@@ -176,30 +186,37 @@ export const ActionStatusDropdown = ({actionId}: {actionId: string}) => {
               </li>
             </ul>
           ) : null}
-          <button className="fr-btn fr-btn--sm" onClick={() => setOpened(true)}>
-            Préciser l'avancement
-          </button>
-          <Dialog
-            open={opened}
-            onClose={() => setOpened(false)}
-            maxWidth="sm"
-            fullWidth={true}
-          >
-            <div className="p-7 flex flex-col items-center">
-              <CloseDialogButton setOpened={setOpened} />
-              <h3 className="pb-4">Préciser l’avancement de cette tâche</h3>
-              <div className="w-full">
-                <DetailedScore
-                  avancement={
-                    (avancement_detaille?.length === 3
-                      ? avancement_detaille
-                      : DEFAULT_DETAIL_VALUES) as AvancementValues
-                  }
-                  onSave={handleSaveDetail}
-                />
-              </div>
-            </div>
-          </Dialog>
+          {disabled ? null : (
+            <>
+              <button
+                className="fr-btn fr-btn--sm"
+                onClick={() => setOpened(true)}
+              >
+                Préciser l'avancement
+              </button>
+              <Dialog
+                open={opened}
+                onClose={() => setOpened(false)}
+                maxWidth="sm"
+                fullWidth={true}
+              >
+                <div className="p-7 flex flex-col items-center">
+                  <CloseDialogButton setOpened={setOpened} />
+                  <h3 className="pb-4">Préciser l’avancement de cette tâche</h3>
+                  <div className="w-full">
+                    <DetailedScore
+                      avancement={
+                        (avancement_detaille?.length === 3
+                          ? avancement_detaille
+                          : DEFAULT_DETAIL_VALUES) as AvancementValues
+                      }
+                      onSave={handleSaveDetail}
+                    />
+                  </div>
+                </div>
+              </Dialog>
+            </>
+          )}
         </>
       ) : null}
     </div>
