@@ -121,3 +121,14 @@ utils/maintenance [utils/maintenance@v1.9.0] 2022-11-08T17:29:14Z Florian <flori
 
 labellisation/suivi_audit 2022-11-10T15:17:25Z Florian <florian@derfurth.com> # La vue du suivi de l'audit
 @v1.11.0 2022-11-15T08:39:44Z Florian <florian@derfurth.com> # Audit lot 2
+
+referentiel/contenu_json 2022-10-21T11:49:29Z Florian <florian@derfurth.com> # Ingestion des contenus JSON générés par le business
+indicateur/contenu_json 2022-10-25T08:45:19Z Florian <florian@derfurth.com> # Ingestion des contenus JSON générés par le business
+evaluation/contenu_json 2022-10-25T15:57:21Z Florian <florian@derfurth.com> # Ingestion des contenus JSON générés par le business
+http_extension 2022-10-17T13:22:43Z Florian <florian@derfurth.com> # Installe l extension http
+evaluation/schema 2022-10-17T13:26:06Z Florian <florian@derfurth.com> # Le schéma pour le domaine évaluation
+evaluation/score_service [evaluation/schema] 2022-10-17T13:23:41Z Florian <florian@derfurth.com> # Utilise l'API REST du business
+evaluation/score_mise_a_jour [evaluation/score_service] 2022-11-02T08:43:32Z Florian <florian@derfurth.com> # Permet déterminer les collectivités dont les scores ne sont plus à jour
+cron/update_late_scores [evaluation/score_mise_a_jour] 2022-11-02T10:08:16Z Florian <florian@derfurth.com> # Met à jour les scores des collectivités toutes les 5 minutes
+evaluation/score_summary [evaluation/score_summary@v1.10.0] 2022-11-15T10:25:46Z Florian <florian@derfurth.com> # Met à jour la fonction de conversion du json.
+@v1.12.0 2022-11-17T14:56:31Z Florian <florian@derfurth.com> # Evaluation dans un service.
