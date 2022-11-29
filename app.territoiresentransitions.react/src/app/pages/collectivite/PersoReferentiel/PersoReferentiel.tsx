@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {ReferentielOfIndicateur} from 'types/litterals';
+import {Referentiel} from 'types/litterals';
 import Thematiques from './Thematiques';
 import {useQuestionThematiqueCompletude} from './useQuestionThematiqueCompletude';
 import {useCurrentCollectivite} from 'core-logic/hooks/useCurrentCollectivite';
@@ -7,10 +7,7 @@ import {useCurrentCollectivite} from 'core-logic/hooks/useCurrentCollectivite';
 const PersoReferentiel = () => {
   const collectivite = useCurrentCollectivite();
   const {collectivite_id, nom} = collectivite || {};
-  const [selected, setSelected] = useState<ReferentielOfIndicateur[]>([
-    'eci',
-    'cae',
-  ]);
+  const [selected, setSelected] = useState<Referentiel[]>(['eci', 'cae']);
   const thematiques = useQuestionThematiqueCompletude(
     collectivite_id || 0,
     selected
@@ -21,7 +18,7 @@ const PersoReferentiel = () => {
   }
 
   return (
-    <main className="fr-container mt-9 mb-16">
+    <main data-test="personnalisation" className="fr-container mt-9 mb-16">
       <Thematiques
         collectivite={{id: collectivite_id, nom: nom || ''}}
         selected={selected}

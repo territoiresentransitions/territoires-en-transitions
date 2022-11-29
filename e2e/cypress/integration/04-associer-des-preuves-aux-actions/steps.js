@@ -24,22 +24,6 @@ When(/je déplie le panneau Preuves de l'action "([^"]+)"/, action =>
 );
 
 When(
-  /les tables de preuves de la collectivité "(\d+)" sont vides/,
-  collectivite_id => {
-    cy.get('@supabaseClient').then(client =>
-      Promise.all([
-        client.rpc('test_reset_preuves'),
-        cy.task('pg_query', {
-          query:
-            'DELETE FROM labellisation.bibliotheque_fichier WHERE collectivite_id = $1',
-          values: [collectivite_id],
-        }),
-      ])
-    );
-  }
-);
-
-When(
   /la table des preuves complémentaires est initialisée avec les données suivantes/,
   dataTable => {
     cy.get('@supabaseClient').then(client =>
@@ -121,10 +105,15 @@ When(
 When(
   /je saisi "([^"]+)" comme commentaire de la preuve "([^"]+)" de l'action "([^"]+)"/,
   (commentaire, preuve, action) => {
-    getPreuvePanel(action)
-      .find(`[data-test^=preuves] input`)
-      .clear()
-      .type(commentaire + '{enter}');
+    getPreuvePanel(action).within(() => {
+      // efface le contenu du champ commentaire
+      const inputSelector = '[data-test^=preuves] input';
+      cy.get(inputSelector).clear();
+      // saisi une nouvelle valeur + ENTREE
+      cy.get(inputSelector).type(commentaire + '{enter}');
+      // le champ doit avoir disparu (le nouveau commentaire est en lecture seule)
+      cy.get(inputSelector).should('not.exist');
+    });
   }
 );
 

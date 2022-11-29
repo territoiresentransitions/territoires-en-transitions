@@ -1,4 +1,5 @@
 import {FC, ReactNode} from 'react';
+import classNames from 'classnames';
 import {TReponse} from 'generated/dataLayer/reponse_read';
 import {TQuestionReponseProps} from './PersoPotentielQR';
 import {TListeChoix} from 'generated/dataLayer/question_read';
@@ -12,7 +13,10 @@ const ReponseContainer = ({
   children: ReactNode;
   className?: string;
 }) => (
-  <div className={`fr-fieldset__content pl-4 ${className || ''}`}>
+  <div
+    data-test="reponse"
+    className={classNames('fr-fieldset__content pl-4', className)}
+  >
     {children}
   </div>
 );
@@ -53,8 +57,8 @@ const ReponseChoix = ({qr, onChange}: TQuestionReponseProps) => {
 const ReponseBinaire = ({qr, onChange}: TQuestionReponseProps) => {
   const {id: questionId, reponse} = qr;
   const choices = getFilteredChoices(reponse, [
-    {id: 'true', label: 'Oui'},
-    {id: 'false', label: 'Non'},
+    {id: 'oui', label: 'Oui'},
+    {id: 'non', label: 'Non'},
   ]);
   const collectivite = useCurrentCollectivite();
 
@@ -81,6 +85,7 @@ const DEFAULT_RANGE = [0, 100];
 const ReponseProportion = ({qr, onChange}: TQuestionReponseProps) => {
   const {id: questionId, reponse} = qr;
   const [min, max] = DEFAULT_RANGE;
+
   const [value, handleChange, setValue] = useDebouncedInput(
     proportionToString(reponse as number),
     query => {
@@ -121,7 +126,7 @@ const stringToProportion = (str: string, min: number, max: number) => {
 };
 
 const proportionToString = (value: number | null) =>
-  value === null ? '' : String(value);
+  value === null || value === undefined ? '' : String(value);
 
 // correspondances entre un type de réponse et son composant
 export const reponseParType: {[k: string]: FC<TQuestionReponseProps>} = {
@@ -173,7 +178,10 @@ const RadioButton = ({
         {hasReponse && (
           <button
             className="fr-link fr-link--icon-left fr-fi-edit-line fr-ml-3w"
-            onClick={() => onChange(null)}
+            onClick={e => {
+              e.preventDefault();
+              onChange(null);
+            }}
           >
             Modifier
           </button>

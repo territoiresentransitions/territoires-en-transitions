@@ -4,24 +4,7 @@ import {LocalSelectors} from './selectors';
 // enregistre les définitions locales
 beforeEach(() => {
   cy.wrap(LocalSelectors).as('LocalSelectors');
-
-  // reset les données d'audit des actions
-  cy.task('supabase_rpc', {name: 'test_reset_audit'});
 });
-
-When(
-  /l'état d'avancement de l'action "([^"]+)" pour la collectivité "(\d+)" est réinitialisé/,
-  (action_id, collectivite_id) => {
-    // on utilise ici un reset "hard" directement dans la base en attendant de
-    // disposer d'un appel RPC pour le faire de manière un peu plus "propre"
-    // (Ref: https://github.com/betagouv/territoires-en-transitions/issues/1572)
-    cy.task('pg_query', {
-      query:
-        'DELETE FROM action_statut WHERE collectivite_id = $1 AND action_id LIKE $2',
-      values: [collectivite_id, action_id],
-    });
-  }
-);
 
 When("aucun score n'est affiché", () => {
   cy.get('[data-test^=score-]').should('not.exist');
@@ -37,7 +20,7 @@ When('tous les scores sont à 0', () => {
 
 When('les scores sont affichés avec les valeurs suivantes :', dataTable => {
   cy.wrap(dataTable.rows()).each(([action, score]) => {
-    cy.get(`[data-test="score-${action}"]`).should('have.text', score);
+    cy.get(`[data-test="score-${action}"]`).should('contain.text', score);
   });
 });
 
@@ -164,9 +147,22 @@ When(/je clique sur le bouton "Masquer le détail" de l'entrée (\d+)/, num => {
   ).click();
 });
 
-When(/l'historique est réinitialisé/, () => {
-  cy.task('pg_query', {
-    query: 'TRUNCATE action_commentaire',
-  });
-  cy.task('supabase_rpc', {name: 'test_clear_history'});
+When(
+  /je filtre l'historique avec le filtre "([^"]+)" par l'option "([^"]+)"/,
+  (filtre, option) => {
+    cy.get(`[data-test=filtre-${filtre}]`).click();
+    cy.root()
+      .get(`[data-test=filtre-${filtre}-options]`)
+      .contains(option)
+      .click();
+    cy.get(`[data-test=filtre-${filtre}]`).click();
+  }
+);
+
+When(/je filtre l'historique avec comme date de fin "([^"]+)"/, date => {
+  cy.get('[data-test=filtre-end-date]').type(date);
+});
+
+When('je désactive tous les filtres', () => {
+  cy.get('[data-test=desactiver-les-filtres]').click();
 });
