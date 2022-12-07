@@ -1,23 +1,29 @@
 import {MultiSelectFilter} from 'ui/shared/select/MultiSelectFilter';
 import HistoriqueFiltreField from './HistoriqueFiltreField';
 
-import {useCollectiviteMembres} from 'app/pages/collectivite/Users/useCollectiviteMembres';
 import {getIsAllSelected, ITEM_ALL} from 'ui/shared/select/commons';
 import {TFiltreProps} from '../filters';
+import {useHistoriqueUtilisateurListe} from '../useHistoriqueUtilisateurListe';
+import {useCollectiviteId} from 'core-logic/hooks/params';
 
 const FiltreMembre = ({filters, setFilters}: TFiltreProps) => {
-  const {membres} = useCollectiviteMembres();
+  const collectivite_id = useCollectiviteId();
+  const utilisateurs = useHistoriqueUtilisateurListe(collectivite_id!);
 
-  const collectiviteMemberList = [
-    {value: ITEM_ALL, label: 'Tous'},
-    ...membres.map(m => ({
-      value: m.user_id!,
-      label: `${m.prenom} ${m.nom}`,
-    })),
-  ];
+  // Initialisation du tableau d'options pour le multi-select
+  const memberList: {value: string; label: string}[] = [];
+  // Ajoute l'option "Tous" s'il y a plus d'une option
+  if (utilisateurs && utilisateurs.length > 1) {
+    memberList.push({value: ITEM_ALL, label: 'Tous'});
+  }
+  // Transformation et ajout des données membres au tableau d'options
+  utilisateurs &&
+    utilisateurs.forEach(u =>
+      memberList.push({value: u.modified_by_id!, label: u.modified_by_nom!})
+    );
 
   return (
-    <HistoriqueFiltreField title="Membre de la collectivité">
+    <HistoriqueFiltreField title="Membre">
       <MultiSelectFilter
         data-test="filtre-membre"
         values={
@@ -25,14 +31,21 @@ const FiltreMembre = ({filters, setFilters}: TFiltreProps) => {
             ? undefined
             : filters.modified_by
         }
-        options={collectiviteMemberList}
-        onSelect={newValues =>
-          setFilters({
-            ...filters,
-            modified_by: newValues,
-          })
-        }
+        options={memberList}
+        onSelect={newValues => {
+          if (getIsAllSelected(newValues)) {
+            const filtres = filters;
+            delete filtres.modified_by;
+            setFilters({...filtres});
+          } else {
+            setFilters({
+              ...filters,
+              modified_by: newValues,
+            });
+          }
+        }}
         placeholderText="Sélectionner des options"
+        disabled={memberList.length === 0}
       />
     </HistoriqueFiltreField>
   );

@@ -28,7 +28,7 @@ exports[`Storyshots app/pages/collectivite/Historique/JournalActivite Exemple 1 
         <p
           className="mb-2 font-medium"
         >
-          Membre de la collectivité
+          Membre
         </p>
         <div
           className="shadow border-b border-b-gray-500"
@@ -38,6 +38,7 @@ exports[`Storyshots app/pages/collectivite/Historique/JournalActivite Exemple 1 
             aria-label="ouvrir le menu"
             className="flex items-center w-full p-2 text-left text-sm"
             data-test="filtre-membre"
+            disabled={true}
             onBlur={[Function]}
             onClick={[Function]}
             onFocus={[Function]}

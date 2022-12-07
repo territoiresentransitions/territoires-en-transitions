@@ -2,14 +2,19 @@ name: Tests end-to-end
 
 on:
   pull_request:
-    branches-ignore:
-      - production
-      - production-static
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   end-to-end-test:
     name: End-to-end tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       e2e-directory: ./e2e
       datalayer-directory: ./data_layer

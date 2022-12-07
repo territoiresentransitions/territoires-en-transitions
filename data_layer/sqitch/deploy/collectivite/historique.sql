@@ -2,7 +2,18 @@
 
 BEGIN;
 
-create view historique
+create view historique_utilisateur
+as
+select collectivite_id,
+       coalesce(modified_by_id, '99999999-9999-9999-9999-999999999999') as modified_by_id,
+       modified_by_nom
+from historique
+group by collectivite_id, modified_by_id, modified_by_nom;
+comment on view historique_utilisateur
+    is 'La liste des utilisateurs ayant apporté des modifications aux données de la collectivité.'
+        'Lorsqu''aucun utilisateur est associé, le modified by id est égal à `99999999-9999-9999-9999-999999999999`';
+
+create or replace view historique
 as
 with
     -- les listes des actions par question
@@ -93,7 +104,25 @@ with
     actions as (select * from action_hierarchy ah where ah.type = 'action')
 
 select -- toutes les colonnes des données historisées
-       h.*,
+       h.type,
+       h.collectivite_id,
+       coalesce(h.modified_by_id, '99999999-9999-9999-9999-999999999999') as modified_by_id,
+       h.previous_modified_by_id,
+       h.modified_at,
+       h.previous_modified_at,
+       h.action_id,
+       h.avancement,
+       h.previous_avancement,
+       h.avancement_detaille,
+       h.previous_avancement_detaille,
+       h.concerne,
+       h.previous_concerne,
+       h.precision,
+       h.previous_precision,
+       h.question_id,
+       h.question_type,
+       h.reponse,
+       h.previous_reponse,
        -- utilisateur
        coalesce(ud.prenom || ' ' || ud.nom, 'Équipe territoires en transitions') as modified_by_nom,
        -- colonnes liées au actions
@@ -117,5 +146,10 @@ from historiques h
          left join question_actions qa on h.question_id = qa.question_id
 where have_lecture_acces(h.collectivite_id) -- limit access
 order by h.modified_at desc;
+comment on view historique
+    is 'La liste des modifications aux données des collectivités.'
+        'Lorsqu''aucun utilisateur est associé, le modified by id est égal à `99999999-9999-9999-9999-999999999999`';
+
+
 
 COMMIT;
