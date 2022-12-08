@@ -1,7 +1,9 @@
-import {supabaseClient} from 'core-logic/api/supabase';
-import {useSearchParams} from 'core-logic/hooks/query';
 import {useEffect} from 'react';
 import {useQuery, useQueryClient} from 'react-query';
+
+import {supabaseClient} from 'core-logic/api/supabase';
+import {useSearchParams} from 'core-logic/hooks/query';
+import {isValidFilter} from 'ui/shared/select/commons';
 import {TFilters, NB_ITEMS_PER_PAGE, nameToShortNames} from './filters';
 import {THistoriqueItem, THistoriqueProps} from './types';
 
@@ -13,28 +15,50 @@ type TFetchedData = {items: THistoriqueItem[]; total: number};
 export const fetchHistorique = async (
   filters: TFilters
 ): Promise<TFetchedData> => {
-  const {collectivite_id, action_id, page} = filters;
+  const {
+    collectivite_id,
+    action_id,
+    page,
+    modified_by,
+    types,
+    startDate,
+    endDate,
+  } = filters;
 
   // la requête
   let query = supabaseClient
-    .from<THistoriqueItem>('historique')
+    .from('historique')
     .select('*', {count: 'exact'})
     .match({collectivite_id})
     .limit(NB_ITEMS_PER_PAGE);
 
   // filtre optionnel par action
   if (action_id) {
-    query = query.or(
-      `action_ids.cs.{${action_id}},action_id.like.${action_id}*`
-    );
+    query.or(`action_ids.cs.{${action_id}},action_id.like.${action_id}*`);
+  }
+
+  // filtre optionnel par membre
+  if (isValidFilter(modified_by)) {
+    query.in('modified_by_id', modified_by!);
+  }
+
+  // filtre optionnel par type
+  if (isValidFilter(types)) {
+    query.in('type', types!);
+  }
+
+  // filtre optionnel par date de début
+  if (startDate) {
+    query.gte('modified_at', startDate);
+  }
+  // filtre optionnel par date de fin
+  if (endDate) {
+    query.lte('modified_at', `${endDate} 24:00`);
   }
 
   // Pagination
   if (page) {
-    query = query.range(
-      NB_ITEMS_PER_PAGE * (page - 1),
-      NB_ITEMS_PER_PAGE * page - 1
-    );
+    query.range(NB_ITEMS_PER_PAGE * (page - 1), NB_ITEMS_PER_PAGE * page - 1);
   }
 
   // attends les données
@@ -43,7 +67,7 @@ export const fetchHistorique = async (
     throw new Error(error.message);
   }
 
-  return {items: data || [], total: count || 0};
+  return {items: (data as THistoriqueItem[]) || [], total: count || 0};
 };
 
 // les mutations "écoutées" pour déclencher le rechargement de l'historique
@@ -65,6 +89,7 @@ export const useHistoriqueItemListe = (
   // recharge les données lors de la mise à jour d'une des mutations écoutées
   const refetch = () => {
     queryClient.invalidateQueries(['historique', collectivite_id]);
+    queryClient.invalidateQueries(['historique_utilisateur', collectivite_id]);
   };
   useEffect(() => {
     return queryClient.getMutationCache().subscribe(mutation => {
@@ -91,6 +116,7 @@ export const useHistoriqueItemListe = (
 
   return {
     ...(data || {items: [], total: 0}),
+    initialFilters: {collectivite_id, action_id},
     filters,
     setFilters,
     filtersCount,

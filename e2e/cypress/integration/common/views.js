@@ -18,6 +18,10 @@ export const Views = {
 };
 
 export const CollectivitePages = {
+  'Personnalisation des référentiels': {
+    route: 'personnalisation',
+    selector: '[data-test=personnalisation]',
+  },
   'Gestion des membres': {
     route: 'users',
     selector: '[data-test=Users]',
@@ -33,6 +37,10 @@ export const CollectivitePages = {
   'Labellisation CAE': {
     route: 'labellisation/cae',
     selector: '[data-test=labellisation-cae]',
+  },
+  'Labellisation ECi': {
+    route: 'labellisation/eci',
+    selector: '[data-test=labellisation-eci]',
   },
   'Action ECI': {
     route: 'action/eci/eci_3.1',

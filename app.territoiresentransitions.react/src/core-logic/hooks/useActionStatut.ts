@@ -1,7 +1,9 @@
 import {useMutation, useQuery, useQueryClient} from 'react-query';
 import {supabaseClient} from 'core-logic/api/supabase';
-import {ActionStatutRead} from 'generated/dataLayer/action_statut_read';
 import {ActionStatutWrite} from 'generated/dataLayer/action_statut_write';
+import {useCurrentCollectivite} from './useCurrentCollectivite';
+import {useAudit, useIsAuditeur} from 'app/pages/collectivite/Audit/useAudit';
+import {useActionScore} from './scoreHooks';
 
 /**
  * Charge le statut d'une action
@@ -28,7 +30,7 @@ const fetchCollectiviteActionStatuts = async (collectivite_id?: number) => {
     return null;
   }
   const query = supabaseClient
-    .from<ActionStatutRead>('action_statut')
+    .from('action_statut')
     .select()
     .eq('collectivite_id', collectivite_id);
   const {error, data} = await query;
@@ -62,3 +64,21 @@ const write = async (statut: ActionStatutWrite) =>
   supabaseClient.from('action_statut').upsert([statut], {
     onConflict: 'collectivite_id,action_id',
   });
+
+/**
+ * Détermine si l'utilisateur a le droit de modifier le statut d'une action
+ */
+export const useEditActionStatutIsDisabled = (actionId: string) => {
+  const collectivite = useCurrentCollectivite();
+  const {data: audit} = useAudit();
+  const isAuditeur = useIsAuditeur();
+  const score = useActionScore(actionId);
+
+  return Boolean(
+    !collectivite ||
+      collectivite.readonly ||
+      !score ||
+      score.desactive ||
+      (audit && !isAuditeur)
+  );
+};

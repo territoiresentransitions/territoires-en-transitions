@@ -7,7 +7,12 @@
 import {Selectors} from './selectors';
 import {Expectations} from './expectations';
 
+// avant chaque test
 beforeEach(function () {
+  // réinitialise les données fake
+  cy.task('supabase_rpc', {name: 'test_reset'});
+
+  // charge l'appli
   cy.visit('/');
   waitForApp();
 
@@ -193,7 +198,9 @@ function selectDropdownValue(value, dropdown) {
   // ouvre le sélecteur
   cy.get(resolveSelector(this, dropdown).selector).click();
   // et sélectionne la valeur voulue
-  cy.get(`#floating-ui-root [data-test="${value}"]`).should('be.visible').click();
+  cy.get(`#floating-ui-root [data-test="${value}"]`)
+    .should('be.visible')
+    .click();
 }
 
 Given('je saisi la valeur {string} dans le champ {string}', fillInput);
@@ -260,4 +267,19 @@ Given(
       );
     });
   }
+);
+
+When(/je clique sur l'onglet "([^"]+)"/, tabName => {
+  cy.get('.fr-tabs__tab').contains(tabName).click();
+});
+
+When(/je vois (\d+) onglets?/, count =>
+  cy.get('.fr-tabs__tab').should('have.length', count)
+);
+
+When(/l'onglet "([^"]+)" est sélectionné/, tabName =>
+  cy
+    .get('.fr-tabs__tab')
+    .contains(tabName)
+    .should('have.attr', 'aria-selected', 'true')
 );

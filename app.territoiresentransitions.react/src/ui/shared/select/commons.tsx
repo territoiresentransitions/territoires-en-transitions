@@ -6,13 +6,17 @@ export const ITEM_ALL = 'tous';
 
 /** vérifie si ITEM_ALL est présent dans la liste de valeurs */
 export const getIsAllSelected = (values: string[]) =>
-  !values.length || values.indexOf(ITEM_ALL) !== -1;
+  !values.length || values.includes(ITEM_ALL);
+
+/** vérifie si ITEM_ALL n'est pas présent dans un filtre */
+export const isValidFilter = (values: string[] | undefined | null) =>
+  values?.length && !values.includes(ITEM_ALL);
 
 /* Class génériques */
 export const buttonDisplayedClassname =
   'flex items-center w-full p-2 text-left text-sm';
 export const buttonDisplayedPlaceholderClassname =
-  'mr-auto text-gray-500 italic';
+  'mr-auto text-gray-500 italic line-clamp-1';
 export const buttonDisplayedIconClassname =
   'fr-fi-arrow-down-s-line mt-1 ml-1 scale-90';
 export const optionButtonClassname =
@@ -34,6 +38,8 @@ export type TSelectBase = {
   placement?: Placement;
   /** Donne un id pour les tests e2e */
   'data-test'?: string;
+  /** Permet de désactiver le bouton d'ouverture */
+  disabled?: boolean;
 };
 
 export type TSelectSelectionButtonBase = {
