@@ -2,11 +2,11 @@ import React from 'react';
 import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
 
-import FormInput from './FormInput';
-import FormSelect from './FormSelect';
+import FormikInput from './FormikInput';
+import FormikSelect from './FormikSelect';
 
 export default {
-  component: FormInput,
+  component: FormikInput,
 };
 
 const selectOptions = [
@@ -39,17 +39,22 @@ export const Defaut = () => (
     onSubmit={() => undefined}
   >
     <Form>
-      <FormInput name="input" label="Basique input" />
-      <FormInput disabled name="inputDisabled" label="Input désactivé" />
-      <FormInput
+      <FormikInput name="input" label="Basique input" />
+      <FormikInput disabled name="inputDisabled" label="Input désactivé" />
+      <FormikInput
         name="email"
         label="Adresse email avec hint *"
+        placeholder="yolo@dodo.com"
         hint="Entrez une adresse valide"
       />
-      <FormInput type="password" name="password" label="Mot de passe *" />
-      <FormInput type="area" name="textarea" label="Text area" />
-      <FormSelect name="select" label="Basique elect" options={selectOptions} />
-      <FormSelect
+      <FormikInput type="password" name="password" label="Mot de passe *" />
+      <FormikInput type="area" name="textarea" label="Text area" />
+      <FormikSelect
+        name="select"
+        label="Basique elect"
+        options={selectOptions}
+      />
+      <FormikSelect
         disabled
         name="selectDisabled"
         label="Select désactivé"

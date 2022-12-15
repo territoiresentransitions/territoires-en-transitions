@@ -1,6 +1,9 @@
 import classNames from 'classnames';
 import {Field, FieldAttributes, FieldProps} from 'formik';
 
+import FormField from 'ui/shared/form/FormField';
+import Textarea from '../Textarea';
+
 /**
  * Prevents enter key submitting the form.
  */
@@ -10,15 +13,17 @@ const preventSubmit = (event: React.KeyboardEvent) => {
   }
 };
 
-type FormInputProps = {
+type FormikInputProps = {
   type?: 'area' | 'text' | 'password';
   hint?: string;
   label: string;
   disabled?: boolean;
   maxLength?: number;
+  /** Only to use for textarea */
+  minHeight?: string;
 };
 
-type FormFieldProps = FieldAttributes<FormInputProps>;
+type FormFieldProps = FieldAttributes<FormikInputProps>;
 
 /**
  * Input field à utiliser dans un formulaire Formik.
@@ -26,29 +31,27 @@ type FormFieldProps = FieldAttributes<FormInputProps>;
  * Peut exécuter du code avec l'événement onBlur si nécessaire.
  * Pour cela, il faut déconstruire Formik pour récupérer handleBlur et le donner à l'input.
  */
-const FormInput = (props: FormFieldProps) => (
+const FormikInput = (props: FormFieldProps) => (
   <Field {...props} component={InputField} />
 );
 
-export default FormInput;
+export default FormikInput;
 
-const InputField = ({field, form, ...props}: FormInputProps & FieldProps) => {
-  const errorMessage = form.errors[field.name];
+const InputField = ({field, form, ...props}: FormikInputProps & FieldProps) => {
+  const errorMessage = (form.errors as Record<string, string | undefined>)[
+    field.name
+  ];
   const isTouched = form.touched[field.name];
   const isError = errorMessage && isTouched;
   const inputType = props.type ?? 'text';
 
   return (
-    <div
-      className={classNames('fr-input-group flex-grow', {
-        'fr-input-group--error': isError,
-        'fr-input-group--disabled': props.disabled,
-      })}
+    <FormField
+      label={props.label}
+      hint={props.hint}
+      htmlFor={field.name}
+      errorMessage={isError ? errorMessage : undefined}
     >
-      <label htmlFor={field.name} className="fr-label">
-        {props.label}
-        {props.hint && <span className="fr-hint-text">{props.hint}</span>}
-      </label>
       {inputType === 'text' && (
         <input
           id={field.name}
@@ -71,15 +74,18 @@ const InputField = ({field, form, ...props}: FormInputProps & FieldProps) => {
         />
       )}
       {inputType === 'area' && (
-        <textarea
+        <Textarea
           id={field.name}
-          className={classNames('fr-input', {'fr-input--error': isError})}
+          className={classNames('fr-input !outline-none', {
+            'fr-input--error': isError,
+          })}
+          onInputChange={() => null}
           maxLength={props.maxLength}
+          minHeight={props.minHeight ?? '4rem'}
           {...field}
           {...props}
         />
       )}
-      {isError && <p className="fr-error-text">{errorMessage}</p>}
-    </div>
+    </FormField>
   );
 };

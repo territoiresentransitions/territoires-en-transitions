@@ -1,6 +1,8 @@
 import classNames from 'classnames';
 import {Field, FieldAttributes, FieldProps} from 'formik';
 
+import FormField from 'ui/shared/form/FormField';
+
 type HTMLSelectOption = string | number | readonly string[] | undefined;
 
 export type SelectOption<T> = {
@@ -8,19 +10,19 @@ export type SelectOption<T> = {
   label: string;
 };
 
-type FormSelectProps<T> = {
+type FormikSelectProps<T> = {
   label: string;
   hint?: string;
   disabled?: boolean;
   options: SelectOption<T>[];
 };
 
-type FormFieldProps<T = unknown> = FieldAttributes<FormSelectProps<T>>;
+type FormFieldProps<T = unknown> = FieldAttributes<FormikSelectProps<T>>;
 
 /**
  * Select field à utiliser dans un formulaire Formik.
  */
-const FormSelect = (props: FormFieldProps) => (
+const FormikSelect = (props: FormFieldProps) => (
   <Field {...props} component={SelectField} />
 );
 
@@ -28,7 +30,7 @@ const SelectField = ({
   field,
   form,
   ...props
-}: FormSelectProps<unknown> & FieldProps) => {
+}: FormikSelectProps<unknown> & FieldProps) => {
   const errorMessage = (form.errors as Record<string, string | undefined>)[
     field.name
   ];
@@ -38,16 +40,12 @@ const SelectField = ({
   const isError = errorMessage && isTouched;
 
   return (
-    <div
-      className={classNames('fr-select-group flex-grow', {
-        'fr-select-group--error': isError,
-        'fr-select-group--disabled': props.disabled,
-      })}
+    <FormField
+      label={props.label}
+      hint={props.hint}
+      htmlFor={props.label}
+      errorMessage={isError ? errorMessage : undefined}
     >
-      <label className="fr-label" htmlFor={props.label}>
-        {props.label}
-        {props.hint && <span className="fr-hint-text">{props.hint}</span>}
-      </label>
       <select
         className={classNames('fr-select', {
           'fr-select--error': isError,
@@ -68,9 +66,8 @@ const SelectField = ({
           </option>
         ))}
       </select>
-      {isError && <p className="fr-error-text">{errorMessage}</p>}
-    </div>
+    </FormField>
   );
 };
 
-export default FormSelect;
+export default FormikSelect;

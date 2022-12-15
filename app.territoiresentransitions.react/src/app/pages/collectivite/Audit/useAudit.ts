@@ -47,3 +47,30 @@ export const useIsAuditeur = () => {
   }
   return audit.auditeurs.findIndex(({id}) => id === user.id) !== -1;
 };
+
+/** Liste des auditeurs */
+export const useAuditeurs = () => {
+  const collectivite_id = useCollectiviteId();
+  const referentiel = useReferentielId() as Referentiel;
+  return useQuery(['auditeurs', collectivite_id, referentiel], () =>
+    collectivite_id ? fetchAuditeurs(collectivite_id, referentiel) : null
+  );
+};
+
+export type TAuditeur = {nom: string; prenom: string};
+const fetchAuditeurs = async (
+  collectivite_id: number,
+  referentiel: Referentiel
+) => {
+  const {data, error} = await supabaseClient
+    .from('auditeurs')
+    .select('noms')
+    .match({collectivite_id, referentiel})
+    .limit(1);
+
+  if (error || !data?.length) {
+    return null;
+  }
+
+  return data[0].noms as TAuditeur[];
+};

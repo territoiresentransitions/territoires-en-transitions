@@ -15,6 +15,7 @@ import {
   ReferentielParamOption,
 } from 'app/paths';
 import {useHistory} from 'react-router-dom';
+import AuditComparaison from '../AuditComparaison';
 
 export type TLabellisationTabsProps = {
   children: ReactElement;
@@ -24,7 +25,7 @@ export type TLabellisationTabsProps = {
 const TABS_INDEX: Record<LabellisationVueParamOption, number> = {
   suivi: 0,
   cycles: 1,
-  criteres: 1,
+  criteres: 2,
 };
 
 /**
@@ -70,7 +71,12 @@ export const LabellisationTabs = (props: TLabellisationTabsProps) => {
         <Tab label="Suivi de l'audit">
           <AuditSuivi />
         </Tab>
-        <Tab label="Critères de labellisation">{children}</Tab>
+        <Tab label="Cycles et comparaison">
+          {activeTab === TABS_INDEX['cycles'] ? <AuditComparaison /> : '...'}
+        </Tab>
+        <Tab label="Critères de labellisation">
+          {activeTab === TABS_INDEX['criteres'] ? children : '...'}
+        </Tab>
       </Tabs>
     </>
   ) : (

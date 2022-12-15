@@ -93,9 +93,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -107,7 +105,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   Référent·e
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -122,9 +120,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -138,7 +134,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   </div>
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -168,9 +164,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -182,7 +176,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   Admin
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -218,9 +212,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -232,7 +224,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   Équipe technique
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -247,9 +239,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -266,7 +256,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   </div>
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -296,9 +286,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -310,7 +298,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   Édition
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -346,9 +334,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -360,7 +346,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   Équipe politique
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -375,9 +361,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -391,7 +375,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   </div>
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -421,9 +405,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -435,7 +417,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   Lecture
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -470,9 +452,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -484,7 +464,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As A
                   Lecture
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -643,9 +623,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As E
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -657,7 +635,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As E
                   Équipe technique
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -672,9 +650,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As E
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -691,7 +667,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As E
                   </div>
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -721,9 +697,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As E
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -735,7 +709,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As E
                   Édition
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -1034,9 +1008,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As L
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -1048,7 +1020,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As L
                   Équipe politique
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -1063,9 +1035,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As L
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -1079,7 +1049,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As L
                   </div>
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
@@ -1109,9 +1079,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As L
                 aria-expanded={false}
                 aria-label="ouvrir le menu"
                 className="flex items-center w-full p-2 text-left text-sm"
-                onBlur={[Function]}
                 onClick={[Function]}
-                onFocus={[Function]}
                 onKeyDown={[Function]}
                 onKeyUp={[Function]}
                 onMouseDown={[Function]}
@@ -1123,7 +1091,7 @@ exports[`Storyshots app/pages/collectivite/Users/components/MembreListTable As L
                   Lecture
                 </span>
                 <span
-                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90"
+                  className="fr-fi-arrow-down-s-line mt-1 ml-1 scale-90 ml-auto"
                 />
               </button>
             </div>
