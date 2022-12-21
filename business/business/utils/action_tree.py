@@ -9,6 +9,7 @@ class ActionTreeError(Exception):
 
 
 class ActionTree:
+    """Un arbre d'action avec des méthodes d'itération"""
     def __init__(self, actions_children: list[ActionChildren]) -> None:
 
         self.children_ids_by_action_id = {
@@ -16,9 +17,7 @@ class ActionTree:
             for action_children in actions_children
         }
 
-        # TODO : get this info from datalayer right view !
         self._depths_by_action_ids = self._build_depths_by_action_ids()
-
         self._backward_ids = self._build_backward_ids_from_children_ids_by_action_id()
         self._forward_ids = self._backward_ids[::-1]
         self._tache_ids = self._build_tache_ids()
@@ -62,6 +61,7 @@ class ActionTree:
         action_id: ActionId,
         include_action: bool = True,
     ):
+        """Appelle la fonction callback en partant de [action_id] jusqu'aux tâches."""
         if include_action:
             callback(action_id)
         for action_child in self.get_children(action_id):

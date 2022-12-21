@@ -1,7 +1,6 @@
 import logging
 from typing import Dict, List
 
-
 from business.utils.models.action_statut import (
     ActionStatut,
 )
@@ -15,21 +14,19 @@ logger = logging.getLogger()
 
 
 def update_scores_from_tache_given_statuses(
-    point_tree_referentiel: ActionPointTree,
-    point_tree_personnalise: ActionPointTree,
-    scores: Dict[ActionId, ActionScore],
-    potentiels: Dict[ActionId, float],
-    tache_id: ActionId,
-    status_by_action_id: Dict[str, ActionStatut],
-    actions_non_concernes_ids: List[ActionId],
-    action_personnalises_ids: List[ActionId],
-    actions_desactivees_ids: List[ActionId],
+        point_tree_referentiel: ActionPointTree,
+        point_tree_personnalise: ActionPointTree,
+        scores: Dict[ActionId, ActionScore],
+        potentiels: Dict[ActionId, float],
+        tache_id: ActionId,
+        status_by_action_id: Dict[str, ActionStatut],
+        actions_non_concernes_ids: List[ActionId],
+        action_personnalises_ids: List[ActionId],
+        actions_desactivees_ids: List[ActionId],
 ):
-
     tache_points_personnalise = point_tree_personnalise.get_action_point(tache_id)
     tache_points_referentiel = point_tree_referentiel.get_action_point(tache_id)
 
-    # TODO : find a softer way to tell that points cannot be None once they have been filled by referentiel constructor.
     assert tache_points_referentiel is not None
     assert tache_points_personnalise is not None
 
@@ -119,13 +116,13 @@ def update_scores_from_tache_given_statuses(
 
 
 def update_scores_for_action_given_children_scores(
-    point_tree_referentiel: ActionPointTree,
-    point_tree_personnalise: ActionPointTree,
-    scores: Dict[ActionId, ActionScore],
-    potentiels: Dict[ActionId, float],
-    action_personnalises_ids: List[ActionId],
-    actions_desactivees_ids: List[ActionId],
-    action_id: ActionId,
+        point_tree_referentiel: ActionPointTree,
+        point_tree_personnalise: ActionPointTree,
+        scores: Dict[ActionId, ActionScore],
+        potentiels: Dict[ActionId, float],
+        action_personnalises_ids: List[ActionId],
+        actions_desactivees_ids: List[ActionId],
+        action_id: ActionId,
 ):
     action_children = point_tree_referentiel.get_children(action_id)
     action_point_referentiel = point_tree_referentiel.get_action_point(action_id)
@@ -214,9 +211,9 @@ def update_scores_for_action_given_children_scores(
 
 
 def _get_non_concerne_action_ids(
-    action_id: ActionId,
-    actions_non_concernes_ids: List[ActionId],
-    point_tree: ActionPointTree,
+        action_id: ActionId,
+        actions_non_concernes_ids: List[ActionId],
+        point_tree: ActionPointTree,
 ):
     if action_id in actions_non_concernes_ids:
         return
@@ -227,7 +224,7 @@ def _get_non_concerne_action_ids(
 
 @timeit("compute_actions_non_concernes_ids")
 def compute_actions_non_concernes_ids(
-    point_tree: ActionPointTree, statuses: List[ActionStatut]
+        point_tree: ActionPointTree, statuses: List[ActionStatut],
 ):
     taches_non_concernes_ids = [
         action_status.action_id
@@ -247,23 +244,29 @@ def compute_actions_non_concernes_ids(
 
 @timeit("compute_actions_desactivees_ids")
 def compute_actions_desactivees_ids(
-    point_tree_personnalise: ActionPointTree,
-    actions_personnalises_desactivees_ids: List[ActionId],
+        point_tree_personnalise: ActionPointTree,
+        personnalisation_consequences: dict[ActionId, ActionPersonnalisationConsequence]
 ) -> List[ActionId]:
-    all_actions_desactivees_ids = []
-    for action_id in actions_personnalises_desactivees_ids:
+    """Propage la désactivation des parents aux enfants."""
+    desactivations = [
+        action_id
+        for action_id, consequence in personnalisation_consequences.items()
+        if consequence.desactive
+    ]
+    action_desactive_ids = set()
+    for action_id in desactivations:
         point_tree_personnalise.map_from_action_to_taches(
-            lambda child_id: all_actions_desactivees_ids.append(child_id),
+            lambda child_id: action_desactive_ids.add(child_id),
             action_id,
         )
-    return all_actions_desactivees_ids
+    return list(action_desactive_ids)
 
 
 def _get_action_potentiel_after_redistribution_for_level_greater_than_action_level(
-    action_id: ActionId,
-    original_action_potentiel: float,
-    actions_non_concernes_ids: List[ActionId],
-    point_tree_personnalise: ActionPointTree,
+        action_id: ActionId,
+        original_action_potentiel: float,
+        actions_non_concernes_ids: List[ActionId],
+        point_tree_personnalise: ActionPointTree,
 ):
     # If some siblings are non concernes, redistribute their points
     action_siblings = point_tree_personnalise.get_siblings(action_id)
@@ -272,7 +275,7 @@ def _get_action_potentiel_after_redistribution_for_level_greater_than_action_lev
     ]
 
     if any(action_sibling_is_non_concerne) and not all(
-        action_sibling_is_non_concerne
+            action_sibling_is_non_concerne
     ):  # Some (but not all) actions are 'non-concernes'
         siblings_non_concernes = set(action_siblings).intersection(
             set(actions_non_concernes_ids)
@@ -292,23 +295,21 @@ def _get_action_potentiel_after_redistribution_for_level_greater_than_action_lev
             if point_tree_personnalise.get_action_point(action_id) != 0
         ]
         if action_id in actions_to_redistribute_amongst:
-            return original_action_potentiel + points_non_concerne_to_redistribute / (
-                len(actions_to_redistribute_amongst)
-            )
+            additional_potentiel = points_non_concerne_to_redistribute / len(actions_to_redistribute_amongst)
+            return original_action_potentiel + additional_potentiel
     return original_action_potentiel
 
 
 @timeit("compute_potentiels")
 def compute_potentiels(
-    point_tree_personnalise: ActionPointTree,
-    actions_non_concernes_ids: List[ActionId],
-    action_level: int,
+        point_tree_personnalise: ActionPointTree,
+        actions_non_concernes_ids: List[ActionId],
+        action_level: int,
 ) -> Dict[ActionId, float]:
-
     potentiels = {}
 
     def _add_action_potentiel_after_redistribution(
-        action_id: ActionId,
+            action_id: ActionId,
     ):
         this_level = point_tree_personnalise._depths_by_action_ids[action_id]
         children = point_tree_personnalise.get_children(action_id)
@@ -344,25 +345,32 @@ def compute_potentiels(
     )
 
     def _resize_children_potentiels(action_id: ActionId):
+        """Ajuste les potentiels des enfants d'une action"""
         action_potentiel = potentiels[action_id]
         action_referentiel_points = point_tree_personnalise.get_action_point(action_id)
+
+        # Si un potentiel a été modifié
         if action_potentiel != action_referentiel_points:
             children = point_tree_personnalise.get_children(action_id)
             if not children:
                 return
 
+            # pour chaque enfant
             for child_id in children:
+                # on ajuste son potentiel avec le même facteur de potentiel que son parent
                 new_child_potentiel = (
                     (
-                        potentiels[child_id]
-                        / action_referentiel_points
-                        * action_potentiel
+                            potentiels[child_id]
+                            / action_referentiel_points
+                            * action_potentiel
                     )
                     if action_referentiel_points
                     else 0.0
                 )
                 potentiels[child_id] = new_child_potentiel
 
+    # On ajuste les potentiels des enfants en partant du niveau de l'action
+    # - les points des actions n'étant pas redistribués.
     point_tree_personnalise.map_from_actions_to_taches(
         lambda action_id: _resize_children_potentiels(
             action_id,
@@ -373,22 +381,23 @@ def compute_potentiels(
 
 
 @timeit("build_point_tree_personnalise")
-def build_point_tree_personnalise(
-    point_tree_referentiel: ActionPointTree,
-    personnalisation_consequences: Dict[ActionId, ActionPersonnalisationConsequence],
+def build_point_personnalisation_tree(
+        referentiel_tree: ActionPointTree,
+        personnalisation_consequences: Dict[ActionId, ActionPersonnalisationConsequence],
 ) -> ActionPointTree:
-    point_tree_personnalise = point_tree_referentiel.clone()
+    """Applique les potentiels personnalisés sur une copie de l'arbre du référentiel."""
+    personnalise_tree = referentiel_tree.clone()
     for action_id, consequence in personnalisation_consequences.items():
         if consequence.potentiel_perso is not None:
             factor = float(consequence.potentiel_perso)
             personnalisation = (
-                lambda action_id: point_tree_personnalise.set_action_point(
+                lambda action_id: personnalise_tree.set_action_point(
                     action_id,
-                    point_tree_personnalise.get_action_point(action_id) * factor,
+                    personnalise_tree.get_action_point(action_id) * factor,
                 )
             )
-            point_tree_personnalise.map_from_action_to_taches(
+            personnalise_tree.map_from_action_to_taches(
                 personnalisation,
                 action_id,
             )
-    return point_tree_personnalise
+    return personnalise_tree
