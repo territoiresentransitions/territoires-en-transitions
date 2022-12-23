@@ -2,8 +2,8 @@ import {useEffect, useState} from 'react';
 import {Form, Formik} from 'formik';
 import * as Yup from 'yup';
 
-import FormSelect from 'ui/shared/form/FormSelect';
-import FormAutoCompleteInput from 'ui/shared/form/FormAutoCompleteInput';
+import FormikSelect from 'ui/shared/form/formik/FormikSelect';
+import FormikAutoCompleteInput from 'ui/shared/form/formik/FormikAutoCompleteInput';
 import Aide from './Aide';
 
 import {AllCollectiviteRead} from 'generated/dataLayer';
@@ -17,6 +17,7 @@ import {MembreFonction} from 'generated/dataLayer/membres';
 import {collectiviteFonctionOptions} from './data';
 import CollectiviteSelectionee from './CollectiviteSelectionee';
 import Success from './Success';
+import {useTracker} from 'core-logic/hooks/useTracker';
 
 /** Schéma de validation du formulaire */
 const formValidation = Yup.object({
@@ -41,6 +42,8 @@ export const RejoindreUneCollectivite = ({
   setSearch,
   getReferentContacts,
 }: RejoindreUneCollectiviteProps) => {
+  const tracker = useTracker();
+
   /** Formate la liste des collectivités à afficher dans le select de l'auto complete */
   const listeCollectivites =
     filteredCollectivites.length > 0
@@ -108,6 +111,7 @@ export const RejoindreUneCollectivite = ({
   const handleFormSubmit = (values: FormProps) => {
     if (selectedCollectivite) {
       claimCollectivite(parseInt(values.collectiviteId));
+      tracker({fonction: 'rejoindre_une_collectivite', action: 'clic'});
     }
   };
 
@@ -125,14 +129,14 @@ export const RejoindreUneCollectivite = ({
               {!isClaimSuccess ? (
                 <>
                   <Form>
-                    <FormSelect
+                    <FormikSelect
                       data-test="SelectFonction"
                       name="fonction"
                       label="Fonction principale"
                       hint="Quel est votre rôle au sein ou auprès de la collectivité ?"
                       options={collectiviteFonctionOptions}
                     />
-                    <FormAutoCompleteInput
+                    <FormikAutoCompleteInput
                       name="collectiviteId"
                       label="Quelle collectivité souhaitez-vous rejoindre ?"
                       hint="Recherchez par nom"

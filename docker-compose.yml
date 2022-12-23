@@ -248,6 +248,8 @@ services:
       - donotstart
     command: >
       bash -c "pytest tests"
+    volumes:
+      - ./markdown:/markdown
 
   business-parse-content:
     container_name: tet-business-parse-content
@@ -300,6 +302,8 @@ services:
   sqitch-test:
     container_name: tet-sqitch-test
     build: ./data_layer/loader/.
+    profiles:
+      - donotstart
     depends_on:
       - db
       - auth

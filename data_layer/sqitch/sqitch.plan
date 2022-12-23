@@ -156,3 +156,24 @@ cron/refresh_stats_views [stats/vues_BI] 2022-12-06T17:02:25Z Florian <florian@d
 automatisation_schema 2022-12-07T15:05:42Z Amandine Jacquelin <conta@LanceLibre> # Ajout du schema automatisation
 automatisation/crm [automatisation_schema] 2022-11-29T15:13:51Z Amandine Jacquelin <conta@LanceLibre> # Envoie JSON à n8n puis à Salesforce quand nouveau utilisateur et collectivité
 @v1.16.0 2022-12-12T08:46:49Z Florian <florian@derfurth.com> # Statistiques et automatisation.
+
+referentiel/action_statut_historique [referentiel/action_statut_historique@v1.14.0] 2022-11-29T15:45:07Z Florian <florian@derfurth.com> # Permet de reconstituer les statuts à un instant donné
+evaluation/score_service [evaluation/score_service@v1.15.0] 2022-11-30T14:31:12Z Florian <florian@derfurth.com> # Améliore la construction des payloads
+referentiel/vue_tabulaire [referentiel/vue_tabulaire@v1.15.0] 2022-12-01T15:35:13Z Florian <florian@derfurth.com> # Améliore les vues tabulaires
+referentiel/contenu_json [referentiel/contenu_json@v1.15.0] 2022-12-01T16:02:41Z Florian <florian@derfurth.com> # Met à jour le trigger post contenu.
+labellisation/comparaison_audit [evaluation/score_service referentiel/action_statut_historique] 2022-11-30T09:40:18Z Florian <florian@derfurth.com> # Permet de calculer les scores pre-audit
+labellisation/audit [labellisation/audit@v1.16.0] 2022-12-14T14:00:38Z Florian <florian@derfurth.com> # Permet d'afficher les noms des auditeurs pour un audit
+@v1.17.0 2022-12-15T12:34:04Z Florian <florian@derfurth.com> # Comparaison des scores avant et après audit.
+
+referentiel/action_statut [referentiel/action_statut@v1.17.0] 2022-12-19T10:08:22Z Florian <florian@derfurth.com> # Répare la vérification de la somme des statuts détaillés
+json_schema 2022-11-14T09:06:51Z Amandine Jacquelin <conta@LanceLibre> # Ajout de l'extension json_schema
+indicateur/indicateur_terristory_json [json_schema] 2022-11-09T13:39:16Z Amandine Jacquelin <conta@LanceLibre> # Indicateur venant de terristory via json
+@v1.18.0 2022-12-20T15:44:33Z Florian <florian@derfurth.com> # API entrante terristory.
+
+stats/vues_BI [stats/vues_BI@v1.17.0] 2022-12-17T15:33:17Z Florian <florian@derfurth.com> # Ajoute des vues
+@v1.19.0 2022-12-21T13:29:28Z Florian <florian@derfurth.com> # Nouvelles vues BI.
+
+stats/vues_BI [stats/vues_BI@v1.19.0] 2022-12-21T14:55:43Z Florian <florian@derfurth.com> # Reconstitue les connections à partir des logs
+timescaledb 2022-12-21T19:13:26Z Florian <florian@derfurth.com> # Ajoute l'extension TimescaleDB
+utilisateur/visite 2022-12-22T15:07:56Z Florian <florian@derfurth.com> # Permet de suivre les visites sur les pages
+utilisateur/usage 2022-12-21T18:40:08Z Florian <florian@derfurth.com> # Permet d'enregistrer les métriques d'usage
