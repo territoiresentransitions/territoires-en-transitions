@@ -2,8 +2,12 @@
 
 BEGIN;
 
-select collectivite_id, audit_id, referentiel, noms
-from auditeurs
+select collectivite_id, referentiel, audit, is_cot
+from audits
+where false;
+
+select id, collectivite_id, referentiel, demande_id, date_debut, date_fin, valide
+from audit_en_cours
 where false;
 
 ROLLBACK;
