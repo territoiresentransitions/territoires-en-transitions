@@ -2,16 +2,6 @@
 
 BEGIN;
 
-create or replace view stats.monthly_bucket
-as
-with serie as (select generate_series(0, extract(month from age(now(), date '2022-01-01'))) as m),
-     month as
-         (select date '2021-01-01' + interval '1 month' * serie.m as start
-          from serie)
-select month.start::date                                  as first_day,
-       (month.start + (interval '1 month - 1 day'))::date as last_day
-from month;
-
 create or replace function
     stats.refresh_views()
     returns void
@@ -28,10 +18,24 @@ begin
     refresh materialized view stats.rattachement;
     refresh materialized view stats.utilisateur;
     refresh materialized view stats.evolution_utilisateur;
+    refresh materialized view stats.connection;
+    refresh materialized view stats.evolution_connection;
 end ;
 $$ language plpgsql security definer;
 
-drop materialized view stats.evolution_connection;
-drop materialized view stats.connection;
+drop view public.stats_carte_collectivite_active;
+drop materialized view stats.carte_collectivite_active;
+drop view stats_evolution_total_activation_par_type;
+drop materialized view stats.evolution_total_activation_par_type;
+drop view stats_collectivite_actives_et_total_par_type;
+drop materialized view stats.collectivite_actives_et_total_par_type;
+drop view stats_evolution_utilisateur;
+drop view stats_evolution_nombre_utilisateur_par_collectivite;
+drop materialized view stats.evolution_nombre_utilisateur_par_collectivite;
+drop view stats_carte_epci_par_departement;
+drop materialized view stats.carte_epci_par_departement;
+drop materialized view stats.pourcentage_completude;
+drop view stats_evolution_collectivite_avec_minimum_fiches;
+drop materialized view stats.evolution_collectivite_avec_minimum_fiches;
 
 COMMIT;
