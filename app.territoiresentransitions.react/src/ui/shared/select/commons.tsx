@@ -31,7 +31,7 @@ export const optionCheckMarkClassname = 'block fr-fi-check-line scale-75';
  * Types partagés entre tous les composants selects
  * (Select, MultiSelect, MultiSelectFilter)
  */
-type TOption = {value: string; label: string};
+export type TOption = {value: string; label: string};
 
 export type TSelectBase = {
   /** Liste des options */
@@ -42,6 +42,8 @@ export type TSelectBase = {
   placeholderText?: string;
   /** Change l'emplacement du dropdown menu */
   placement?: Placement;
+  /** Pour que la largeur des options ne dépasse pas la largeur du bouton d'ouverture */
+  containerWidthMatchButton?: boolean;
   /** Donne un id pour les tests e2e */
   'data-test'?: string;
   /** Permet de désactiver le bouton d'ouverture */
@@ -51,7 +53,6 @@ export type TSelectBase = {
 export type TSelectSelectionButtonBase = {
   /** Donné par le DropdownFloater */
   isOpen?: boolean;
-  toggleOpen?: (open: boolean) => void;
 };
 
 export type TSelectDropdownBase<T extends string> = {
@@ -62,7 +63,7 @@ export type TSelectDropdownBase<T extends string> = {
 /** Affiche une marque de sélection (ou seulement son emplacement) devant un
  * item de la liste */
 export const Checkmark = ({isSelected}: {isSelected: boolean}) => (
-  <div className="w-6 mr-2">
+  <div className="w-6 mr-2 shrink-0">
     {isSelected ? <span className="block fr-fi-check-line scale-75" /> : null}
   </div>
 );

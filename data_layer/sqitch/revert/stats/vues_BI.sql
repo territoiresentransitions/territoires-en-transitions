@@ -2,39 +2,67 @@
 
 BEGIN;
 
-create or replace function
-    stats.refresh_views()
-    returns void
-as
-$$
-begin
-    refresh materialized view stats.collectivite;
-    refresh materialized view stats.collectivite_utilisateur;
-    refresh materialized view stats.collectivite_referentiel;
-    refresh materialized view stats.collectivite_labellisation;
-    refresh materialized view stats.collectivite_plan_action;
-    refresh materialized view stats.collectivite_action_statut;
-    refresh materialized view stats.evolution_activation;
-    refresh materialized view stats.rattachement;
-    refresh materialized view stats.utilisateur;
-    refresh materialized view stats.evolution_utilisateur;
-    refresh materialized view stats.connection;
-    refresh materialized view stats.evolution_connection;
-    refresh materialized view stats.carte_collectivite_active;
-    refresh materialized view stats.evolution_total_activation_par_type;
-    refresh materialized view stats.collectivite_actives_et_total_par_type;
-    refresh materialized view stats.evolution_nombre_utilisateur_par_collectivite;
-    refresh materialized view stats.carte_epci_par_departement;
-    refresh materialized view stats.pourcentage_completude;
-    refresh materialized view stats.evolution_collectivite_avec_minimum_fiches;
-    refresh materialized view stats.evolution_indicateur_referentiel;
-    refresh materialized view stats.evolution_resultat_indicateur_referentiel;
-    refresh materialized view stats.evolution_resultat_indicateur_personnalise;
-    refresh materialized view stats.engagement_collectivite;
-end ;
-$$ language plpgsql security definer;
+drop view if exists stats_evolution_collectivite_avec_minimum_fiches;
+drop materialized view if exists stats.evolution_collectivite_avec_minimum_fiches;
 
-drop view stats_evolution_nombre_fiches;
-drop materialized view stats.evolution_nombre_fiches;
+create materialized view stats.evolution_collectivite_avec_minimum_fiches
+as
+with fiche_collecticite as (select first_day                                               as mois,
+                                   collectivite_id,
+                                   count(*) filter ( where fa.modified_at <= mb.last_day ) as fiches
+                            from stats.monthly_bucket mb
+                                     join stats.collectivite_active ca on true
+                                     join fiche_action fa using (collectivite_id)
+                            group by mb.first_day, collectivite_id)
+select mois,
+       count(*) filter ( where fiches > 5 ) as collectivites
+from fiche_collecticite
+group by mois
+order by mois;
+
+create view stats_evolution_collectivite_avec_minimum_fiches
+as
+select mois, collectivites
+from stats.evolution_collectivite_avec_minimum_fiches;
+
+drop view if exists stats_evolution_nombre_fiches;
+drop materialized view if exists stats.evolution_nombre_fiches;
+
+create materialized view stats.evolution_nombre_fiches
+as
+select first_day                                               as mois,
+       count(*) filter ( where fa.modified_at <= mb.last_day ) as fiches
+from stats.monthly_bucket mb
+         join stats.collectivite_active ca on true
+         join fiche_action fa using (collectivite_id)
+group by mb.first_day
+order by mois;
+
+create view stats_evolution_nombre_fiches
+as
+select mois, fiches
+from stats.evolution_nombre_fiches;
+
+drop materialized view if exists stats.collectivite_plan_action;
+
+-- non réversible car dépendante du plan d'action.
+--
+-- create materialized view stats.collectivite_plan_action
+-- as
+-- with fa as (select collectivite_id,
+--                    count(*) as count
+--             from fiche_action f
+--             group by f.collectivite_id),
+--      pa as (select collectivite_id,
+--                    count(*) as count
+--             from plan_action p
+--             group by p.collectivite_id)
+-- select c.*,
+--        coalesce(fa.count, 0) as fiches,
+--        coalesce(pa.count, 0) as plans
+-- from stats.collectivite c
+--          left join pa on pa.collectivite_id = c.collectivite_id
+--          left join fa on pa.collectivite_id = fa.collectivite_id
+-- order by fiches desc;
 
 COMMIT;

@@ -1,5 +1,19 @@
 /// <reference types="Cypress" />
 import '../05-modifier-etat-avancement/steps';
+import '../12-utiliser-la-bibliotheque/steps';
+import {LocalSelectors as LocalSelectorsPreuves} from '../04-associer-des-preuves-aux-actions/selectors';
+import {LocalSelectors as LocalSelectorsStatut} from '../05-modifier-etat-avancement/selectors';
+import {LocalSelectors} from './selectors';
+import {makeCheckPreuveRows} from '../04-associer-des-preuves-aux-actions/checkPreuves';
+
+beforeEach(() => {
+  // enregistre les définitions locales
+  cy.wrap({
+    ...LocalSelectorsPreuves,
+    ...LocalSelectorsStatut,
+    ...LocalSelectors,
+  }).as('LocalSelectors');
+});
 
 const suiviAuditTable = '[data-test="suivi-audit"]';
 
@@ -68,5 +82,33 @@ When(
       // ainsi que les sélecteurs pour modifier la valeur
       cy.get('[data-test=SelectStatut]').should('have.length.gt', 0);
     });
+  }
+);
+
+When("il n'y a pas de rapports d'audit", () => {
+  cy.get('[data-test=rapports-audit]').should('not.exist');
+});
+
+When(
+  "la liste des rapports d'audit contient les lignes suivantes :",
+  dataTable => {
+    cy.get('[data-test=rapports-audit]').within(makeCheckPreuveRows(dataTable));
+  }
+);
+
+When("l'en-tête contient {string}", text =>
+  cy.get('[data-test=HeaderMessage]').should('contain.text', text)
+);
+
+When("l'en-tête ne contient pas de message", text =>
+  cy.get('[data-test=HeaderMessage]').should('not.exist')
+);
+
+When(
+  `la liste des documents de labellisation contient le titre {string} sans l'indication {string}`,
+  (titre, indication) => {
+    cy.get('[data-test=labellisation]')
+      .should('contain.text', titre)
+      .should('not.contain.text', indication);
   }
 );

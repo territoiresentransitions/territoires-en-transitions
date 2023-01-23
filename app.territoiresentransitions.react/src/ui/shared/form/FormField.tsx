@@ -2,6 +2,7 @@ import classNames from 'classnames';
 
 type Props = {
   label: string;
+  className?: string;
   hint?: string;
   htmlFor?: string;
   errorMessage?: string;
@@ -11,6 +12,7 @@ type Props = {
 
 const FormField = ({
   label,
+  className,
   hint,
   htmlFor,
   errorMessage,
@@ -19,9 +21,10 @@ const FormField = ({
 }: Props) => {
   return (
     <div
-      className={classNames('fr-input-group flex-grow', {
+      className={classNames(`fr-input-group flex-grow`, {
         'fr-input-group--error': errorMessage,
         'fr-input-group--disabled': disabled,
+        className,
       })}
     >
       <label htmlFor={htmlFor} className="fr-label mb-2">

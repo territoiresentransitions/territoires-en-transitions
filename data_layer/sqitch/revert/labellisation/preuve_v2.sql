@@ -4,8 +4,6 @@ BEGIN;
 
 drop view retool_preuves;
 drop view preuve;
-drop table preuve_audit;
-
 
 -- La vue utilisée par le client qui regroupe tout les types de preuves.
 create view preuve
@@ -24,7 +22,8 @@ select -- champs communs
        snippet.snippet                             as action,
        null:: jsonb                                as preuve_reglementaire,
        null:: jsonb                                as demande,
-       null:: jsonb                                as rapport
+       null:: jsonb                                as rapport,
+       null:: jsonb                                as audit
 from preuve_complementaire pc
          left join labellisation.bibliotheque_fichier_snippet fs
                    on fs.id = pc.fichier_id
@@ -44,10 +43,11 @@ select 'reglementaire',
        pr.modified_by,
        utilisateur.modified_by_nom(pr.modified_by),
        snippet.snippet,
-       (select jsonb_build_object(
-                       'id', prd.id,
-                       'nom', prd.nom,
-                       'description', prd.description)),
+       jsonb_build_object(
+               'id', prd.id,
+               'nom', prd.nom,
+               'description', prd.description),
+       null,
        null,
        null
 from collectivite c -- toutes les collectivités ...
@@ -61,7 +61,35 @@ union all
 
 select 'labellisation',
        p.id,
-       d.collectivite_id,
+       coalesce(d.collectivite_id, pa.collectivite_id),
+       fs.snippet,
+       coalesce(p.lien, pa.lien),
+       coalesce(p.commentaire, pa.commentaire),
+       coalesce(p.modified_at, pa.modified_at),
+       coalesce(p.modified_by, pa.modified_by),
+       utilisateur.modified_by_nom(coalesce(p.modified_by, pa.modified_by)),
+       null,
+       null,
+       jsonb_build_object(
+               'en_cours', d.en_cours,
+               'referentiel', d.referentiel,
+               'etoiles', d.etoiles,
+               'date', d.date,
+               'id', d.id,
+               'audit_id', pa.audit_id
+           ),
+       null,
+       null
+from labellisation.demande d
+         left join preuve_labellisation p on p.demande_id = d.id
+         left join audit a on d.id = a.demande_id
+         left join preuve_audit pa on a.id = pa.audit_id
+         left join labellisation.bibliotheque_fichier_snippet fs on fs.id = p.fichier_id
+union all
+
+select 'audit',
+       p.id,
+       a.collectivite_id,
        fs.snippet,
        p.lien,
        p.commentaire,
@@ -70,17 +98,13 @@ select 'labellisation',
        utilisateur.modified_by_nom(p.modified_by),
        null,
        null,
-       (select jsonb_build_object(
-                       'en_cours', d.en_cours,
-                       'referentiel', d.referentiel,
-                       'etoiles', d.etoiles,
-                       'date', d.date,
-                       'id', d.id
-                   )),
-       null
-from labellisation.demande d
-         join preuve_labellisation p on p.demande_id = d.id
+       null,
+       null,
+       jsonb_build_object('id', a.id, 'referentiel', a.referentiel, 'date_debut', a.date_debut, 'date_fin', a.date_fin)
+from audit a
+         join preuve_audit p on p.audit_id = a.id
          left join labellisation.bibliotheque_fichier_snippet fs on fs.id = p.fichier_id
+where a.demande_id is null
 
 union all
 select 'rapport',
@@ -95,7 +119,8 @@ select 'rapport',
        null,
        null,
        null,
-       jsonb_build_object('date', p.date)
+       jsonb_build_object('date', p.date),
+       null
 from preuve_rapport p
          left join labellisation.bibliotheque_fichier_snippet fs on fs.id = p.fichier_id
 ;
@@ -115,6 +140,5 @@ from preuve
     and created_at is not null
 where is_service_role()
 order by collectivite_id, referentiel, naturalsort(action ->> 'identifiant');
-
 
 COMMIT;

@@ -37,7 +37,8 @@ const MultiSelectDropdown = <T extends string>({
   values,
   options,
   buttonClassName,
-  placeholderText,
+  containerWidthMatchButton,
+  placeholderText = 'Sélectionnez une ou plusieurs options',
   onSelect,
   renderSelection,
   renderOption,
@@ -46,6 +47,7 @@ const MultiSelectDropdown = <T extends string>({
   'data-test': dataTest,
 }: TMultiSelectDropdownProps<T>) => (
   <DropdownFloater
+    containerWidthMatchButton={containerWidthMatchButton}
     placement={placement}
     render={() => (
       <div data-test={`${dataTest}-options`}>
@@ -136,7 +138,7 @@ const MultiSelectButton = forwardRef(
         )
       ) : (
         <span className={buttonDisplayedPlaceholderClassname}>
-          {placeholderText ?? ''}
+          {placeholderText}
         </span>
       )}
       <ExpandCollapseIcon isOpen={isOpen} />
