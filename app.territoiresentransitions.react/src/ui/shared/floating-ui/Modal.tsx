@@ -30,7 +30,7 @@ export type ModalProps = {
   /* accompagne "externalOpen" afin de pouvoir fermer la modale */
   setExternalOpen?: Dispatch<SetStateAction<boolean>>;
   /* max-width prédéfinies dans le DSFR, valeur par défaut "md" */
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   /** désactive la fermeture lors du clic sur le fond */
   disableDismiss?: boolean;
 };
@@ -65,8 +65,8 @@ const Modal = ({
     useDismiss(context, {enabled: !disableDismiss}),
   ]);
 
-  const mobileClassnames = 'absolute inset-x-0 bottom-0 mt-8 max-h-full';
-  const aboveMobileClassnames = 'sm:relative sm:m-0 max-h-90vh';
+  const mobileClassnames = 'absolute inset-x-0 bottom-0 mt-8';
+  const aboveMobileClassnames = 'sm:relative sm:m-6';
 
   const handleCloseClick = () => {
     setExternalOpen ? setExternalOpen(false) : setOpen(false);
@@ -96,11 +96,12 @@ const Modal = ({
                 {...getFloatingProps({
                   ref: floating,
                   className: classNames(
-                    `${mobileClassnames} ${aboveMobileClassnames} flex flex-col w-full p-4 md:px-8 bg-white overflow-y-auto`,
+                    `${mobileClassnames} ${aboveMobileClassnames} flex flex-col w-full max-h-[100vh] p-4 md:px-8 bg-white overflow-y-auto`,
                     {
                       'max-w-sm': size === 'sm',
                       'max-w-xl': size === 'md',
                       'max-w-4xl': size === 'lg',
+                      'max-w-7xl': size === 'xl',
                     }
                   ),
                   'aria-labelledby': labelId,
@@ -109,10 +110,10 @@ const Modal = ({
               >
                 <button
                   onClick={handleCloseClick}
-                  className="flex items-center ml-auto mb-2 px-2 py-2 md:-mr-4 fr-btn--secondary !shadow-none"
+                  className="flex items-center ml-auto mb-2 pl-2 py-0.5 md:-mr-4 fr-btn--secondary !shadow-none"
                 >
-                  <span className="-mt-1">Fermer</span>
-                  <div className="fr-fi-close-line ml-2" />
+                  <span className="-mt-1 text-sm underline">Fermer</span>
+                  <div className="fr-fi-close-line ml-0.5 scale-75" />
                 </button>
                 {render({
                   close: () => setOpen(false),

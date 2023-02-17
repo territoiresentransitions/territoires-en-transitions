@@ -1,6 +1,10 @@
 begin;
-select plan(19);
+select plan(34);
 
+truncate fiche_action_financeur_tag;
+truncate financeur_tag cascade;
+truncate fiche_action_service_tag;
+truncate service_tag cascade;
 truncate fiche_action_annexe;
 truncate annexe cascade;
 truncate fiche_action_indicateur;
@@ -158,5 +162,98 @@ set objectifs = 'objectif'
 where id=1;
 
 select ok((select objectifs = 'objectif' from fiches_action where id = 1));
+
+-- Test service
+select ajouter_service(1, (select pt.*::service_tag from (select null as id, 'serv1' as nom, 1 as collectivite_id) pt limit 1));
+select ajouter_service(1, (select pt.*::service_tag from (select null as id, 'serv2' as nom, 1 as collectivite_id) pt limit 1));
+select ajouter_service(2, (select pt.*::service_tag from (select null as id, 'serv3' as nom, 2 as collectivite_id) pt limit 1));
+select enlever_service(3, (select ajouter_service(3, (select pt.*::service_tag from (select null as id, 'serv4' as nom, 2 as collectivite_id) pt limit 1))));
+select ok ((select count(*)=4 from service_tag),
+           'Il devrait y avoir 3 entrées dans service_tag');
+select ok ((select count(*)=3 from fiche_action_service_tag),
+           'Il devrait y avoir 3 entrées dans fiche_action_service_tag');
+
+-- Test financeur
+select ajouter_financeur(1,(
+select pt.*::financeur_montant
+    from (
+             select
+                 (
+                     select fi::financeur_tag
+                     from (
+                              select null as id,
+                                     'fina1' as nom,
+                                     1 as collectivite_id
+                          ) fi
+                 ) as financeur,
+                 0 as montant_ttc,
+                 null as id
+         ) pt
+    limit 1
+));
+select ajouter_financeur(1,(
+    select pt.*::financeur_montant
+    from (
+             select
+                 (
+                     select fi::financeur_tag
+                     from (
+                              select null as id,
+                                     'fina2' as nom,
+                                     1 as collectivite_id
+                          ) fi
+                 ) as financeur,
+                 10 as montant_ttc,
+                 null as id
+         ) pt
+    limit 1
+));
+select ajouter_financeur(2,(
+    select pt.*::financeur_montant
+    from (
+             select
+                 (
+                     select fi::financeur_tag
+                     from (
+                              select null as id,
+                                     'fina3' as nom,
+                                     2 as collectivite_id
+                          ) fi
+                 ) as financeur,
+                 5 as montant_ttc,
+                 null as id
+         ) pt
+    limit 1
+));
+delete from fiche_action_financeur_tag where fiche_id = 2;
+select ok ((select count(*)=3 from financeur_tag),
+           'Il devrait y avoir 3 entrées dans financeur_tag');
+select ok ((select count(*)=2 from fiche_action_financeur_tag),
+           'Il devrait y avoir 2 entrées dans fiche_action_financeur_tag');
+-- VUE PLAN ACTION
+select ok((select count(*)=2 from plan_action_profondeur), 'La fonction devrait retourner deux jsonb');
+select ok((select count(*)=4 from plan_action_chemin where collectivite_id = 1), 'La fonction devrait retourner quatre chemins');
+
+-- Test supression cascade
+select enlever_fiche_action_d_un_axe(3, 3);
+select ok ((select count(*)=1 from axe where id = 4),
+           'L''axe id 4 devrait exister');
+select ok ((select count(*)=1 from fiche_action where id = 1),
+           'La fiche id 1 devrait exister');
+select ok ((select count(*)=1 from fiche_action where id = 2),
+           'La fiche id 2 devrait exister');
+select ok ((select count(*)=2 from fiche_action_axe where fiche_id = 1),
+           'La fiche id 1 devrait être dans 2 plans');
+select delete_axe_all(1);
+select ok ((select count(*)=0 from axe where id = 4),
+           'L''axe id 4 ne devrait plus exister');
+select ok ((select count(*)=1 from fiche_action where id = 1),
+           'La fiche id 1 devrait toujours exister');
+select ok ((select count(*)=1 from fiche_action_axe where fiche_id = 1),
+           'La fiche id 1 devrait être dans 1 plan');
+select ok ((select count(*)=0 from fiche_action where id = 2),
+           'La fiche id 2 ne devrait plus exister');
+select ok ((select count(*)=1 from fiche_action where id = 3),
+           'La fiche id 3 devrait exister');
 
 rollback;

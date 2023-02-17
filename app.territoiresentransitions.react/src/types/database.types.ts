@@ -147,7 +147,9 @@ export interface Database {
         | 'bibliotheque'
         | 'historique'
         | 'plan'
-        | 'fiche';
+        | 'fiche'
+        | 'plan_axe'
+        | 'fiches_non_classees';
       visite_tag:
         | 'cae'
         | 'eci'
@@ -275,6 +277,10 @@ export interface Database {
         Args: {axe_id: number; fiche_id: number};
         Returns: undefined;
       };
+      ajouter_financeur: {
+        Args: {fiche_id: number; financeur: unknown};
+        Returns: unknown;
+      };
       ajouter_indicateur: {
         Args: {fiche_id: number; indicateur: unknown};
         Returns: undefined;
@@ -289,6 +295,10 @@ export interface Database {
       };
       ajouter_referent: {
         Args: {fiche_id: number; referent: unknown};
+        Returns: unknown;
+      };
+      ajouter_service: {
+        Args: {fiche_id: number; service: unknown};
         Returns: unknown;
       };
       ajouter_sous_thematique: {
@@ -428,6 +438,10 @@ export interface Database {
         Args: {if_compressed: boolean; uncompressed_chunk: unknown};
         Returns: unknown;
       };
+      delete_axe_all: {
+        Args: {axe_id: number};
+        Returns: undefined;
+      };
       delete_data_node: {
         Args: {
           drop_database: boolean;
@@ -495,6 +509,10 @@ export interface Database {
       };
       enlever_referent: {
         Args: {fiche_id: number; referent: unknown};
+        Returns: undefined;
+      };
+      enlever_service: {
+        Args: {fiche_id: number; service: unknown};
         Returns: undefined;
       };
       enlever_sous_thematique: {
@@ -888,6 +906,10 @@ export interface Database {
         Args: {id: number};
         Returns: Json;
       };
+      plan_action_profondeur: {
+        Args: {id: number; profondeur: number};
+        Returns: Json;
+      };
       plans_action_collectivite: {
         Args: {collectivite_id: number};
         Returns: unknown;
@@ -1077,19 +1099,19 @@ export interface Database {
       };
       time_bucket:
         | {
+            Args: {bucket_width: unknown; ts: string};
+            Returns: string;
+          }
+        | {
+            Args: {bucket_width: unknown; ts: string};
+            Returns: string;
+          }
+        | {
+            Args: {bucket_width: unknown; ts: string};
+            Returns: string;
+          }
+        | {
             Args: {bucket_width: unknown; origin: string; ts: string};
-            Returns: string;
-          }
-        | {
-            Args: {bucket_width: unknown; ts: string};
-            Returns: string;
-          }
-        | {
-            Args: {bucket_width: unknown; ts: string};
-            Returns: string;
-          }
-        | {
-            Args: {bucket_width: unknown; ts: string};
             Returns: string;
           }
         | {
@@ -1139,39 +1161,39 @@ export interface Database {
       time_bucket_gapfill:
         | {
             Args: {
-              bucket_width: number;
-              finish: number;
-              start: number;
-              ts: number;
-            };
-            Returns: number;
-          }
-        | {
-            Args: {
-              bucket_width: number;
-              finish: number;
-              start: number;
-              ts: number;
-            };
-            Returns: number;
-          }
-        | {
-            Args: {
-              bucket_width: number;
-              finish: number;
-              start: number;
-              ts: number;
-            };
-            Returns: number;
-          }
-        | {
-            Args: {
               bucket_width: unknown;
               finish: string;
               start: string;
               ts: string;
             };
             Returns: string;
+          }
+        | {
+            Args: {
+              bucket_width: number;
+              finish: number;
+              start: number;
+              ts: number;
+            };
+            Returns: number;
+          }
+        | {
+            Args: {
+              bucket_width: number;
+              finish: number;
+              start: number;
+              ts: number;
+            };
+            Returns: number;
+          }
+        | {
+            Args: {
+              bucket_width: number;
+              finish: number;
+              start: number;
+              ts: number;
+            };
+            Returns: number;
           }
         | {
             Args: {
@@ -1711,7 +1733,7 @@ export interface Database {
           nom: string;
           prenom: string;
           telephone?: string | null;
-          user_id?: string | null;
+          user_id: string;
         };
         Row: {
           created_at: string;
@@ -1722,7 +1744,7 @@ export interface Database {
           nom: string;
           prenom: string;
           telephone: string | null;
-          user_id: string | null;
+          user_id: string;
         };
         Update: {
           created_at?: string;
@@ -1733,7 +1755,7 @@ export interface Database {
           nom?: string;
           prenom?: string;
           telephone?: string | null;
-          user_id?: string | null;
+          user_id?: string;
         };
       };
       epci: {
@@ -1893,6 +1915,26 @@ export interface Database {
           fiche_id?: number;
         };
       };
+      fiche_action_financeur_tag: {
+        Insert: {
+          fiche_id: number;
+          financeur_tag_id: number;
+          id?: number;
+          montant_ttc?: number | null;
+        };
+        Row: {
+          fiche_id: number;
+          financeur_tag_id: number;
+          id: number;
+          montant_ttc: number | null;
+        };
+        Update: {
+          fiche_id?: number;
+          financeur_tag_id?: number;
+          id?: number;
+          montant_ttc?: number | null;
+        };
+      };
       fiche_action_import_csv: {
         Insert: {
           amelioration_continue?: string | null;
@@ -1906,6 +1948,12 @@ export interface Database {
           description?: string | null;
           elu_referent?: string | null;
           financements?: string | null;
+          financeur_deux?: string | null;
+          financeur_trois?: string | null;
+          financeur_un?: string | null;
+          montant_deux?: string | null;
+          montant_trois?: string | null;
+          montant_un?: string | null;
           moyens?: string | null;
           notes?: string | null;
           num_action?: string | null;
@@ -1915,6 +1963,7 @@ export interface Database {
           plan_nom?: string | null;
           priorite?: string | null;
           resultats_attendus?: string | null;
+          service?: string | null;
           sous_axe?: string | null;
           sous_sous_axe?: string | null;
           statut?: string | null;
@@ -1933,6 +1982,12 @@ export interface Database {
           description: string | null;
           elu_referent: string | null;
           financements: string | null;
+          financeur_deux: string | null;
+          financeur_trois: string | null;
+          financeur_un: string | null;
+          montant_deux: string | null;
+          montant_trois: string | null;
+          montant_un: string | null;
           moyens: string | null;
           notes: string | null;
           num_action: string | null;
@@ -1942,6 +1997,7 @@ export interface Database {
           plan_nom: string | null;
           priorite: string | null;
           resultats_attendus: string | null;
+          service: string | null;
           sous_axe: string | null;
           sous_sous_axe: string | null;
           statut: string | null;
@@ -1960,6 +2016,12 @@ export interface Database {
           description?: string | null;
           elu_referent?: string | null;
           financements?: string | null;
+          financeur_deux?: string | null;
+          financeur_trois?: string | null;
+          financeur_un?: string | null;
+          montant_deux?: string | null;
+          montant_trois?: string | null;
+          montant_un?: string | null;
           moyens?: string | null;
           notes?: string | null;
           num_action?: string | null;
@@ -1969,6 +2031,7 @@ export interface Database {
           plan_nom?: string | null;
           priorite?: string | null;
           resultats_attendus?: string | null;
+          service?: string | null;
           sous_axe?: string | null;
           sous_sous_axe?: string | null;
           statut?: string | null;
@@ -2041,6 +2104,20 @@ export interface Database {
           user_id?: string | null;
         };
       };
+      fiche_action_service_tag: {
+        Insert: {
+          fiche_id: number;
+          service_tag_id: number;
+        };
+        Row: {
+          fiche_id: number;
+          service_tag_id: number;
+        };
+        Update: {
+          fiche_id?: number;
+          service_tag_id?: number;
+        };
+      };
       fiche_action_sous_thematique: {
         Insert: {
           fiche_id: number;
@@ -2101,6 +2178,23 @@ export interface Database {
           intervalle?: unknown;
           libelle?: string;
           type?: Database['public']['Enums']['collectivite_filtre_type'];
+        };
+      };
+      financeur_tag: {
+        Insert: {
+          collectivite_id: number;
+          id?: number;
+          nom: string;
+        };
+        Row: {
+          collectivite_id: number;
+          id: number;
+          nom: string;
+        };
+        Update: {
+          collectivite_id?: number;
+          id?: number;
+          nom?: string;
         };
       };
       indicateur_action: {
@@ -3064,6 +3158,23 @@ export interface Database {
           reponse?: number | null;
         };
       };
+      service_tag: {
+        Insert: {
+          collectivite_id: number;
+          id?: number;
+          nom: string;
+        };
+        Row: {
+          collectivite_id: number;
+          id: number;
+          nom: string;
+        };
+        Update: {
+          collectivite_id?: number;
+          id?: number;
+          nom?: string;
+        };
+      };
       sous_thematique: {
         Insert: {
           id?: number;
@@ -3514,6 +3625,7 @@ export interface Database {
           date_fin_provisoire: string | null;
           description: string | null;
           financements: string | null;
+          financeurs: unknown[] | null;
           id: number | null;
           indicateurs: unknown[] | null;
           maj_termine: boolean | null;
@@ -3534,6 +3646,7 @@ export interface Database {
           resultats_attendus:
             | Database['public']['Enums']['fiche_action_resultats_attendus'][]
             | null;
+          services: unknown[] | null;
           sous_thematiques: unknown[] | null;
           statut: Database['public']['Enums']['fiche_action_statuts'] | null;
           structures: unknown[] | null;
@@ -3609,6 +3722,48 @@ export interface Database {
           begins_at: string | null;
           ends_at: string | null;
           now: string | null;
+        };
+      };
+      plan_action: {
+        Insert: {
+          collectivite_id?: number | null;
+          id?: number | null;
+          plan?: never;
+        };
+        Row: {
+          collectivite_id: number | null;
+          id: number | null;
+          plan: Json | null;
+        };
+        Update: {
+          collectivite_id?: number | null;
+          id?: number | null;
+          plan?: never;
+        };
+      };
+      plan_action_chemin: {
+        Row: {
+          axe_id: number | null;
+          chemin: unknown[] | null;
+          collectivite_id: number | null;
+          plan_id: number | null;
+        };
+      };
+      plan_action_profondeur: {
+        Insert: {
+          collectivite_id?: number | null;
+          id?: number | null;
+          plan?: never;
+        };
+        Row: {
+          collectivite_id: number | null;
+          id: number | null;
+          plan: Json | null;
+        };
+        Update: {
+          collectivite_id?: number | null;
+          id?: number | null;
+          plan?: never;
         };
       };
       preuve: {
