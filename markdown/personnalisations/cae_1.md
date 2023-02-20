@@ -21,6 +21,15 @@ identite(population, moins_de_50000)
 ```
 Les collectivités de moins de 50 000 habitants ne sont pas concernées par l'obligation BEGES.
 
+# Desactivation cae 1.1.2.1.5 liee EPCI
+```yaml
+action_id: cae_1.1.2.1.5
+```
+## Règles
+### Désactivation
+```formule
+identite(type, EPCI)
+```
 
 # Réduction potentiel cae 1.2.2 liee AOM
 ```yaml
@@ -29,8 +38,8 @@ action_id: cae_1.2.2
 ## Règles
 ### Réduction de potentiel
 ```formule
-si reponse(centre_urbain, OUI) et reponse (AOM_1, NON) alors 6/12 
-sinon si reponse (AOM_1, NON) alors 2/12
+si reponse(centre_urbain, NON) et reponse (AOM_1, NON) alors 2/12 
+sinon si reponse (AOM_1, NON) alors 6/12
 ```
 Pour une collectivité n'ayant pas la compétence AOM, le score de la 1.2.2 est réduit de 50 %.
 
@@ -97,7 +106,7 @@ action_id: cae_1.2.3
 ```formule
 si reponse(dechets_1, OUI) et reponse(dechets_2, OUI) et reponse(dechets_3, OUI) alors 1.0
 sinon si reponse(dechets_1, NON) et reponse(dechets_2, NON) et reponse(dechets_3, NON) alors 2/10
-sinon si reponse(dechets_1, OUI) ou reponse(dechets_2, OUI) ou reponse(dechets_3, OUI) alors 0.75
+sinon si reponse(dechets_1, NON) ou reponse(dechets_2, NON) ou reponse(dechets_3, NON) alors 0.75
 ```
 Pour une collectivité ne possédant que partiellement les compétences collecte, traitement des déchets et plan de prévention des déchets, le score de la 1.2.3 est réduit de 25 %.
 
