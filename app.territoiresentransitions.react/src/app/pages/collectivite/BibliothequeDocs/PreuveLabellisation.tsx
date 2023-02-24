@@ -4,7 +4,9 @@ import {Referentiel} from 'types/litterals';
 import PreuveDoc from 'ui/shared/preuves/Bibliotheque/PreuveDoc';
 import {TPreuveAuditEtLabellisation} from 'ui/shared/preuves/Bibliotheque/types';
 import {useIsAuditAuditeur} from '../Audit/useAudit';
+import {getParcoursStatus} from '../ParcoursLabellisation/getParcoursStatus';
 import {numLabels} from '../ParcoursLabellisation/numLabels';
+import {groupeParReferentielEtDemande} from './groupeParReferentielEtDemande';
 
 /**
  * Affiche les documents d'audit et labellisation, groupés par référentiel et
@@ -15,24 +17,27 @@ export const PreuvesLabellisation = ({
 }: {
   preuves: TPreuveAuditEtLabellisation[];
 }) => {
-  const parReferentiel = groupByReferentielEtDate(preuves);
+  const parReferentiel = groupeParReferentielEtDemande(preuves);
   return (
     <>
       {Object.entries(parReferentiel).map(
         ([referentiel, preuvesReferentiel]) => {
-          const parDate = Object.entries(preuvesReferentiel);
+          const parDemande = Object.entries(preuvesReferentiel)
+            .map(addInfoToEntry)
+            .sort((a, b) => b.info.timestamp - a.info.timestamp);
           return (
             <Fragment key={referentiel}>
               <h2>
                 Documents d'audit et de labellisation - Référentiel{' '}
                 {referentielToName[referentiel as Referentiel]}
               </h2>
-              {parDate.map(([date, preuvesDate]) => {
+              {parDemande.map(({id, docs, info}, index) => {
                 return (
                   <DocsAuditOuLabellisation
-                    key={date}
-                    date={date}
-                    preuves={preuves}
+                    key={id}
+                    preuves={docs}
+                    info={info}
+                    className={index ? 'fr-mt-3w' : undefined}
                   />
                 );
               })}
@@ -49,32 +54,47 @@ export const PreuvesLabellisation = ({
  * d'audit.
  */
 const DocsAuditOuLabellisation = (props: {
-  date: string;
+  className?: string;
   preuves: TPreuveAuditEtLabellisation[];
+  info: TCycleInfo;
 }) => {
-  const {date, preuves} = props;
-
-  // les documents ne sont pas éditables si la demande ou l'audit sont en cours,
-  // sauf si l'utilisateur courant est l'auditeur, ou si l'audit est validé
-  const {audit, demande} = preuves[0];
-  const isAuditeur = useIsAuditAuditeur(audit?.id);
-  const readonly =
-    (!audit && !demande?.en_cours) ||
-    (audit && (audit.valide || !isAuditeur)) ||
-    false;
+  const {className, preuves, info} = props;
 
   return (
     <Fragment>
-      <Title date={date} preuves={preuves} />
+      <h3 className={className}>
+        <Title info={info} />
+      </h3>
       {preuves.map(preuve => (
-        <PreuveDoc
-          key={preuve.id}
-          preuve={preuve}
-          readonly={readonly}
-          classComment="pb-0 mb-2"
-        />
+        <DocAuditOuLabellisation key={preuve.id} preuve={preuve} info={info} />
       ))}
     </Fragment>
+  );
+};
+
+const DocAuditOuLabellisation = ({
+  preuve,
+  info,
+}: {
+  preuve: TPreuveAuditEtLabellisation;
+  info: TCycleInfo;
+}) => {
+  const {audit} = preuve;
+  const {status} = info;
+  const isAuditeur = useIsAuditAuditeur(audit?.id);
+
+  // le document n'est pas éditable si...
+  const readonly =
+    // ... c'est le rapport d’un audit en cours et l'utilisateur n'est pas auditeur
+    (preuve.preuve_type === 'audit' &&
+      status === 'audit_en_cours' &&
+      !isAuditeur) ||
+    //... ou si l'audit est validé
+    status === 'audit_valide' ||
+    false;
+
+  return (
+    <PreuveDoc preuve={preuve} readonly={readonly} classComment="pb-0 mb-2" />
   );
 };
 
@@ -82,88 +102,57 @@ const DocsAuditOuLabellisation = (props: {
  * Affiche le titre d'un sous-ensemble de documents d'une demande de
  * labellisation ou d'audit.
  */
-const Title = (props: {
-  date: string;
-  preuves: TPreuveAuditEtLabellisation[];
-}) => {
-  const {date, preuves} = props;
-  const annee = new Date(date).getFullYear();
-  const demande = preuves.find(p => p.demande)?.demande;
-  const audit = preuves?.find(p => p.audit)?.audit;
-
-  const etoile = demande?.etoiles;
+const Title = (props: {info: TCycleInfo}) => {
+  const {info} = props;
+  const {etoile, status, annee, audit} = info;
   const labelEtoile = etoile ? (numLabels[etoile] as string) : null;
-  const en_cours = (!audit && demande?.en_cours) || (audit && !audit.valide);
+  const en_cours = status === 'demande_envoyee' || status === 'audit_en_cours';
   const label = annee + (en_cours ? ' (en cours)' : '') + ' - ';
 
   if (etoile) {
     return (
-      <h3>
+      <>
         {label}
         <span className="capitalize">{labelEtoile}</span> étoile
-      </h3>
+      </>
     );
   }
 
   if (audit) {
     return (
-      <h3>
+      <>
         {label}
         <span>Audit contrat d'objectif territorial (COT)</span>
-      </h3>
+      </>
     );
   }
 
   return null;
 };
 
-// groupe les preuves par référentiel
-type TPreuvesParReferentiel = Record<
-  Referentiel,
-  TPreuveAuditEtLabellisation[]
->;
-const groupByReferentiel = (
-  preuves: TPreuveAuditEtLabellisation[]
-): TPreuvesParReferentiel =>
-  preuves.reduce((dict, preuve) => {
-    const referentiel =
-      preuve.demande?.referentiel || preuve.audit?.referentiel;
-    if (!referentiel) {
-      return dict;
-    }
-    return {
-      ...dict,
-      [referentiel]: [...(dict[referentiel] || []), preuve],
-    };
-  }, {} as TPreuvesParReferentiel);
+// donne les infos du cycle d'audit/labellisation associé à un sous-ensemble de preuves
+const getCycleInfo = (preuves: TPreuveAuditEtLabellisation[]) => {
+  const demande = preuves.find(p => p.demande)?.demande || null;
+  const audit = preuves?.find(p => p.audit)?.audit || null;
+  const d = audit?.date_fin || audit?.date_debut || demande?.date;
+  const date = d ? new Date(d) : new Date();
+  const annee = date.getFullYear();
+  const status = getParcoursStatus({demande, audit});
+  const timestamp = date.getTime();
 
-// groupe les preuves par date de la demande
-type TPreuvesParDate = Record<string, TPreuveAuditEtLabellisation[]>;
-const groupByDate = (preuves: TPreuveAuditEtLabellisation[]): TPreuvesParDate =>
-  preuves.reduce((dict, preuve) => {
-    const date = preuve.created_at;
-    if (!date) {
-      return dict;
-    }
-    return {
-      ...dict,
-      [date]: [...(dict[date] || []), preuve],
-    };
-  }, {} as TPreuvesParDate);
+  const etoile = demande?.etoiles;
+  return {timestamp, annee, audit, demande, etoile, status};
+};
+type TCycleInfo = ReturnType<typeof getCycleInfo>;
 
-// groupe les preuves par référentiel et par étoile demandée
-type TPreuvesParReferentielEtDate = Record<
-  string,
-  Record<string, TPreuveAuditEtLabellisation[]>
->;
-const groupByReferentielEtDate = (
-  preuves: TPreuveAuditEtLabellisation[]
-): TPreuvesParReferentielEtDate => {
-  return Object.entries(groupByReferentiel(preuves)).reduce(
-    (dict, [referentiel, preuvesReferentiel]) => ({
-      ...dict,
-      [referentiel]: groupByDate(preuvesReferentiel),
-    }),
-    {} as TPreuvesParReferentielEtDate
-  );
+// ajoute les infos du cycle d'audit/labellisation associé à un sous-ensemble de preuves
+const addInfoToEntry = (
+  entry: [id: string, docs: TPreuveAuditEtLabellisation[]]
+) => {
+  const [id, docs] = entry;
+  return {
+    id,
+    docs,
+    info: getCycleInfo(docs),
+  };
 };

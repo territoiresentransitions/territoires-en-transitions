@@ -1,7 +1,5 @@
 import {TEditState} from 'core-logic/hooks/useEditState';
-import {TEtoiles} from 'generated/dataLayer/labellisation_parcours_read';
 import {Database} from 'types/database.types';
-import {Referentiel} from 'types/litterals';
 
 // un fichier de la bibliothèque
 export type TBibliothequeFichier = {
@@ -87,12 +85,8 @@ export type TPreuveAction = {
   desactive: boolean;
 };
 
-type TLabellisationDemande = {
-  en_cours: boolean;
-  referentiel: Referentiel;
-  etoiles: TEtoiles;
-  date: string;
-};
+type TLabellisationDemande =
+  Database['labellisation']['Tables']['demande']['Row'];
 
 // champs propres aux preuves pour la labellisation
 type TPreuveLabellisationFields = {

@@ -50,15 +50,16 @@ type TAddPreuveLabellisationArgs = {
   collectivite_id: number;
   demande_id: number;
 } & TFileOrLink;
-export const useAddPreuveLabellisation = () =>
-  useMutation(
+export const useAddPreuveLabellisation = () => {
+  return useMutation(
     async (preuve: TAddPreuveLabellisationArgs) =>
       supabaseClient.from('preuve_labellisation').insert(preuve),
     {
       mutationKey: 'add_preuve_labellisation',
-      onSuccess: useRefetchPreuves(),
+      onSuccess: useRefetchPreuves(true),
     }
   );
+};
 
 /** Ajoute un rapport d'audit */
 type TAddPreuveAuditArgs = {
@@ -71,7 +72,7 @@ export const useAddPreuveAudit = () =>
       supabaseClient.from('preuve_audit').insert(preuve),
     {
       mutationKey: 'add_preuve_audit',
-      onSuccess: useRefetchPreuves(),
+      onSuccess: useRefetchPreuves(true),
     }
   );
 
@@ -91,9 +92,16 @@ export const useAddPreuveRapport = () =>
   );
 
 // recharge la liste des preuves
-export const useRefetchPreuves = () => {
+export const useRefetchPreuves = (invalidateParcours: boolean = false) => {
   const queryClient = useQueryClient();
   return (data: unknown, variables: {collectivite_id: number}) => {
-    queryClient.invalidateQueries(['preuve', variables.collectivite_id]);
+    const {collectivite_id} = variables;
+    queryClient.invalidateQueries(['preuve', collectivite_id]);
+    if (invalidateParcours) {
+      queryClient.invalidateQueries([
+        'labellisation_parcours',
+        collectivite_id,
+      ]);
+    }
   };
 };

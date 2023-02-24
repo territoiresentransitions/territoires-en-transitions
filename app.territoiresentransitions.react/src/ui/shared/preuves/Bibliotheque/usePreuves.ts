@@ -69,11 +69,7 @@ const fetch = async (collectivite_id: number, filters?: TFilters) => {
     return [];
   }
 
-  // filtre supplémentaire pour éviter les preuves labellisation vides (?)
-  return data.filter(
-    ({preuve_type, fichier, lien}) =>
-      preuve_type !== 'labellisation' || fichier || lien
-  );
+  return data;
 };
 
 /**
@@ -83,9 +79,9 @@ const fetch = async (collectivite_id: number, filters?: TFilters) => {
  */
 export const usePreuves = (filters?: TFilters) => {
   const collectivite_id = useCollectiviteId();
-  const {data} = useQuery(['preuve', collectivite_id, filters], () =>
-    collectivite_id ? fetch(collectivite_id, filters) : []
-  );
+  const {data} = useQuery(['preuve', collectivite_id, filters], () => {
+    return collectivite_id ? fetch(collectivite_id, filters) : [];
+  });
   return (data as TPreuve[]) || [];
 };
 

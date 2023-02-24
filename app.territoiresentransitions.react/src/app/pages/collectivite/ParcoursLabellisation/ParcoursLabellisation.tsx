@@ -1,7 +1,7 @@
 import {Link} from 'react-router-dom';
 import {useCollectiviteId, useReferentielId} from 'core-logic/hooks/params';
 import {referentielToName} from 'app/labels';
-import {useParcoursLabellisation} from './useParcoursLabellisation';
+import {useCycleLabellisation} from './useCycleLabellisation';
 import HeaderLabellisation from './HeaderLabellisation';
 import {ReferentielOfIndicateur} from 'types/litterals';
 import {
@@ -14,7 +14,7 @@ import {useIsUnchangedReferentiel} from './useIsUnchangedReferentiel';
 const ParcoursLabellisation = () => {
   const collectiviteId = useCollectiviteId();
   const referentiel = useReferentielId();
-  const {parcours} = useParcoursLabellisation(referentiel);
+  const {parcours} = useCycleLabellisation(referentiel);
   const isUnchangedReferentiel = useIsUnchangedReferentiel(
     collectiviteId,
     referentiel
@@ -25,7 +25,10 @@ const ParcoursLabellisation = () => {
     return (
       <>
         <Title referentiel={referentiel} />
-        <main className="fr-container mt-9 mb-16">
+        <main
+          className="fr-container mt-9 mb-16"
+          data-test={`labellisation-${referentiel}`}
+        >
           <p>
             Ce référentiel n’est pas encore renseigné pour votre collectivité.
             Pour commencer à visualiser votre progression, mettez à jour les

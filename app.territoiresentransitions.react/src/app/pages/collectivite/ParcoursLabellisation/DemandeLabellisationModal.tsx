@@ -1,13 +1,12 @@
 import Dialog from '@material-ui/core/Dialog';
-import {LabellisationDemandeRead} from 'generated/dataLayer/labellisation_demande_read';
-import {LabellisationParcoursRead} from 'generated/dataLayer/labellisation_parcours_read';
 import {CloseDialogButton} from 'ui/shared/CloseDialogButton';
 import {numLabels} from './numLabels';
 import {useEnvoiDemande} from './useEnvoiDemande';
+import {TCycleLabellisation} from './useCycleLabellisation';
+import {DemandeAuditModal} from './DemandeAuditModal';
 
 export type TDemandeLabellisationModalProps = {
-  parcours: LabellisationParcoursRead;
-  demande: LabellisationDemandeRead;
+  parcoursLabellisation: TCycleLabellisation;
   opened: boolean;
   setOpened: (opened: boolean) => void;
 };
@@ -43,11 +42,14 @@ const messageEtoile_5 = [
 
 const submittedEtoile1 =
   'Votre demande de labellisation a bien été envoyée. Vous recevrez dans les 48h ouvrées un mail de l’ADEME.';
-const submittedAutresEtoiles =
+export const submittedAutresEtoiles =
   'Votre demande d’audit a bien été envoyée. Vous recevrez prochainement un mail du Bureau d’Appui.';
 
-const getMessage = (parcours: LabellisationParcoursRead) => {
-  const {etoiles, referentiel} = parcours;
+const getMessage = (parcours: TCycleLabellisation['parcours']) => {
+  const {etoiles, referentiel} = parcours || {};
+  if (!etoiles) {
+    return null;
+  }
   if (etoiles === '1') {
     return messageEtoile_1;
   }
@@ -61,44 +63,74 @@ const getMessage = (parcours: LabellisationParcoursRead) => {
 };
 
 /**
- * Affiche la modale d'envoie de la demande de labellisation
+ * Affiche la modale d'envoie de la demande d'audit
  */
 export const DemandeLabellisationModal = (
   props: TDemandeLabellisationModalProps
 ) => {
-  const {parcours, demande, opened, setOpened} = props;
-  const {etoiles} = parcours;
   const {isLoading, envoiDemande} = useEnvoiDemande();
-
+  const {parcoursLabellisation, opened, setOpened} = props;
+  const {parcours, status, isCOT} = parcoursLabellisation;
+  const {collectivite_id, referentiel, etoiles} = parcours || {};
   const onClose = () => setOpened(false);
+
+  // n'affiche rien si les donnnées ne sont pas valides
+  if (
+    !parcours ||
+    !collectivite_id ||
+    (status !== 'non_demandee' && status !== 'demande_envoyee')
+  ) {
+    return null;
+  }
+
+  // affiche le sélecteur de sujet de demande d'audit pour les COT
+  if (isCOT) {
+    return <DemandeAuditModal {...props} />;
+  }
+
+  const canSubmit = referentiel && etoiles;
+
   return (
     <Dialog
       data-test="DemandeLabellisationModal"
       open={opened}
       onClose={onClose}
       maxWidth="md"
-      fullWidth={true}
+      fullWidth
     >
       <div className="p-7 flex flex-col">
         <CloseDialogButton setOpened={setOpened} />
         <h3>
           {etoiles === '1'
             ? 'Demander la première étoile'
-            : `Demander un audit pour la ${numLabels[etoiles]} étoile`}
+            : `Demander un audit pour la ${numLabels[etoiles!]} étoile`}
         </h3>
         <div className="w-full">
-          {isLoading ? 'Envoi en cours...' : null}
-          {!demande.en_cours ? (
+          {status === 'non_demandee' && isLoading ? 'Envoi en cours...' : null}
+          {status === 'demande_envoyee' ? (
             <div className="fr-alert fr-alert--success">
               {etoiles === '1' ? submittedEtoile1 : submittedAutresEtoiles}
             </div>
           ) : null}
-          {demande.en_cours && !isLoading ? (
+          {status === 'non_demandee' && !isLoading ? (
             <>
-              {getMessage(parcours).map((line, index) => (
+              {getMessage(parcours)?.map((line, index) => (
                 <p key={index}>{line}</p>
               ))}
-              <button className="fr-btn" onClick={() => envoiDemande(demande)}>
+              <button
+                className="fr-btn"
+                data-test="EnvoyerDemandeBtn"
+                disabled={!canSubmit}
+                onClick={() =>
+                  canSubmit &&
+                  envoiDemande({
+                    collectivite_id,
+                    referentiel,
+                    etoiles,
+                    sujet: 'labellisation',
+                  })
+                }
+              >
                 Envoyer ma demande
               </button>
               {etoiles !== '1' ? (

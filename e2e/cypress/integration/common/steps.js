@@ -6,11 +6,17 @@
 
 import {Selectors} from './selectors';
 import {Expectations} from './expectations';
+import {waitForApp, logout} from './shared';
 
 // avant chaque test
 beforeEach(function () {
   // réinitialise les données fake
-  cy.task('supabase_rpc', {name: 'test_reset'});
+  cy.task('supabase_rpc', {name: 'test_reset'}).then(ret =>
+    assert(
+      ret.status === 200,
+      'les données de test sont réinitialisées correctement'
+    )
+  );
 
   // charge l'appli
   cy.visit('/');
@@ -22,16 +28,6 @@ beforeEach(function () {
     cy.stub(win, 'open').callsFake(stub);
   });
 });
-
-// attends que l'appli expose un objet `e2e` permettant de la contrôler, il est
-// nécessaire de rappeler cette fonction si on veut que la promesse
-// `cy.get('@auth')` soit bien résolue une 2ème fois dans le même scénario
-// (utilisée avec le step "je me reconnecte en tant que ...")
-function waitForApp() {
-  cy.window({log: false}).its('e2e.history').as('history');
-  cy.window({log: false}).its('e2e.auth').as('auth');
-  cy.window({log: false}).its('e2e.supabaseClient').as('supabaseClient');
-}
 
 Given("j'ouvre le site", () => {
   cy.get('[data-test=home]').should('be.visible');
@@ -97,10 +93,6 @@ Given('les informations des membres sont réinitialisées', () => {
 });
 
 Given('je me déconnecte', logout);
-function logout() {
-  cy.get('[data-test=connectedMenu]').click();
-  cy.get('[data-test=logoutBtn]').click();
-}
 
 // Met en pause le déroulement d'un scénario.
 // Associé avec le tag @focus cela permet de debugger facilement les tests.
@@ -154,7 +146,17 @@ Given(
 );
 Given(/le "([^"]*)" vérifie la condition "([^"]*)"/, verifyExpectation);
 Given(/^le "([^"]*)" est ([^"]*)$/, verifyExpectation);
+Given(/"([^"]*)" contient "([^"]*)"$/, function (elem, value) {
+  checkExpectation(resolveSelector(this, elem).selector, 'contient', value);
+});
 Given(/^le bouton "([^"]*)" est ([^"]*)$/, verifyExpectation);
+Given(
+  /^le bouton "([^"]*)" est ([^"]*) et ([^"]*)$/,
+  (elem, expectation1, expectation2) => {
+    verifyExpectation(elem, expectation1);
+    verifyExpectation(elem, expectation2);
+  }
+);
 Given(
   /^le bouton "([^"]*)" du "([^"]*)" est ([^"]*)$/,
   childrenVerifyExpectation
@@ -180,6 +182,10 @@ Given(
 );
 Given(/^je clique sur le bouton "([^"]*)"$/, function (btnName) {
   cy.get(resolveSelector(this, btnName).selector).click();
+});
+Given(/^je clique sur le bouton radio "([^"]*)"$/, function (btnName) {
+  // le bouton radio natif est masqué par la version stylé alors on clique sur le libellé qui le suit immédiatement
+  cy.get(resolveSelector(this, btnName).selector + '+label').click();
 });
 
 Given(/^je clique sur la case "([^"]*)"$/, function (checkbox) {
@@ -289,6 +295,9 @@ When(/je clique sur l'onglet "([^"]+)"/, tabName => {
 
 When(/je vois (\d+) onglets?/, count =>
   cy.get('.fr-tabs__tab').should('have.length', count)
+);
+When('je ne vois aucun onglet', () =>
+  cy.get('.fr-tabs__tab').should('have.length', 0)
 );
 
 When(/l'onglet "([^"]+)" est sélectionné/, tabName =>
