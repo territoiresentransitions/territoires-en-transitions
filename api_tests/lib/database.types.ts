@@ -776,6 +776,19 @@ export interface Database {
         Args: {col: number};
         Returns: boolean;
       };
+      filter_fiches_action: {
+        Args: {
+          axe_id: number;
+          collectivite_id: number;
+          niveau_priorite: Database['public']['Enums']['fiche_action_niveaux_priorite'];
+          pilote_tag_id: number;
+          pilote_user_id: string;
+          referent_tag_id: number;
+          referent_user_id: string;
+          statut: Database['public']['Enums']['fiche_action_statuts'];
+        };
+        Returns: unknown;
+      };
       gbt_bit_compress: {
         Args: {'': unknown};
         Returns: unknown;
@@ -1388,19 +1401,19 @@ export interface Database {
             Returns: string;
           }
         | {
+            Args: {bucket_width: unknown; ts: string};
+            Returns: string;
+          }
+        | {
+            Args: {bucket_width: unknown; ts: string};
+            Returns: string;
+          }
+        | {
+            Args: {bucket_width: unknown; ts: string};
+            Returns: string;
+          }
+        | {
             Args: {bucket_width: unknown; origin: string; ts: string};
-            Returns: string;
-          }
-        | {
-            Args: {bucket_width: unknown; ts: string};
-            Returns: string;
-          }
-        | {
-            Args: {bucket_width: unknown; ts: string};
-            Returns: string;
-          }
-        | {
-            Args: {bucket_width: unknown; ts: string};
             Returns: string;
           }
         | {
@@ -3786,6 +3799,14 @@ export interface Database {
           demande: unknown | null;
           is_cot: boolean | null;
           referentiel: Database['public']['Enums']['referentiel'] | null;
+        };
+      };
+      axe_descendants: {
+        Row: {
+          axe_id: number | null;
+          depth: number | null;
+          descendants: number[] | null;
+          parents: number[] | null;
         };
       };
       bibliotheque_fichier: {

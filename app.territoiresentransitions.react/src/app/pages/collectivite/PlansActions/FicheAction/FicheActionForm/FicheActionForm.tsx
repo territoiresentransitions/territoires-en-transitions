@@ -32,12 +32,14 @@ import {TSousThematiqueRow, TThematiqueRow} from '../data/types/alias';
 import {DSFRbuttonClassname} from 'ui/shared/select/commons';
 import FicheActionRangerModal from '../FicheActionRangerModal/FicheActionRangerModal';
 import {usePlanActionProfondeur} from '../../PlanAction/data/usePlanActionProfondeur';
+import ServicePiloteDropdown from './ServicePiloteDropdown';
 
 type TFicheActionForm = {
   fiche: FicheActionVueRow;
+  isReadonly: boolean;
 };
 
-const FicheActionForm = ({fiche}: TFicheActionForm) => {
+const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
   const {mutate: updateFiche} = useEditFicheAction();
 
   const plansProfondeur = usePlanActionProfondeur();
@@ -45,9 +47,11 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
   return (
     <div className="flex flex-col gap-6">
       <Section isDefaultOpen icon={<PictoInformation />} title="Présentation">
-        {plansProfondeur?.plans && plansProfondeur.plans.length > 0 && (
-          <FicheActionRangerModal fiche={fiche} />
-        )}
+        {!isReadonly &&
+          plansProfondeur?.plans &&
+          plansProfondeur.plans.length > 0 && (
+            <FicheActionRangerModal fiche={fiche} />
+          )}
         <FormField
           label="Nom de la fiche"
           hint="Exemple : 1.3.2.5 Limiter les émissions liées au chauffage résidentiel au bois"
@@ -56,26 +60,37 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
           <TextareaControlled
             id="title"
             initialValue={fiche.titre ?? ''}
-            onBlur={e => updateFiche({...fiche, titre: e.target.value})}
+            onBlur={e => {
+              e.target.value.trim().length > 0 &&
+                e.target.value.trim() !== fiche.titre &&
+                updateFiche({...fiche, titre: e.target.value.trim()});
+            }}
             placeholder="Écrire ici..."
             maxLength={300}
             className="outline-transparent resize-none"
+            disabled={isReadonly}
           />
         </FormField>
         <FormField label="Description de l'action" htmlFor="description">
           <TextareaControlled
             id="description"
             initialValue={fiche.description ?? ''}
-            onBlur={e => updateFiche({...fiche, description: e.target.value})}
+            onBlur={e => {
+              e.target.value.trim().length > 0 &&
+                e.target.value.trim() !== fiche.description &&
+                updateFiche({...fiche, description: e.target.value.trim()});
+            }}
             placeholder="Écrire ici..."
             maxLength={20000}
             className="outline-transparent resize-none"
+            disabled={isReadonly}
           />
         </FormField>
         <FormField label="Thématique">
           <ThematiquesDropdown
             thematiques={fiche.thematiques}
             onSelect={thematiques => updateFiche({...fiche, thematiques})}
+            isReadonly={isReadonly}
           />
         </FormField>
         <FormField label="Sous-thématique">
@@ -89,6 +104,7 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
             onSelect={sous_thematiques =>
               updateFiche({...fiche, sous_thematiques})
             }
+            isReadonly={isReadonly}
           />
         </FormField>
       </Section>
@@ -97,16 +113,22 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
         <FormField label="Objectifs">
           <TextareaControlled
             initialValue={fiche.objectifs ?? ''}
-            onBlur={e => updateFiche({...fiche, objectifs: e.target.value})}
+            onBlur={e => {
+              e.target.value.trim().length > 0 &&
+                e.target.value.trim() !== fiche.objectifs &&
+                updateFiche({...fiche, objectifs: e.target.value.trim()});
+            }}
             placeholder="Écrire ici..."
             maxLength={10000}
             className="outline-transparent resize-none"
+            disabled={isReadonly}
           />
         </FormField>
         <FormField label="Indicateurs liés">
           <IndicateursDropdown
             indicateurs={fiche.indicateurs}
             onSelect={indicateurs => updateFiche({...fiche, indicateurs})}
+            isReadonly={isReadonly}
           />
         </FormField>
         <FormField label="Résultats attendus">
@@ -117,6 +139,7 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
             onSelect={values =>
               updateFiche({...fiche, resultats_attendus: values})
             }
+            disabled={isReadonly}
           />
         </FormField>
       </Section>
@@ -128,12 +151,14 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
             values={fiche.cibles ?? []}
             options={ficheActionCiblesOptions}
             onSelect={values => updateFiche({...fiche, cibles: values})}
+            disabled={isReadonly}
           />
         </FormField>
         <FormField label="Structure pilote">
           <StructurePiloteDropdown
             structures={fiche.structures}
             onSelect={structures => updateFiche({...fiche, structures})}
+            isReadonly={isReadonly}
           />
         </FormField>
         <FormField
@@ -143,28 +168,43 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
           <TextareaControlled
             id="moyens-humains-tech"
             initialValue={fiche.ressources ?? ''}
-            onBlur={e => updateFiche({...fiche, ressources: e.target.value})}
+            onBlur={e => {
+              e.target.value.trim().length > 0 &&
+                e.target.value.trim() !== fiche.ressources &&
+                updateFiche({...fiche, ressources: e.target.value.trim()});
+            }}
             placeholder="Écrire ici..."
             maxLength={10000}
             className="outline-transparent resize-none"
+            disabled={isReadonly}
           />
         </FormField>
         <FormField label="Partenaires">
           <PartenairesDropdown
             partenaires={fiche.partenaires}
             onSelect={partenaires => updateFiche({...fiche, partenaires})}
+            isReadonly={isReadonly}
           />
         </FormField>
         <FormField label="Personne pilote">
           <PersonnePiloteDropdown
             personnes={fiche.pilotes}
             onSelect={pilotes => updateFiche({...fiche, pilotes})}
+            isReadonly={isReadonly}
+          />
+        </FormField>
+        <FormField label="Direction ou service pilote">
+          <ServicePiloteDropdown
+            services={fiche.services}
+            onSelect={services => updateFiche({...fiche, services})}
+            isReadonly={isReadonly}
           />
         </FormField>
         <FormField label="Élu·e référent·e">
           <PersonneReferenteDropdown
             personnes={fiche.referents}
             onSelect={referents => updateFiche({...fiche, referents})}
+            isReadonly={isReadonly}
           />
         </FormField>
       </Section>
@@ -174,9 +214,14 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
           <TextareaControlled
             id="financements"
             initialValue={fiche.financements ?? ''}
-            onBlur={e => updateFiche({...fiche, financements: e.target.value})}
+            onBlur={e =>
+              e.target.value.trim().length > 0 &&
+              e.target.value.trim() !== fiche.financements &&
+              updateFiche({...fiche, financements: e.target.value.trim()})
+            }
             placeholder="Écrire ici..."
             className="outline-transparent resize-none"
+            disabled={isReadonly}
           />
         </FormField>
         <FormField
@@ -186,11 +231,14 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
           <FicheActionFormBudgetInput
             budget={fiche.budget_previsionnel}
             onBlur={e => {
-              updateFiche({
-                ...fiche,
-                budget_previsionnel: parseInt(e.target.value),
-              });
+              e.target.value.trim().length > 0 &&
+                parseInt(e.target.value) !== fiche.budget_previsionnel &&
+                updateFiche({
+                  ...fiche,
+                  budget_previsionnel: parseInt(e.target.value),
+                });
             }}
+            disabled={isReadonly}
           />
         </FormField>
         <div className="grid grid-cols-2 gap-4">
@@ -205,6 +253,7 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
               renderOption={option => (
                 <FicheActionBadgeStatut statut={option} />
               )}
+              disabled={isReadonly}
             />
           </FormField>
           <FormField label="Niveau de priorité">
@@ -216,6 +265,7 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
                 updateFiche({...fiche, niveau_priorite: value})
               }
               placeholderText="Sélectionnez une option"
+              disabled={isReadonly}
             />
           </FormField>
         </div>
@@ -230,12 +280,13 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
                     e.target.value.length !== 0 ? e.target.value : null,
                 })
               }
+              disabled={isReadonly}
             />
           </FormField>
           <FormField label="Date de fin prévisionnelle">
             <FicheActionFormDateInput
               initialValue={fiche.date_fin_provisoire}
-              disabled={fiche.amelioration_continue ?? false}
+              disabled={(fiche.amelioration_continue || isReadonly) ?? false}
               onBlur={e =>
                 updateFiche({
                   ...fiche,
@@ -254,6 +305,7 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
                 });
               }}
               checked={fiche.amelioration_continue ?? false}
+              disabled={isReadonly}
             />
           </FormField>
         </div>
@@ -266,9 +318,14 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
           <TextareaControlled
             id="calendrier"
             initialValue={fiche.calendrier ?? ''}
-            onBlur={e => updateFiche({...fiche, calendrier: e.target.value})}
+            onBlur={e =>
+              e.target.value.trim().length > 0 &&
+              e.target.value.trim() !== fiche.calendrier &&
+              updateFiche({...fiche, calendrier: e.target.value.trim()})
+            }
             placeholder="Écrire ici..."
             className="outline-transparent resize-none"
+            disabled={isReadonly}
           />
         </FormField>
       </Section>
@@ -285,11 +342,17 @@ const FicheActionForm = ({fiche}: TFicheActionForm) => {
             id="notes-complementaires"
             initialValue={fiche.notes_complementaires ?? ''}
             onBlur={e =>
-              updateFiche({...fiche, notes_complementaires: e.target.value})
+              e.target.value.trim().length > 0 &&
+              e.target.value.trim() !== fiche.notes_complementaires &&
+              updateFiche({
+                ...fiche,
+                notes_complementaires: e.target.value.trim(),
+              })
             }
             placeholder="Écrire ici..."
             maxLength={20000}
             className="outline-transparent resize-none"
+            disabled={isReadonly}
           />
         </FormField>
       </Section>
