@@ -1,8 +1,8 @@
 'use client';
 
 import useSWR from 'swr';
-import { ResponsiveLine } from '@nivo/line';
-import { supabase } from '../initSupabase';
+import {ResponsiveLine} from '@nivo/line';
+import {supabase} from '../initSupabase';
 import {
   axisBottomAsDate,
   axisLeftMiddleLabel,
@@ -13,47 +13,64 @@ import {
   getLegendData,
   theme,
 } from './shared';
-import { SliceTooltip } from './SliceTooltip';
+import {SliceTooltip} from './SliceTooltip';
+import {addLocalFilters} from './utils';
 
-function useActiveUsers() {
-  return useSWR('stats_evolution_utilisateur', async () => {
-    const { data, error } = await supabase
-      .from('stats_evolution_utilisateur')
-      .select()
-      .gte('mois', fromMonth);
-    if (error) {
-      throw new Error('stats_evolution_utilisateur');
+function useActiveUsers(codeRegion: string, codeDepartement: string) {
+  return useSWR(
+    `stats_locales_evolution_utilisateur-${codeRegion}-${codeDepartement}`,
+    async () => {
+      let select = supabase
+        .from('stats_locales_evolution_utilisateur')
+        .select()
+        .gte('mois', fromMonth);
+
+      select = addLocalFilters(select, codeDepartement, codeRegion);
+
+      const {data, error} = await select;
+
+      if (error) {
+        throw new Error('stats_evolution_utilisateur');
+      }
+      if (!data || !data.length) {
+        return null;
+      }
+      return {
+        precedent: data[data.length - 2],
+        courant: data[data.length - 1],
+        evolution: [
+          {
+            id: 'utilisateurs',
+            label: 'Nouveaux utilisateurs',
+            data: data.map(d => ({x: d.mois, y: d.utilisateurs})),
+          },
+          {
+            id: 'total_utilisateurs',
+            label: 'Total utilisateurs',
+            data: data.map(d => ({x: d.mois, y: d.total_utilisateurs})),
+          },
+        ],
+      };
     }
-    if (!data) {
-      return null;
-    }
-    return {
-      precedent: data[data.length - 2],
-      courant: data[data.length - 1],
-      evolution: [
-        {
-          id: 'utilisateurs',
-          label: 'Nouveaux utilisateurs',
-          data: data.map((d) => ({ x: d.mois, y: d.utilisateurs })),
-        },
-        {
-          id: 'total_utilisateurs',
-          label: 'Total utilisateurs',
-          data: data.map((d) => ({ x: d.mois, y: d.total_utilisateurs })),
-        },
-      ],
-    };
-  });
+  );
 }
 
-export default function ActiveUsers() {
-  const { data } = useActiveUsers();
+type ActiveUsersProps = {
+  region?: string;
+  department?: string;
+};
+
+export default function ActiveUsers({
+  region = '',
+  department = '',
+}: ActiveUsersProps) {
+  const {data} = useActiveUsers(region, department);
 
   if (!data) {
     return null;
   }
 
-  const { precedent, courant, evolution } = data;
+  const {precedent, courant, evolution} = data;
   const legendData = getLegendData(evolution);
   const labelById = getLabelsById(evolution);
 
@@ -62,18 +79,21 @@ export default function ActiveUsers() {
       <div className="fr-grid-row fr-grid-row--center">
         <h6>
           Notre plateforme est utilisée par&nbsp;
-          {courant?.total_utilisateurs} personnes, dont&nbsp;
-          {precedent?.utilisateurs} nous ont rejoint le mois dernier
+          {courant?.total_utilisateurs} personne
+          {courant?.total_utilisateurs !== 1 && 's'}, dont&nbsp;
+          {precedent?.utilisateurs}
+          {precedent?.utilisateurs === 1 ? ' nous a' : ' nous ont'} rejoint le
+          mois dernier
         </h6>
       </div>
-      <div style={{ height: 400 }}>
+      <div style={{height: 400}}>
         <ResponsiveLine
           theme={theme}
           colors={colors}
           data={evolution}
           // les marges servent aux légendes
-          margin={{ top: 5, right: 5, bottom: 85, left: 50 }}
-          xScale={{ type: 'point' }}
+          margin={{top: 5, right: 5, bottom: 85, left: 50}}
+          xScale={{type: 'point'}}
           yScale={{
             type: 'linear',
             min: 0,
@@ -87,14 +107,12 @@ export default function ActiveUsers() {
           yFormat=" >-.0f"
           axisBottom={axisBottomAsDate}
           axisLeft={axisLeftMiddleLabel("Nombre d'utilisateurs actifs")}
-          pointColor={{ theme: 'background' }}
+          pointColor={{theme: 'background'}}
           pointBorderWidth={4}
-          pointBorderColor={{ from: 'serieColor' }}
+          pointBorderColor={{from: 'serieColor'}}
           pointLabelYOffset={-12}
           enableSlices="x"
-          sliceTooltip={(props) => (
-            <SliceTooltip {...props} labels={labelById} />
-          )}
+          sliceTooltip={props => <SliceTooltip {...props} labels={labelById} />}
           legends={[
             {
               ...bottomLegend,
@@ -103,6 +121,7 @@ export default function ActiveUsers() {
               itemWidth: 180,
             },
           ]}
+          animate={false}
         />
       </div>
     </div>

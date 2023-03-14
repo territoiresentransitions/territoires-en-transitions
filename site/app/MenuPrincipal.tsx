@@ -5,13 +5,15 @@ import Link from 'next/link';
 import {ReactNode} from 'react';
 
 type MenuItemProps = {
-  children : ReactNode,
-  href : string
+  children: ReactNode;
+  href: string;
 };
 
 function MenuItem(props: MenuItemProps) {
   const {href, children} = props;
   const pathName = usePathname();
+  const pathNameBase = pathName?.split('/').splice(0, 2).join('/');
+
   return (
     <li className="fr-nav__item">
       <Link
@@ -19,7 +21,7 @@ function MenuItem(props: MenuItemProps) {
         target="_self"
         aria-controls="modal-header__menu"
         className="fr-nav__link"
-        aria-current={href === pathName ? "page" : undefined}
+        aria-current={href === pathNameBase ? 'page' : undefined}
       >
         {children}
       </Link>
@@ -30,9 +32,7 @@ function MenuItem(props: MenuItemProps) {
 export function MenuPrincipal() {
   return (
     <ul className="fr-nav__list">
-      <MenuItem href="/stats">
-        Statistiques
-      </MenuItem>
+      <MenuItem href="/stats">Statistiques</MenuItem>
     </ul>
   );
 }

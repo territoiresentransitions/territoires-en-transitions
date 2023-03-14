@@ -1,62 +1,87 @@
 'use client';
 
 import useSWR from 'swr';
-import { supabase } from '../initSupabase';
-import { ResponsiveLine } from '@nivo/line';
+import {supabase} from '../initSupabase';
+import {ResponsiveLine} from '@nivo/line';
 import {
   axisBottomAsDate,
   axisLeftMiddleLabel,
   bottomLegend,
   colors,
-  dateAsMonthAndYear,
   fromMonth,
   getLabelsById,
   getLegendData,
   theme,
 } from './shared';
+import {addLocalFilters} from './utils';
 
-function useEvolutionTotalActivationParType() {
-  return useSWR('stats_evolution_total_activation_par_type', async () => {
-    const { data, error } = await supabase
-      .from('stats_evolution_total_activation_par_type')
-      .select()
-      .gte('mois', fromMonth);
-    if (error) {
-      throw new Error(error.message);
+/**
+ * L'évolution des activations par type de collectivité
+ * Filtrable par département ou région.
+ *
+ * @param codeRegion le code de la région ou ''
+ * @param codeDepartement le code du département ou ''
+ */
+function useEvolutionTotalActivation(
+  codeRegion: string,
+  codeDepartement: string
+) {
+  return useSWR(
+    `stats_locales_evolution_total_activation-${codeRegion}-${codeDepartement}`,
+    async () => {
+      let select = supabase
+        .from('stats_locales_evolution_total_activation')
+        .select()
+        .gte('mois', fromMonth);
+
+      select = addLocalFilters(select, codeDepartement, codeRegion);
+
+      const {data, error} = await select;
+
+      if (error) {
+        throw new Error(error.message);
+      }
+      if (!data || !data.length) {
+        return null;
+      }
+      return {
+        courant: data[data.length - 1],
+        evolution: [
+          {
+            id: 'total_epci',
+            label: 'EPCI',
+            data: data.map(d => ({x: d.mois, y: d.total_epci})),
+          },
+          {
+            id: 'total_syndicat',
+            label: 'syndicats',
+            data: data.map(d => ({x: d.mois, y: d.total_syndicat})),
+          },
+          {
+            id: 'total_commune',
+            label: 'communes',
+            data: data.map(d => ({x: d.mois, y: d.total_commune})),
+          },
+        ],
+      };
     }
-    if (!data) {
-      return null;
-    }
-    return {
-      courant: data[data.length - 1],
-      evolution: [
-        {
-          id: 'total_epci',
-          label: 'EPCI',
-          data: data.map((d) => ({ x: d.mois, y: d.total_epci })),
-        },
-        {
-          id: 'total_syndicat',
-          label: 'syndicats',
-          data: data.map((d) => ({ x: d.mois, y: d.total_syndicat })),
-        },
-        {
-          id: 'total_commune',
-          label: 'communes',
-          data: data.map((d) => ({ x: d.mois, y: d.total_commune })),
-        },
-      ],
-    };
-  });
+  );
 }
 
-export default function EvolutionTotalActivationParType() {
-  const { data } = useEvolutionTotalActivationParType();
+type EvolutionTotalActivationParTypeProps = {
+  region?: string;
+  department?: string;
+};
 
-  if (!data) {
-    return null;
-  }
-  const { courant, evolution } = data;
+export default function EvolutionTotalActivationParType({
+  region = '',
+  department = '',
+}: EvolutionTotalActivationParTypeProps) {
+  const {data} = useEvolutionTotalActivation(region, department);
+
+  if (!data) return null;
+
+  const {courant, evolution} = data;
   const legendData = getLegendData(evolution);
   const labelById = getLabelsById(evolution);
 
@@ -64,21 +89,25 @@ export default function EvolutionTotalActivationParType() {
     <div>
       <div className="fr-grid-row fr-grid-row--center">
         <h6>
-          {courant.total} collectivités activées dont {courant.total_epci}{' '}
-          EPCI,&nbsp;
-          {courant.total_syndicat} syndicats et&nbsp;
-          {courant.total_commune} communes
+          {courant.total}{' '}
+          {courant.total !== 1
+            ? 'collectivités activées'
+            : 'collectivité activée'}{' '}
+          dont {courant.total_epci} EPCI,&nbsp;
+          {courant.total_syndicat} syndicat{courant.total_syndicat !== 1 && 's'}{' '}
+          et&nbsp;
+          {courant.total_commune} commune{courant.total_commune !== 1 && 's'}
         </h6>
       </div>
 
-      <div style={{ height: 400 }}>
+      <div style={{height: 400}}>
         <ResponsiveLine
           colors={colors}
           theme={theme}
           data={evolution}
           // les marges servent aux légendes
-          margin={{ top: 5, right: 5, bottom: 80, left: 50 }}
-          xScale={{ type: 'point' }}
+          margin={{top: 5, right: 5, bottom: 80, left: 50}}
+          xScale={{type: 'point'}}
           yScale={{
             type: 'linear',
             min: 0,
@@ -95,23 +124,23 @@ export default function EvolutionTotalActivationParType() {
           yFormat=" >-.0f"
           axisBottom={axisBottomAsDate}
           axisLeft={axisLeftMiddleLabel('Évolution des collectivités activées')}
-          pointColor={{ theme: 'background' }}
+          pointColor={{theme: 'background'}}
           pointBorderWidth={3}
-          pointBorderColor={{ from: 'serieColor' }}
+          pointBorderColor={{from: 'serieColor'}}
           pointLabelYOffset={-12}
           enableSlices="x"
-          sliceTooltip={({ slice }) => {
+          sliceTooltip={({slice}) => {
             return (
               <div style={theme.tooltip?.container}>
                 <div>
                   <strong>
                     {slice.points
-                      .map((p) => p.data.y as number)
+                      .map(p => p.data.y as number)
                       .reduce((a, b) => a + b, 0)}
                   </strong>{' '}
                   collectivités, dont :
                 </div>
-                {slice.points.map((point) => (
+                {slice.points.map(point => (
                   <div
                     key={point.id}
                     style={{
@@ -135,6 +164,7 @@ export default function EvolutionTotalActivationParType() {
               data: legendData,
             },
           ]}
+          animate={false}
         />
       </div>
     </div>
