@@ -61,7 +61,7 @@ const QuestionReponse = (props: TQuestionReponseProps) => {
   return (
     <>
       <legend
-        className="fr-fieldset__legend fr-text--regular pt-6"
+        className="fr-fieldset__legend fr-fieldset__legend--regular"
         dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(formulation)}}
       />
       {description ? (
@@ -106,7 +106,7 @@ export const QuestionReponseList = (props: TQuestionReponseListProps) => {
       {questionReponses.map((qr, index) => {
         const {id} = qr;
         return (
-          <fieldset key={id} className="fr-fieldset">
+          <fieldset key={id} className="fr-fieldset !flex-col !items-stretch">
             <QuestionReponse
               qr={qr}
               onChange={(reponse: TReponse) => onChange(qr, reponse)}

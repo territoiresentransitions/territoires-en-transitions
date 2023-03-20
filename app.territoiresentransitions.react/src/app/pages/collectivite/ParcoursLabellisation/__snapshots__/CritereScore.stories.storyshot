@@ -3,12 +3,12 @@
 exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CritereScore Niveau 1 Atteint 1`] = `
 <ul>
   <li
-    className="fr-mb-1w"
+    className="fr-mt-2w fr-mb-1w"
   >
     Atteindre un score d’au moins 0 % d’actions réalisées et le prouver (via les documents preuves ou un texte justificatif)
   </li>
   <i
-    className="flex fr-icon fr-fi-checkbox-circle-fill before:text-[#5FD68C] before:pr-3 fr-text--sm fr-mb-0 fr-ml-3w "
+    className="flex fr-icon fr-icon-checkbox-circle-fill before:text-[#5FD68C] before:pr-3 fr-text--sm fr-mb-0 fr-ml-3w "
   >
     Terminé
   </i>
@@ -18,7 +18,7 @@ exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CritereScore Ni
 exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CritereScore Niveau 1 Non Atteint 1`] = `
 <ul>
   <li
-    className="fr-mb-1w"
+    className="fr-mt-2w fr-mb-1w"
   >
     Atteindre un score d’au moins 0 % d’actions réalisées et le prouver (via les documents preuves ou un texte justificatif)
   </li>
@@ -36,12 +36,12 @@ exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CritereScore Ni
 exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CritereScore Niveau Suivant Atteint 1`] = `
 <ul>
   <li
-    className="fr-mb-1w"
+    className="fr-mt-2w fr-mb-1w"
   >
     Atteindre un score d’au moins 35 % d’actions réalisées et le prouver (via les documents preuves ou un texte justificatif)
   </li>
   <i
-    className="flex fr-icon fr-fi-checkbox-circle-fill before:text-[#5FD68C] before:pr-3 fr-text--sm fr-mb-0 fr-ml-3w "
+    className="flex fr-icon fr-icon-checkbox-circle-fill before:text-[#5FD68C] before:pr-3 fr-text--sm fr-mb-0 fr-ml-3w "
   >
     Terminé
   </i>
@@ -51,7 +51,7 @@ exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CritereScore Ni
 exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CritereScore Niveau Suivant Non Atteint 1`] = `
 <ul>
   <li
-    className="fr-mb-1w"
+    className="fr-mt-2w fr-mb-1w"
   >
     Atteindre un score d’au moins 0 % d’actions réalisées et le prouver (via les documents preuves ou un texte justificatif)
   </li>

@@ -60,29 +60,31 @@ export const ThematiqueQR = (props: TThematiqueQRProps) => {
         {identite ? (
           <>
             <CarteIdentite identite={identite} />
-            <h3 className="fr-mb-0">
-              Questions pour la personnalisation des référentiels
-            </h3>
+            <h3>Questions pour la personnalisation des référentiels</h3>
           </>
         ) : null}
         <QuestionReponseList questionReponses={qrList} onChange={onChange} />
-        <a
-          className="fr-btn fr-btn--secondary fr-btn--icon-left fr-fi-arrow-left-line self-start fr-mt-5w"
-          href={makeCollectivitePersoRefUrl({collectiviteId: collectivite.id})}
-        >
-          Revenir au sommaire
-        </a>
-        {nextThematiqueId ? (
+        <div className="flex fr-pt-4w">
           <a
-            className="fr-btn fr-btn--icon-right fr-fi-arrow-right-line self-start fr-mt-5w fr-ml-3w"
-            href={makeCollectivitePersoRefThematiqueUrl({
+            className="fr-btn fr-btn--secondary fr-btn--icon-left fr-fi-arrow-left-line self-start"
+            href={makeCollectivitePersoRefUrl({
               collectiviteId: collectivite.id,
-              thematiqueId: nextThematiqueId,
             })}
           >
-            Afficher la catégorie suivante
+            Revenir au sommaire
           </a>
-        ) : null}
+          {nextThematiqueId ? (
+            <a
+              className="fr-btn fr-btn--icon-right fr-fi-arrow-right-line self-start fr-ml-3w"
+              href={makeCollectivitePersoRefThematiqueUrl({
+                collectiviteId: collectivite.id,
+                thematiqueId: nextThematiqueId,
+              })}
+            >
+              Afficher la catégorie suivante
+            </a>
+          ) : null}
+        </div>
       </div>
     </div>
   );

@@ -162,7 +162,7 @@ exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CriterePreuves 
     </li>
   </ul>
   <i
-    className="flex fr-icon fr-fi-checkbox-circle-fill before:text-[#5FD68C] before:pr-3 fr-text--sm fr-mb-0 fr-ml-3w fr-mb-2w"
+    className="flex fr-icon fr-icon-checkbox-circle-fill before:text-[#5FD68C] before:pr-3 fr-text--sm fr-mb-0 fr-ml-3w fr-mb-2w"
   >
     Terminé
   </i>
@@ -199,7 +199,7 @@ exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CriterePreuves 
           className="invisible group-hover:visible"
         >
           <button
-            className="ml-1 px-1 w-7 text-sm inline-block text-center fr-fi-chat-quote-line"
+            className="ml-1 px-1 w-7 text-sm inline-block text-center fr-icon-quote-line"
             onClick={[Function]}
             title="Décrire"
           />
@@ -323,7 +323,7 @@ exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CriterePreuves 
     </a>
   </li>
   <i
-    className="flex fr-icon fr-fi-checkbox-circle-fill before:text-[#5FD68C] before:pr-3 fr-text--sm fr-mb-0 fr-ml-3w fr-mb-2w"
+    className="flex fr-icon fr-icon-checkbox-circle-fill before:text-[#5FD68C] before:pr-3 fr-text--sm fr-mb-0 fr-ml-3w fr-mb-2w"
   >
     Terminé
   </i>
@@ -360,7 +360,7 @@ exports[`Storyshots app/pages/collectivite/ParcoursLabellisation/CriterePreuves 
           className="invisible group-hover:visible"
         >
           <button
-            className="ml-1 px-1 w-7 text-sm inline-block text-center fr-fi-chat-quote-line"
+            className="ml-1 px-1 w-7 text-sm inline-block text-center fr-icon-quote-line"
             onClick={[Function]}
             title="Décrire"
           />

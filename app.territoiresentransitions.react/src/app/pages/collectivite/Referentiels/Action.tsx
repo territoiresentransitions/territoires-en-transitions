@@ -155,7 +155,7 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
       </div>
 
       <Tabs defaultActiveTab={activeTab} onChange={handleChange}>
-        <Tab label="Suivi de l'action" icon="fr-fi-seedling-fill">
+        <Tab label="Suivi de l'action" icon="seedling">
           <section>
             <div
               className="htmlContent"
@@ -192,7 +192,7 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
             ))}
           </section>
         </Tab>
-        <Tab label="Preuves" icon="fr-fi-file-line">
+        <Tab label="Preuves" icon="file">
           {activeTab === TABS_INDEX['preuves'] ? (
             <section>
               <ActionPreuvePanel withSubActions showWarning action={action} />
@@ -202,7 +202,7 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
             '...'
           )}
         </Tab>
-        <Tab label="Indicateurs" icon="fr-fi-line-chart-fill">
+        <Tab label="Indicateurs" icon="line-chart">
           {activeTab === TABS_INDEX['indicateurs'] && !noIndicateursTab ? (
             <section>
               {actionLinkedIndicateurDefinitions.length === 0 && (
@@ -220,7 +220,7 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
             '...'
           )}
         </Tab>
-        <Tab label="Historique" icon="fr-fi-history-line">
+        <Tab label="Historique" icon="history">
           {activeTab === TABS_INDEX['historique'] ? (
             <HistoriqueListe actionId={action.id} />
           ) : (

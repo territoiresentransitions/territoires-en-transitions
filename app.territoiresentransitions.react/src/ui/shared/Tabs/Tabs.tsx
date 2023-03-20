@@ -75,29 +75,31 @@ const Tabs = ({
   return (
     <div className={_className} {...remainingProps}>
       <ul className="fr-tabs__list" role="tablist">
-        {tabsPanel.map((element, index) => (
-          <li role="presentation" key={element.props.label}>
-            <button
-              type="button"
-              role="tab"
-              id={`fr-tab-${index}`}
-              aria-selected={activeTab === index ? 'true' : 'false'}
-              aria-controls={`fr-tabpanel-${index}`}
-              className={classNames('fr-tabs__tab', {
-                'fr-tabs__tab--icon-left': element.props.icon,
-              })}
-              onClick={() => changeTab(index)}
-              onKeyDown={e => onKeyDownTab(e, index)}
-            >
-              {element.props.icon && (
-                <span
-                  className={`ri-sm icon-left ds-fr--v-middle ${element.props.icon}`}
-                />
-              )}
-              {element.props.label}
-            </button>
-          </li>
-        ))}
+        {tabsPanel.map((element, index) => {
+          const isActive = activeTab === index;
+          const icon = element.props.icon
+            ? `fr-icon-${element.props.icon}-${isActive ? 'fill' : 'line'}`
+            : undefined;
+          return (
+            <li role="presentation" key={element.props.label}>
+              <button
+                type="button"
+                role="tab"
+                id={`fr-tab-${index}`}
+                tabIndex={isActive ? 0 : -1}
+                aria-selected={isActive ? 'true' : 'false'}
+                aria-controls={`fr-tabpanel-${index}`}
+                className={classNames('fr-tabs__tab', icon, {
+                  'fr-tabs__tab--icon-left': icon,
+                })}
+                onClick={() => changeTab(index)}
+                onKeyDown={e => onKeyDownTab(e, index)}
+              >
+                {element.props.label}
+              </button>
+            </li>
+          );
+        })}
       </ul>
       {tabsPanel}
     </div>
