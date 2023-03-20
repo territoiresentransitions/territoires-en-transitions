@@ -3,7 +3,6 @@ import {format} from 'date-fns';
 import {saveBlob} from 'ui/shared/preuves/Bibliotheque/saveBlob';
 import {CurrentCollectivite} from 'core-logic/hooks/useCurrentCollectivite';
 import {ActionReferentiel} from '../../ReferentielTable/useReferentiel';
-import {TComparaisonScoreAudit} from '../types';
 import {Config} from './config';
 import {
   MIME_XLSX,
@@ -14,9 +13,9 @@ import {
 } from 'utils/exportXLSX';
 import {useExportData} from './useExportData';
 import {Database} from 'types/database.types';
-import {TAuditeur} from '../../Audit/useAudit';
+import {TCollectiviteScore} from './useCollectiviteScores';
 
-export const useExportAuditScores = (
+export const useExportScores = (
   referentiel: string | null,
   collectivite: CurrentCollectivite | null
 ) => {
@@ -25,7 +24,7 @@ export const useExportAuditScores = (
     collectivite
   );
 
-  const exportAuditScores = () => {
+  const exportScores = () => {
     // charge le modèle si nécessaire et insère les données
     if (data && referentiel) {
       if (template) {
@@ -40,7 +39,7 @@ export const useExportAuditScores = (
     }
   };
 
-  return {exportAuditScores, isLoading};
+  return {exportScores, isLoading};
 };
 
 // insère les données dans le modèle et sauvegarde le fichier xls résultant
@@ -51,12 +50,11 @@ const updateAndSaveXLS = async (
     config: Config;
     collectivite: CurrentCollectivite;
     actionsByIdentifiant: Record<string, ActionReferentiel>;
-    scoresByActionId: Record<string, TComparaisonScoreAudit>;
+    scoresByActionId: Record<string, TCollectiviteScore>;
     commentairesByActionId: Record<
       string,
       Database['public']['Tables']['action_commentaire']['Row']
     >;
-    auditeurs: TAuditeur[];
   }
 ) => {
   const {
@@ -65,7 +63,6 @@ const updateAndSaveXLS = async (
     actionsByIdentifiant,
     scoresByActionId,
     commentairesByActionId,
-    auditeurs,
   } = data;
 
   const {first_data_row, data_cols, info_cells} = config;
@@ -79,16 +76,12 @@ const updateAndSaveXLS = async (
   const exportedAt = new Date();
 
   // le nom du fichier cible
-  const filename = `Export_audit_${collectivite.nom}_${format(
-    exportedAt,
-    'yyyy-MM-dd'
-  )}.xlsx`;
+  const filename = `Export_${referentiel.toUpperCase()}_${
+    collectivite.nom
+  }_${format(exportedAt, 'yyyy-MM-dd')}.xlsx`;
 
   // remplace les valeurs dans le cartouche d'en-tête
   worksheet.getCell(info_cells.collectivite).value = collectivite.nom;
-  worksheet.getCell(info_cells.auditeurs).value = auditeurs
-    ?.map(({prenom, nom}) => `${prenom} ${nom}`)
-    .join(' / ');
   worksheet.getCell(info_cells.exportedAt).value = format(
     exportedAt,
     'dd/MM/yyyy'
@@ -118,7 +111,7 @@ const updateAndSaveXLS = async (
           worksheet.getCell(data_cols.phase + row).value = action.phase;
         }
 
-        // scores avant audit et courant
+        // scores courant
         setScoreIntoRow(worksheet, data_cols, row, score, action);
 
         // commentaire de la collectivité
@@ -146,68 +139,39 @@ const setScoreIntoRow = (
   worksheet: Worksheet,
   data_cols: Config['data_cols'],
   row: number,
-  score: TComparaisonScoreAudit,
+  score: TCollectiviteScore,
   action?: ActionReferentiel
 ) => {
   // points max réf.
   setNumValue(
     worksheet.getCell(data_cols.points_max_referentiel + row),
-    score.pre_audit.points_max_referentiel
+    score.points_max_referentiel
   );
 
   // score avant audit
   setNumValue(
-    worksheet.getCell(data_cols.pre_audit.points_max_personnalises + row),
-    score.pre_audit.points_max_personnalises
+    worksheet.getCell(data_cols.points_max_personnalises + row),
+    score.points_max_personnalises
   );
   setNumValue(
-    worksheet.getCell(data_cols.pre_audit.points_realises + row),
-    score.pre_audit.points_realises
+    worksheet.getCell(data_cols.points_realises + row),
+    score.points_realises
   );
   setNumValue(
-    worksheet.getCell(data_cols.pre_audit.score_realise + row),
-    score.pre_audit.score_realise,
+    worksheet.getCell(data_cols.score_realise + row),
+    score.score_realise,
     FORMAT_PERCENT
   );
   setNumValue(
-    worksheet.getCell(data_cols.pre_audit.points_programmes + row),
-    score.pre_audit.points_programmes
+    worksheet.getCell(data_cols.points_programmes + row),
+    score.points_programmes
   );
   setNumValue(
-    worksheet.getCell(data_cols.pre_audit.score_programme + row),
-    score.pre_audit.score_programme,
-    FORMAT_PERCENT
-  );
-  if (action && !action.have_children) {
-    worksheet.getCell(data_cols.pre_audit.statut + row).value =
-      formatActionStatut(score.pre_audit);
-  }
-
-  // score après audit
-  setNumValue(
-    worksheet.getCell(data_cols.courant.points_max_personnalises + row),
-    score.courant.points_max_personnalises
-  );
-  setNumValue(
-    worksheet.getCell(data_cols.courant.points_realises + row),
-    score.courant.points_realises
-  );
-  setNumValue(
-    worksheet.getCell(data_cols.courant.score_realise + row),
-    score.courant.score_realise,
-    FORMAT_PERCENT
-  );
-  setNumValue(
-    worksheet.getCell(data_cols.courant.points_programmes + row),
-    score.courant.points_programmes
-  );
-  setNumValue(
-    worksheet.getCell(data_cols.courant.score_programme + row),
-    score.courant.score_programme,
+    worksheet.getCell(data_cols.score_programme + row),
+    score.score_programme,
     FORMAT_PERCENT
   );
   if (action && !action.have_children) {
-    worksheet.getCell(data_cols.courant.statut + row).value =
-      formatActionStatut(score.courant);
+    worksheet.getCell(data_cols.statut + row).value = formatActionStatut(score);
   }
 };

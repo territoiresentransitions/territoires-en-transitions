@@ -3,10 +3,9 @@ import {useReferentielCommentaires} from 'core-logic/hooks/useActionCommentaire'
 import {CurrentCollectivite} from 'core-logic/hooks/useCurrentCollectivite';
 import {indexBy} from 'utils/indexBy';
 import {useExportTemplate} from 'utils/exportXLSX';
-import {useAuditeurs} from '../../Audit/useAudit';
-import {useReferentielData} from '../../ReferentielTable/useReferentiel';
-import {useComparaisonScoreAudit} from '../useComparaisonScoreAudit';
+import {useReferentielData} from 'app/pages/collectivite/ReferentielTable/useReferentiel';
 import {configParReferentiel} from './config';
+import {useCollectiviteScores} from './useCollectiviteScores';
 
 /** Fourni les données nécessaires à l'export des scores pendant l'audit */
 export const useExportData = (
@@ -18,7 +17,7 @@ export const useExportData = (
     refetch: loadTemplate,
     data: template,
     isLoading: isLoadingTemplate,
-  } = useExportTemplate('export_audit', referentiel);
+  } = useExportTemplate('export', referentiel);
 
   // chargement du référentiel
   const {rows, isLoading: isLoadingReferentiel} =
@@ -29,7 +28,7 @@ export const useExportData = (
   );
 
   // chargement des scores
-  const {data: scores, isLoading: isLoadingScores} = useComparaisonScoreAudit(
+  const {data: scores, isLoading: isLoadingScores} = useCollectiviteScores(
     collectivite?.collectivite_id || null,
     referentiel
   );
@@ -49,15 +48,11 @@ export const useExportData = (
     [commentaires]
   );
 
-  // chargement de la liste des auditeurs
-  const {data: auditeurs, isLoading: isLoadingAuditeurs} = useAuditeurs();
-
   const isLoading =
     isLoadingTemplate ||
     isLoadingReferentiel ||
     isLoadingScores ||
-    isLoadingCommentaires ||
-    isLoadingAuditeurs;
+    isLoadingCommentaires;
 
   const config = referentiel && configParReferentiel[referentiel];
 
@@ -67,8 +62,7 @@ export const useExportData = (
     collectivite &&
     scoresByActionId &&
     actionsByIdentifiant &&
-    commentairesByActionId &&
-    auditeurs;
+    commentairesByActionId;
 
   return {
     isLoading,
@@ -83,7 +77,6 @@ export const useExportData = (
             actionsByIdentifiant,
             scoresByActionId,
             commentairesByActionId,
-            auditeurs,
           },
   };
 };
