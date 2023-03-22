@@ -1,6 +1,7 @@
 import {
   makeCollectiviteFichesNonClasseesUrl,
   makeCollectivitePlanActionUrl,
+  makeCollectivitePlansActionsRechercheUrl,
   makeCollectivitePlansActionsSyntheseUrl,
 } from 'app/paths';
 import {useCreateFicheAction} from './FicheAction/data/useUpsertFicheAction';
@@ -36,6 +37,12 @@ const PlansActionsNavigation = ({collectivite}: Props) => {
           collectiviteId: collectivite.collectivite_id,
         }),
         displayName: 'Synthèse',
+      },
+      {
+        link: makeCollectivitePlansActionsRechercheUrl({
+          collectiviteId: collectivite.collectivite_id,
+        }),
+        displayName: 'Rechercher',
       },
     ];
 

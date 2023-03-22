@@ -36,6 +36,7 @@ export const fetchFichesActionFiltresListe = async (
     },
     {count: 'exact'}
   );
+  // .textSearch('pilote', 'Harry Cot', {type: 'websearch', config: 'french'});
 
   if (error) {
     throw new Error(error.message);
@@ -48,17 +49,19 @@ export const fetchFichesActionFiltresListe = async (
  * Liste de fiches actions au sein d'un plan
  */
 export const useFichesActionFiltresListe = (
-  plan_id: number
+  plan_id: number | number[]
 ): TFichesActionsListe => {
   const collectivite_id = useCollectiviteId();
 
   const initialFilters: TFilters = {
     collectivite_id: collectivite_id!,
-    axes_id: [plan_id],
+    axes_id: Array.isArray(plan_id) ? plan_id : [plan_id],
   };
 
   const [filters, setFilters, filtersCount] = useSearchParams<TFilters>(
-    `/collectivite/${collectivite_id}/plans/plan/${plan_id}`,
+    `/collectivite/${collectivite_id}${
+      !Array.isArray(plan_id) ? `/plans/plan/${plan_id}` : ''
+    }`,
     initialFilters,
     nameToShortNames
   );

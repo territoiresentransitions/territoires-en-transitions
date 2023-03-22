@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import HeaderTitle from '../components/HeaderTitle';
-import FiltersPlanAction from './FiltersPlanAction';
+import TagFiltrePlanAction from '../components/TagFiltrePlanAction';
 import SyntheseGraphsList from './SyntheseGraphsList';
 
 /**
@@ -26,7 +26,7 @@ const Synthese = ({collectiviteId}: SyntheseProps): JSX.Element => {
       />
       <div className="max-w-4xl mx-auto p-10">
         {/* Filtres par plan d'actions */}
-        <FiltersPlanAction
+        <TagFiltrePlanAction
           collectiviteId={collectiviteId}
           onChangePlan={setSelectedPlan}
           onChangeWithoutPlan={setWithoutPlan}
