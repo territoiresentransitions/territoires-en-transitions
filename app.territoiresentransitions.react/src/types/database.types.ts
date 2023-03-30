@@ -13,6 +13,13 @@ export interface Database {
       sujet_demande: 'labellisation' | 'labellisation_cot' | 'cot';
     };
     Functions: {
+      active_audit: {
+        Args: {
+          collectivite_id: number;
+          referentiel: Database['public']['Enums']['referentiel'];
+        };
+        Returns: unknown;
+      };
       audit_evaluation_payload: {
         Args: {audit: unknown};
         Returns: Record<string, unknown>[];
@@ -812,7 +819,10 @@ export interface Database {
         Returns: undefined;
       };
       est_auditeur: {
-        Args: {col: number};
+        Args: {
+          collectivite: number;
+          referentiel: Database['public']['Enums']['referentiel'];
+        };
         Returns: boolean;
       };
       filter_fiches_action: {
@@ -1167,6 +1177,10 @@ export interface Database {
         Args: {instance: Json; schema: Json};
         Returns: boolean;
       };
+      labellisation_cloturer_audit: {
+        Args: {audit_id: number; date_fin: string};
+        Returns: unknown;
+      };
       labellisation_commencer_audit: {
         Args: {audit_id: number; date_debut: string};
         Returns: unknown;
@@ -1181,6 +1195,13 @@ export interface Database {
       labellisation_parcours: {
         Args: {collectivite_id: number};
         Returns: Record<string, unknown>[];
+      };
+      labellisation_peut_commencer_audit: {
+        Args: {
+          collectivite_id: number;
+          referentiel: Database['public']['Enums']['referentiel'];
+        };
+        Returns: boolean;
       };
       labellisation_submit_demande: {
         Args: {
@@ -1446,19 +1467,19 @@ export interface Database {
             Returns: string;
           }
         | {
-            Args: {bucket_width: unknown; ts: string};
-            Returns: string;
-          }
-        | {
-            Args: {bucket_width: unknown; ts: string};
-            Returns: string;
-          }
-        | {
-            Args: {bucket_width: unknown; ts: string};
-            Returns: string;
-          }
-        | {
             Args: {bucket_width: unknown; origin: string; ts: string};
+            Returns: string;
+          }
+        | {
+            Args: {bucket_width: unknown; ts: string};
+            Returns: string;
+          }
+        | {
+            Args: {bucket_width: unknown; ts: string};
+            Returns: string;
+          }
+        | {
+            Args: {bucket_width: unknown; ts: string};
             Returns: string;
           }
         | {

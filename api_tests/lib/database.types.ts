@@ -3,7 +3,7 @@ export type Json =
   | number
   | boolean
   | null
-  | {[key: string]: Json}
+  | { [key: string]: Json }
   | Json[];
 
 export interface Database {
@@ -13,44 +13,51 @@ export interface Database {
       sujet_demande: 'labellisation' | 'labellisation_cot' | 'cot';
     };
     Functions: {
+      active_audit: {
+        Args: {
+          collectivite_id: number;
+          referentiel: Database['public']['Enums']['referentiel'];
+        };
+        Returns: unknown;
+      };
       audit_evaluation_payload: {
-        Args: {audit: unknown};
+        Args: { audit: unknown };
         Returns: Record<string, unknown>[];
       };
       critere_action: {
-        Args: {collectivite_id: number};
+        Args: { collectivite_id: number };
         Returns: Record<string, unknown>[];
       };
       critere_fichier: {
-        Args: {collectivite_id: number};
+        Args: { collectivite_id: number };
         Returns: Record<string, unknown>[];
       };
       critere_score_global: {
-        Args: {collectivite_id: number};
+        Args: { collectivite_id: number };
         Returns: Record<string, unknown>[];
       };
       current_audit: {
-        Args: {col: number; ref: Database['public']['Enums']['referentiel']};
+        Args: { col: number; ref: Database['public']['Enums']['referentiel'] };
         Returns: unknown;
       };
       etoiles: {
-        Args: {collectivite_id: number};
+        Args: { collectivite_id: number };
         Returns: Record<string, unknown>[];
       };
       evaluate_audit_statuts: {
-        Args: {audit_id: number; scores_table: string};
+        Args: { audit_id: number; scores_table: string };
         Returns: number;
       };
       pre_audit_service_statuts: {
-        Args: {audit_id: number};
+        Args: { audit_id: number };
         Returns: Json;
       };
       referentiel_score: {
-        Args: {collectivite_id: number};
+        Args: { collectivite_id: number };
         Returns: Record<string, unknown>[];
       };
       upsert_preuves_reglementaire: {
-        Args: {preuves: Json};
+        Args: { preuves: Json };
         Returns: undefined;
       };
     };
@@ -410,7 +417,7 @@ export interface Database {
         Returns: unknown;
       };
       action_contexte: {
-        Args: {id: unknown};
+        Args: { id: unknown };
         Returns: Record<string, unknown>[];
       };
       action_down_to_tache: {
@@ -421,27 +428,27 @@ export interface Database {
         Returns: unknown;
       };
       action_exemples: {
-        Args: {id: unknown};
+        Args: { id: unknown };
         Returns: Record<string, unknown>[];
       };
       action_perimetre_evaluation: {
-        Args: {id: unknown};
+        Args: { id: unknown };
         Returns: Record<string, unknown>[];
       };
       action_preuve: {
-        Args: {id: unknown};
+        Args: { id: unknown };
         Returns: Record<string, unknown>[];
       };
       action_reduction_potentiel: {
-        Args: {id: unknown};
+        Args: { id: unknown };
         Returns: Record<string, unknown>[];
       };
       action_ressources: {
-        Args: {id: unknown};
+        Args: { id: unknown };
         Returns: Record<string, unknown>[];
       };
       add_bibliotheque_fichier: {
-        Args: {collectivite_id: number; filename: string; hash: string};
+        Args: { collectivite_id: number; filename: string; hash: string };
         Returns: unknown;
       };
       add_compression_policy: {
@@ -533,51 +540,51 @@ export interface Database {
         Returns: Json;
       };
       ajouter_action: {
-        Args: {action_id: unknown; fiche_id: number};
+        Args: { action_id: unknown; fiche_id: number };
         Returns: undefined;
       };
       ajouter_annexe: {
-        Args: {annexe: unknown; fiche_id: number};
+        Args: { annexe: unknown; fiche_id: number };
         Returns: unknown;
       };
       ajouter_fiche_action_dans_un_axe: {
-        Args: {axe_id: number; fiche_id: number};
+        Args: { axe_id: number; fiche_id: number };
         Returns: undefined;
       };
       ajouter_financeur: {
-        Args: {fiche_id: number; financeur: unknown};
+        Args: { fiche_id: number; financeur: unknown };
         Returns: unknown;
       };
       ajouter_indicateur: {
-        Args: {fiche_id: number; indicateur: unknown};
+        Args: { fiche_id: number; indicateur: unknown };
         Returns: undefined;
       };
       ajouter_partenaire: {
-        Args: {fiche_id: number; partenaire: unknown};
+        Args: { fiche_id: number; partenaire: unknown };
         Returns: unknown;
       };
       ajouter_pilote: {
-        Args: {fiche_id: number; pilote: unknown};
+        Args: { fiche_id: number; pilote: unknown };
         Returns: unknown;
       };
       ajouter_referent: {
-        Args: {fiche_id: number; referent: unknown};
+        Args: { fiche_id: number; referent: unknown };
         Returns: unknown;
       };
       ajouter_service: {
-        Args: {fiche_id: number; service: unknown};
+        Args: { fiche_id: number; service: unknown };
         Returns: unknown;
       };
       ajouter_sous_thematique: {
-        Args: {fiche_id: number; thematique_id: number};
+        Args: { fiche_id: number; thematique_id: number };
         Returns: undefined;
       };
       ajouter_structure: {
-        Args: {fiche_id: number; structure: unknown};
+        Args: { fiche_id: number; structure: unknown };
         Returns: unknown;
       };
       ajouter_thematique: {
-        Args: {fiche_id: number; thematique: string};
+        Args: { fiche_id: number; thematique: string };
         Returns: undefined;
       };
       alter_data_node: {
@@ -606,7 +613,7 @@ export interface Database {
         Returns: Record<string, unknown>[];
       };
       approximate_row_count: {
-        Args: {relation: unknown};
+        Args: { relation: unknown };
         Returns: number;
       };
       attach_data_node: {
@@ -635,39 +642,39 @@ export interface Database {
         Returns: undefined;
       };
       business_update_actions: {
-        Args: {computed_points: unknown; definitions: unknown};
+        Args: { computed_points: unknown; definitions: unknown };
         Returns: undefined;
       };
       business_upsert_indicateurs: {
-        Args: {indicateur_actions: unknown; indicateur_definitions: unknown};
+        Args: { indicateur_actions: unknown; indicateur_definitions: unknown };
         Returns: undefined;
       };
       can_read_acces_restreint: {
-        Args: {collectivite_id: number};
+        Args: { collectivite_id: number };
         Returns: boolean;
       };
       chunk_compression_stats: {
-        Args: {hypertable: unknown};
+        Args: { hypertable: unknown };
         Returns: Record<string, unknown>[];
       };
       chunks_detailed_size: {
-        Args: {hypertable: unknown};
+        Args: { hypertable: unknown };
         Returns: Record<string, unknown>[];
       };
       claim_collectivite: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: Json;
       };
       collectivite_membres: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: Record<string, unknown>[];
       };
       compress_chunk: {
-        Args: {if_not_compressed: boolean; uncompressed_chunk: unknown};
+        Args: { if_not_compressed: boolean; uncompressed_chunk: unknown };
         Returns: unknown;
       };
       consume_invitation: {
-        Args: {id: string};
+        Args: { id: string };
         Returns: undefined;
       };
       create_distributed_hypertable: {
@@ -692,7 +699,7 @@ export interface Database {
         Returns: Record<string, unknown>[];
       };
       create_distributed_restore_point: {
-        Args: {name: string};
+        Args: { name: string };
         Returns: Record<string, unknown>[];
       };
       create_hypertable: {
@@ -718,11 +725,11 @@ export interface Database {
         Returns: Record<string, unknown>[];
       };
       decompress_chunk: {
-        Args: {if_compressed: boolean; uncompressed_chunk: unknown};
+        Args: { if_compressed: boolean; uncompressed_chunk: unknown };
         Returns: unknown;
       };
       delete_axe_all: {
-        Args: {axe_id: number};
+        Args: { axe_id: number };
         Returns: undefined;
       };
       delete_data_node: {
@@ -736,7 +743,7 @@ export interface Database {
         Returns: boolean;
       };
       delete_job: {
-        Args: {job_id: number};
+        Args: { job_id: number };
         Returns: undefined;
       };
       detach_data_node: {
@@ -751,11 +758,15 @@ export interface Database {
         Returns: number;
       };
       detach_tablespace: {
-        Args: {hypertable: unknown; if_attached: boolean; tablespace: unknown};
+        Args: {
+          hypertable: unknown;
+          if_attached: boolean;
+          tablespace: unknown;
+        };
         Returns: number;
       };
       detach_tablespaces: {
-        Args: {hypertable: unknown};
+        Args: { hypertable: unknown };
         Returns: number;
       };
       drop_chunks: {
@@ -768,51 +779,54 @@ export interface Database {
         Returns: string;
       };
       enlever_action: {
-        Args: {action_id: unknown; fiche_id: number};
+        Args: { action_id: unknown; fiche_id: number };
         Returns: undefined;
       };
       enlever_annexe: {
-        Args: {annexe: unknown; fiche_id: number; supprimer: boolean};
+        Args: { annexe: unknown; fiche_id: number; supprimer: boolean };
         Returns: undefined;
       };
       enlever_fiche_action_d_un_axe: {
-        Args: {axe_id: number; fiche_id: number};
+        Args: { axe_id: number; fiche_id: number };
         Returns: undefined;
       };
       enlever_indicateur: {
-        Args: {fiche_id: number; indicateur: unknown};
+        Args: { fiche_id: number; indicateur: unknown };
         Returns: undefined;
       };
       enlever_partenaire: {
-        Args: {fiche_id: number; partenaire: unknown};
+        Args: { fiche_id: number; partenaire: unknown };
         Returns: undefined;
       };
       enlever_pilote: {
-        Args: {fiche_id: number; pilote: unknown};
+        Args: { fiche_id: number; pilote: unknown };
         Returns: undefined;
       };
       enlever_referent: {
-        Args: {fiche_id: number; referent: unknown};
+        Args: { fiche_id: number; referent: unknown };
         Returns: undefined;
       };
       enlever_service: {
-        Args: {fiche_id: number; service: unknown};
+        Args: { fiche_id: number; service: unknown };
         Returns: undefined;
       };
       enlever_sous_thematique: {
-        Args: {fiche_id: number; thematique_id: number};
+        Args: { fiche_id: number; thematique_id: number };
         Returns: undefined;
       };
       enlever_structure: {
-        Args: {fiche_id: number; structure: unknown};
+        Args: { fiche_id: number; structure: unknown };
         Returns: undefined;
       };
       enlever_thematique: {
-        Args: {fiche_id: number; thematique: string};
+        Args: { fiche_id: number; thematique: string };
         Returns: undefined;
       };
       est_auditeur: {
-        Args: {col: number};
+        Args: {
+          collectivite: number;
+          referentiel: Database['public']['Enums']['referentiel'];
+        };
         Returns: boolean;
       };
       filter_fiches_action: {
@@ -827,227 +841,227 @@ export interface Database {
         Returns: unknown;
       };
       gbt_bit_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_bool_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_bool_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_bpchar_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_bytea_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_cash_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_cash_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_date_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_date_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_decompress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_enum_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_enum_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_float4_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_float4_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_float8_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_float8_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_inet_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_int2_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_int2_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_int4_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_int4_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_int8_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_int8_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_intv_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_intv_decompress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_intv_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_macad8_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_macad8_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_macad_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_macad_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_numeric_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_oid_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_oid_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_text_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_time_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_time_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_timetz_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_ts_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_ts_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_tstz_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_uuid_compress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_uuid_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_var_decompress: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbt_var_fetch: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey16_in: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey16_out: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey2_in: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey2_out: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey32_in: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey32_out: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey4_in: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey4_out: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey8_in: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey8_out: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey_var_in: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       gbtreekey_var_out: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       get_telemetry_report: {
@@ -1055,43 +1069,43 @@ export interface Database {
         Returns: Json;
       };
       have_admin_acces: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: boolean;
       };
       have_discussion_edition_acces: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: boolean;
       };
       have_discussion_lecture_acces: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: boolean;
       };
       have_edition_acces: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: boolean;
       };
       have_lecture_acces: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: boolean;
       };
       have_one_of_niveaux_acces: {
-        Args: {id: number; niveaux: unknown};
+        Args: { id: number; niveaux: unknown };
         Returns: boolean;
       };
       hypertable_compression_stats: {
-        Args: {hypertable: unknown};
+        Args: { hypertable: unknown };
         Returns: Record<string, unknown>[];
       };
       hypertable_detailed_size: {
-        Args: {hypertable: unknown};
+        Args: { hypertable: unknown };
         Returns: Record<string, unknown>[];
       };
       hypertable_index_size: {
-        Args: {index_name: unknown};
+        Args: { index_name: unknown };
         Returns: number;
       };
       hypertable_size: {
-        Args: {hypertable: unknown};
+        Args: { hypertable: unknown };
         Returns: number;
       };
       interpolate:
@@ -1136,11 +1150,11 @@ export interface Database {
             Returns: number;
           };
       is_agent_of: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: boolean;
       };
       is_any_role_on: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: boolean;
       };
       is_authenticated: {
@@ -1148,11 +1162,11 @@ export interface Database {
         Returns: boolean;
       };
       is_bucket_writer: {
-        Args: {id: string};
+        Args: { id: string };
         Returns: boolean;
       };
       is_referent_of: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: boolean;
       };
       is_service_role: {
@@ -1160,15 +1174,19 @@ export interface Database {
         Returns: boolean;
       };
       json_matches_schema: {
-        Args: {instance: Json; schema: Json};
+        Args: { instance: Json; schema: Json };
         Returns: boolean;
       };
       jsonb_matches_schema: {
-        Args: {instance: Json; schema: Json};
+        Args: { instance: Json; schema: Json };
         Returns: boolean;
       };
+      labellisation_cloturer_audit: {
+        Args: { audit_id: number; date_fin: string };
+        Returns: unknown;
+      };
       labellisation_commencer_audit: {
-        Args: {audit_id: number; date_debut: string};
+        Args: { audit_id: number; date_debut: string };
         Returns: unknown;
       };
       labellisation_demande: {
@@ -1179,8 +1197,15 @@ export interface Database {
         Returns: unknown;
       };
       labellisation_parcours: {
-        Args: {collectivite_id: number};
+        Args: { collectivite_id: number };
         Returns: Record<string, unknown>[];
+      };
+      labellisation_peut_commencer_audit: {
+        Args: {
+          collectivite_id: number;
+          referentiel: Database['public']['Enums']['referentiel'];
+        };
+        Returns: boolean;
       };
       labellisation_submit_demande: {
         Args: {
@@ -1192,7 +1217,7 @@ export interface Database {
         Returns: unknown;
       };
       locf: {
-        Args: {prev: unknown; treat_null_as_missing: boolean; value: unknown};
+        Args: { prev: unknown; treat_null_as_missing: boolean; value: unknown };
         Returns: unknown;
       };
       move_chunk: {
@@ -1206,51 +1231,51 @@ export interface Database {
         Returns: undefined;
       };
       naturalsort: {
-        Args: {'': string};
+        Args: { '': string };
         Returns: string;
       };
       personnes_collectivite: {
-        Args: {collectivite_id: number};
+        Args: { collectivite_id: number };
         Returns: unknown;
       };
       peut_lire_la_fiche: {
-        Args: {fiche_id: number};
+        Args: { fiche_id: number };
         Returns: boolean;
       };
       peut_modifier_la_fiche: {
-        Args: {fiche_id: number};
+        Args: { fiche_id: number };
         Returns: boolean;
       };
       plan_action: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: Json;
       };
       plan_action_profondeur: {
-        Args: {id: number; profondeur: number};
+        Args: { id: number; profondeur: number };
         Returns: Json;
       };
       plans_action_collectivite: {
-        Args: {collectivite_id: number};
+        Args: { collectivite_id: number };
         Returns: unknown;
       };
       quit_collectivite: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: Json;
       };
       referent_contact: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: Json;
       };
       referent_contacts: {
-        Args: {id: number};
+        Args: { id: number };
         Returns: Record<string, unknown>[];
       };
       referentiel_down_to_action: {
-        Args: {referentiel: Database['public']['Enums']['referentiel']};
+        Args: { referentiel: Database['public']['Enums']['referentiel'] };
         Returns: unknown;
       };
       remove_compression_policy: {
-        Args: {hypertable: unknown; if_exists: boolean};
+        Args: { hypertable: unknown; if_exists: boolean };
         Returns: boolean;
       };
       remove_continuous_aggregate_policy: {
@@ -1262,19 +1287,19 @@ export interface Database {
         Returns: undefined;
       };
       remove_membre_from_collectivite: {
-        Args: {collectivite_id: number; email: string};
+        Args: { collectivite_id: number; email: string };
         Returns: Json;
       };
       remove_reorder_policy: {
-        Args: {hypertable: unknown; if_exists: boolean};
+        Args: { hypertable: unknown; if_exists: boolean };
         Returns: undefined;
       };
       remove_retention_policy: {
-        Args: {if_exists: boolean; relation: unknown};
+        Args: { if_exists: boolean; relation: unknown };
         Returns: undefined;
       };
       reorder_chunk: {
-        Args: {chunk: unknown; index: unknown; verbose: boolean};
+        Args: { chunk: unknown; index: unknown; verbose: boolean };
         Returns: undefined;
       };
       retool_user_list: {
@@ -1282,11 +1307,11 @@ export interface Database {
         Returns: Record<string, unknown>[];
       };
       save_reponse: {
-        Args: {'': Json};
+        Args: { '': Json };
         Returns: undefined;
       };
       set_adaptive_chunking: {
-        Args: {chunk_target_size: string; hypertable: unknown};
+        Args: { chunk_target_size: string; hypertable: unknown };
         Returns: Record<string, unknown>[];
       };
       set_chunk_time_interval: {
@@ -1314,15 +1339,15 @@ export interface Database {
         Returns: undefined;
       };
       set_replication_factor: {
-        Args: {hypertable: unknown; replication_factor: number};
+        Args: { hypertable: unknown; replication_factor: number };
         Returns: undefined;
       };
       show_chunks: {
-        Args: {newer_than: unknown; older_than: unknown; relation: unknown};
+        Args: { newer_than: unknown; older_than: unknown; relation: unknown };
         Returns: unknown;
       };
       show_tablespaces: {
-        Args: {hypertable: unknown};
+        Args: { hypertable: unknown };
         Returns: unknown;
       };
       teapot: {
@@ -1346,7 +1371,7 @@ export interface Database {
         Returns: undefined;
       };
       test_changer_acces_restreint_collectivite: {
-        Args: {access_restreint: boolean; collectivite_id: number};
+        Args: { access_restreint: boolean; collectivite_id: number };
         Returns: undefined;
       };
       test_clear_history: {
@@ -1354,11 +1379,11 @@ export interface Database {
         Returns: undefined;
       };
       test_create_collectivite: {
-        Args: {nom: string};
+        Args: { nom: string };
         Returns: unknown;
       };
       test_create_user: {
-        Args: {email: string; nom: string; prenom: string; user_id: string};
+        Args: { email: string; nom: string; prenom: string; user_id: string };
         Returns: undefined;
       };
       test_disable_fake_score_generation: {
@@ -1385,7 +1410,7 @@ export interface Database {
         Returns: Json;
       };
       test_remove_user: {
-        Args: {email: string};
+        Args: { email: string };
         Returns: undefined;
       };
       test_reset: {
@@ -1429,52 +1454,52 @@ export interface Database {
         Returns: undefined;
       };
       test_set_auditeur: {
-        Args: {audit_en_cours: boolean; demande_id: number; user_id: string};
+        Args: { audit_en_cours: boolean; demande_id: number; user_id: string };
         Returns: unknown;
       };
       test_set_cot: {
-        Args: {actif: boolean; collectivite_id: number};
+        Args: { actif: boolean; collectivite_id: number };
         Returns: unknown;
       };
       test_write_scores: {
-        Args: {collectivite_id: number; scores: unknown};
+        Args: { collectivite_id: number; scores: unknown };
         Returns: undefined;
       };
       time_bucket:
         | {
-            Args: {bucket_width: unknown; origin: string; ts: string};
+            Args: { bucket_width: unknown; origin: string; ts: string };
             Returns: string;
           }
         | {
-            Args: {bucket_width: unknown; ts: string};
+            Args: { bucket_width: unknown; origin: string; ts: string };
             Returns: string;
           }
         | {
-            Args: {bucket_width: unknown; ts: string};
+            Args: { bucket_width: unknown; ts: string };
             Returns: string;
           }
         | {
-            Args: {bucket_width: unknown; ts: string};
+            Args: { bucket_width: unknown; ts: string };
             Returns: string;
           }
         | {
-            Args: {bucket_width: unknown; origin: string; ts: string};
+            Args: { bucket_width: unknown; ts: string };
             Returns: string;
           }
         | {
-            Args: {bucket_width: unknown; origin: string; ts: string};
+            Args: { bucket_width: unknown; origin: string; ts: string };
             Returns: string;
           }
         | {
-            Args: {bucket_width: unknown; offset: unknown; ts: string};
+            Args: { bucket_width: unknown; offset: unknown; ts: string };
             Returns: string;
           }
         | {
-            Args: {bucket_width: unknown; offset: unknown; ts: string};
+            Args: { bucket_width: unknown; offset: unknown; ts: string };
             Returns: string;
           }
         | {
-            Args: {bucket_width: unknown; offset: unknown; ts: string};
+            Args: { bucket_width: unknown; offset: unknown; ts: string };
             Returns: string;
           }
         | {
@@ -1488,27 +1513,27 @@ export interface Database {
             Returns: string;
           }
         | {
-            Args: {bucket_width: number; ts: number};
+            Args: { bucket_width: number; ts: number };
             Returns: number;
           }
         | {
-            Args: {bucket_width: number; ts: number};
+            Args: { bucket_width: number; ts: number };
             Returns: number;
           }
         | {
-            Args: {bucket_width: number; ts: number};
+            Args: { bucket_width: number; ts: number };
             Returns: number;
           }
         | {
-            Args: {bucket_width: number; offset: number; ts: number};
+            Args: { bucket_width: number; offset: number; ts: number };
             Returns: number;
           }
         | {
-            Args: {bucket_width: number; offset: number; ts: number};
+            Args: { bucket_width: number; offset: number; ts: number };
             Returns: number;
           }
         | {
-            Args: {bucket_width: number; offset: number; ts: number};
+            Args: { bucket_width: number; offset: number; ts: number };
             Returns: number;
           };
       time_bucket_gapfill:
@@ -1589,15 +1614,15 @@ export interface Database {
         Returns: boolean;
       };
       unaccent: {
-        Args: {'': string};
+        Args: { '': string };
         Returns: string;
       };
       unaccent_init: {
-        Args: {'': unknown};
+        Args: { '': unknown };
         Returns: unknown;
       };
       update_bibliotheque_fichier_filename: {
-        Args: {collectivite_id: number; filename: string; hash: string};
+        Args: { collectivite_id: number; filename: string; hash: string };
         Returns: undefined;
       };
       update_collectivite_membre_champ_intervention: {
@@ -1633,7 +1658,7 @@ export interface Database {
         Returns: Json;
       };
       upsert_axe: {
-        Args: {collectivite_id: number; nom: string; parent: number};
+        Args: { collectivite_id: number; nom: string; parent: number };
         Returns: number;
       };
     };
