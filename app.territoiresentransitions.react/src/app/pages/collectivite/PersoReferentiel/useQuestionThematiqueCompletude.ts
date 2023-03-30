@@ -12,7 +12,7 @@ type TUseQuestionThematiqueCompletude = (
 export const useQuestionThematiqueCompletude: TUseQuestionThematiqueCompletude =
   (collectivite_id, filters) => {
     const {data} = useQuery(
-      ['question_thematique_completude', collectivite_id, filters],
+      ['question_thematique_completude', collectivite_id],
       () => (collectivite_id ? fetch(collectivite_id) : []),
       {enabled: !!collectivite_id}
     );
@@ -43,14 +43,15 @@ const applyFilter = (
   if (!filters) {
     return thematiques;
   }
+  const filtersWithoutEmptyEntries = filters.filter(f => Boolean(f));
   // aucun référentiel sélectionné => affiche uniquement la thématique identité :
-  if (filters.length === 0) {
+  if (filtersWithoutEmptyEntries.length === 0) {
     const identite = thematiques?.find(({id}) => id === 'identite');
     return identite ? [identite] : [];
   }
   return thematiques?.length
     ? thematiques.filter(({referentiels}) =>
-        filters.find(r => referentiels.includes(r))
+        filtersWithoutEmptyEntries.find(r => referentiels.includes(r))
       )
     : [];
 };

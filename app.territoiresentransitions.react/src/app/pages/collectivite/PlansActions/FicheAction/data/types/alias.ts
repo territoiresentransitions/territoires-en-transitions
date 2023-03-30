@@ -39,6 +39,11 @@ export type TPartenaireRow =
 export type TPartenaireInsert =
   Database['public']['Tables']['partenaire_tag']['Insert'];
 
+export type TFinanceurRow =
+  Database['public']['Tables']['financeur_tag']['Row'];
+export type TFinanceurInsert =
+  Database['public']['Tables']['financeur_tag']['Insert'];
+
 export type TFicheActionCibles =
   Database['public']['Enums']['fiche_action_cibles'];
 export type TFicheActionNiveauxPriorite =
@@ -49,3 +54,6 @@ export type TFicheActionResultatsAttendus =
   Database['public']['Enums']['fiche_action_resultats_attendus'];
 export type TFicheActionStatuts =
   Database['public']['Enums']['fiche_action_statuts'];
+
+export type TActionRelationInsert =
+  Database['public']['Tables']['action_relation']['Insert'];

@@ -33,6 +33,9 @@ import {DSFRbuttonClassname} from 'ui/shared/select/commons';
 import FicheActionRangerModal from '../FicheActionRangerModal/FicheActionRangerModal';
 import {usePlanActionProfondeur} from '../../PlanAction/data/usePlanActionProfondeur';
 import ServicePiloteDropdown from './ServicePiloteDropdown';
+import Financeurs from './Financeurs';
+import PictoLeaf from 'ui/pictogrammes/PictoLeaf';
+import ActionsLiees from './ActionsLiees';
 
 type TFicheActionForm = {
   fiche: FicheActionVueRow;
@@ -80,9 +83,13 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
             id="description"
             initialValue={fiche.description ?? ''}
             onBlur={e => {
-              e.target.value.trim().length > 0 &&
-                e.target.value.trim() !== fiche.description &&
-                updateFiche({...fiche, description: e.target.value.trim()});
+              if (fiche.description) {
+                e.target.value !== fiche.description &&
+                  updateFiche({...fiche, description: e.target.value.trim()});
+              } else {
+                e.target.value.trim().length > 0 &&
+                  updateFiche({...fiche, description: e.target.value.trim()});
+              }
             }}
             placeholder="Écrire ici..."
             maxLength={20000}
@@ -118,9 +125,13 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
           <TextareaControlled
             initialValue={fiche.objectifs ?? ''}
             onBlur={e => {
-              e.target.value.trim().length > 0 &&
-                e.target.value.trim() !== fiche.objectifs &&
-                updateFiche({...fiche, objectifs: e.target.value.trim()});
+              if (fiche.objectifs) {
+                e.target.value !== fiche.objectifs &&
+                  updateFiche({...fiche, objectifs: e.target.value.trim()});
+              } else {
+                e.target.value.trim().length > 0 &&
+                  updateFiche({...fiche, objectifs: e.target.value.trim()});
+              }
             }}
             placeholder="Écrire ici..."
             maxLength={10000}
@@ -148,7 +159,11 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
         </FormField>
       </Section>
 
-      <Section icon={<PictoCommunity />} title="Acteurs">
+      <Section
+        icon={<PictoCommunity />}
+        title="Acteurs"
+        dataTest="section-acteurs"
+      >
         <FormField label="Cibles">
           <MultiSelectTagsDropdown
             buttonClassName={DSFRbuttonClassname}
@@ -173,9 +188,13 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
             id="moyens-humains-tech"
             initialValue={fiche.ressources ?? ''}
             onBlur={e => {
-              e.target.value.trim().length > 0 &&
-                e.target.value.trim() !== fiche.ressources &&
-                updateFiche({...fiche, ressources: e.target.value.trim()});
+              if (fiche.ressources) {
+                e.target.value !== fiche.ressources &&
+                  updateFiche({...fiche, ressources: e.target.value.trim()});
+              } else {
+                e.target.value.trim().length > 0 &&
+                  updateFiche({...fiche, ressources: e.target.value.trim()});
+              }
             }}
             placeholder="Écrire ici..."
             maxLength={10000}
@@ -213,21 +232,11 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
         </FormField>
       </Section>
 
-      <Section icon={<PictoCalendar />} title="Modalités de mise en œuvre">
-        <FormField label="Financements" htmlFor="financements">
-          <TextareaControlled
-            id="financements"
-            initialValue={fiche.financements ?? ''}
-            onBlur={e =>
-              e.target.value.trim().length > 0 &&
-              e.target.value.trim() !== fiche.financements &&
-              updateFiche({...fiche, financements: e.target.value.trim()})
-            }
-            placeholder="Écrire ici..."
-            className="outline-transparent resize-none"
-            disabled={isReadonly}
-          />
-        </FormField>
+      <Section
+        dataTest="section-modalites"
+        icon={<PictoCalendar />}
+        title="Modalités de mise en œuvre"
+      >
         <FormField
           label="Budget prévisionnel total "
           htmlFor="budget-previsionnel"
@@ -235,19 +244,56 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
           <FicheActionFormBudgetInput
             budget={fiche.budget_previsionnel}
             onBlur={e => {
-              e.target.value.trim().length > 0 &&
+              if (fiche.budget_previsionnel) {
                 parseInt(e.target.value) !== fiche.budget_previsionnel &&
-                updateFiche({
-                  ...fiche,
-                  budget_previsionnel: parseInt(e.target.value),
-                });
+                  updateFiche({
+                    ...fiche,
+                    budget_previsionnel: parseInt(e.target.value.trim()),
+                  });
+              } else {
+                e.target.value.length > 0 &&
+                  updateFiche({
+                    ...fiche,
+                    budget_previsionnel: parseInt(e.target.value.trim()),
+                  });
+              }
             }}
+            disabled={isReadonly}
+          />
+        </FormField>
+        <div className="mb-6 pt-6 border-y border-gray-300">
+          <Financeurs
+            fiche={fiche}
+            onUpdate={newFiche => updateFiche(newFiche)}
+            isReadonly={isReadonly}
+          />
+        </div>
+        <FormField
+          label="Financements"
+          htmlFor="financements"
+          hint="Programmes de financements, etc."
+        >
+          <TextareaControlled
+            id="financements"
+            initialValue={fiche.financements ?? ''}
+            onBlur={e => {
+              if (fiche.financements) {
+                e.target.value !== fiche.financements &&
+                  updateFiche({...fiche, financements: e.target.value.trim()});
+              } else {
+                e.target.value.trim().length > 0 &&
+                  updateFiche({...fiche, financements: e.target.value.trim()});
+              }
+            }}
+            placeholder="Écrire ici..."
+            className="outline-transparent resize-none"
             disabled={isReadonly}
           />
         </FormField>
         <div className="grid grid-cols-2 gap-4">
           <FormField label="Statut">
             <SelectDropdown
+              data-test="Statut"
               buttonClassName={DSFRbuttonClassname}
               value={fiche.statut ?? undefined}
               options={ficheActionStatutOptions}
@@ -322,20 +368,28 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
           <TextareaControlled
             id="calendrier"
             initialValue={fiche.calendrier ?? ''}
-            onBlur={e =>
-              e.target.value.trim().length > 0 &&
-              e.target.value.trim() !== fiche.calendrier &&
-              updateFiche({...fiche, calendrier: e.target.value.trim()})
-            }
+            onBlur={e => {
+              if (fiche.calendrier) {
+                e.target.value !== fiche.calendrier &&
+                  updateFiche({...fiche, calendrier: e.target.value.trim()});
+              } else {
+                e.target.value.trim().length > 0 &&
+                  updateFiche({...fiche, calendrier: e.target.value.trim()});
+              }
+            }}
             placeholder="Écrire ici..."
             className="outline-transparent resize-none"
             disabled={isReadonly}
           />
         </FormField>
       </Section>
-      {/* <Section icon={<PictoLeaf />} title="Actions et fiches liées">
-        Hello
-      </Section> */}
+      <Section icon={<PictoLeaf />} title="Actions et fiches liées">
+        <ActionsLiees
+          actions={fiche.actions}
+          onSelect={actions => updateFiche({...fiche, actions})}
+          isReadonly={isReadonly}
+        />
+      </Section>
       <Section icon={<PictoDocument />} title="Notes">
         <FormField
           label="Notes complémentaires"
@@ -345,14 +399,21 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
           <TextareaControlled
             id="notes-complementaires"
             initialValue={fiche.notes_complementaires ?? ''}
-            onBlur={e =>
-              e.target.value.trim().length > 0 &&
-              e.target.value.trim() !== fiche.notes_complementaires &&
-              updateFiche({
-                ...fiche,
-                notes_complementaires: e.target.value.trim(),
-              })
-            }
+            onBlur={e => {
+              if (fiche.notes_complementaires) {
+                e.target.value !== fiche.notes_complementaires &&
+                  updateFiche({
+                    ...fiche,
+                    notes_complementaires: e.target.value.trim(),
+                  });
+              } else {
+                e.target.value.trim().length > 0 &&
+                  updateFiche({
+                    ...fiche,
+                    notes_complementaires: e.target.value.trim(),
+                  });
+              }
+            }}
             placeholder="Écrire ici..."
             maxLength={20000}
             className="outline-transparent resize-none"
