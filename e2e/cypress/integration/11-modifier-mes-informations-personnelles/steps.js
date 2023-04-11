@@ -1,48 +1,60 @@
-/// <reference types="Cypress" />
+import {defineStep} from '@badeball/cypress-cucumber-preprocessor';
 
-import { LocalSelectors } from "./selectors";
+import {LocalSelectors} from './selectors';
 
 beforeEach(() => {
   // enregistre les définitions locales
-  cy.wrap(LocalSelectors).as("LocalSelectors");
+  cy.wrap(LocalSelectors).as('LocalSelectors', {type: 'static'});
 });
 
-Given("un formulaire de modification de compte est affiché", () => {
+defineStep('un formulaire de modification de compte est affiché', () => {
   cy.get(
-    LocalSelectors["formulaire de modification de compte"].selector
-  ).should("be.visible");
+    LocalSelectors['formulaire de modification de compte'].selector
+  ).should('be.visible');
 });
 
-Given(/je modifie le champ "([^"]+)" en "([^"]+)"/, (champ, value) => {
-  cy.get(`[data-test="${champ}"]`).clear().type(value).blur();
+defineStep(/je modifie le champ "([^"]+)" en "([^"]+)"/, (champ, value) => {
+  cy.get(`[data-test="${champ}"]`)
+    .type('{selectall}{backspace}' + value)
+    .blur();
 });
 
-Given(/le champ "([^"]+)" doit contenir "([^"]+)"/, (champ, value) => {
-  cy.get(`[data-test="${champ}"]`).should("have.value", value);
+defineStep(/le champ "([^"]+)" doit contenir "([^"]+)"/, (champ, value) => {
+  cy.get(`[data-test="${champ}"]`).should('have.value', value);
 });
 
-Given("la modale de modification d'email est affichée", () => {
+defineStep("la modale de modification d'email est affichée", () => {
   cy.get(LocalSelectors["modale de modification d'email"].selector).should(
-    "be.visible"
+    'be.visible'
   );
 });
 
-Given (/je vide ma boite de reception/, (email) => {
-  cy.origin(`http://localhost:8025/`, { args: { email } }, ({ email }) => {
-    cy.visit("/");
-    cy.get(`[ng-click="deleteAll()"]`).click();
-    cy.get(`[ng-click="deleteAllConfirm()"]`).click();
-  })
-  cy.visit("/");
+const INBUCKET_URL = 'http://localhost:54324/';
+
+defineStep(/je vide la boîte de réception de "([^"]+)"/, email => {
+  cy.origin(INBUCKET_URL, {args: {email}}, ({email}) => {
+    cy.visit(`/m/${email}`);
+    cy.get(`.fa-trash`).click();
+    cy.get(`.danger`).click();
+  });
+  cy.visit('/');
 });
 
-Given("je clique sur le bouton confirmer de la modale de modification d'email", () => {
-  cy.get(LocalSelectors["modale de modification d'email"].selector).get(`[aria-label="Confirmer"]`).click();
-});
+defineStep(
+  "je clique sur le bouton confirmer de la modale de modification d'email",
+  () => {
+    cy.get(LocalSelectors["modale de modification d'email"].selector)
+      .get(`[aria-label="Confirmer"]`)
+      .click();
+  }
+);
 
-Given (/ma boite de reception contient un mail adressé à "([^"]+)"/, (email) => {
-  cy.origin(`http://localhost:8025/`, { args: { email } }, ({ email }) => {
-    cy.visit("/");
-    cy.get(".msglist-message").contains(email);
-  })
-});
+defineStep(
+  /la boîte de réception de "([^"]+)" contient un mail intitulé "([^"]+)"/,
+  (email, titre) => {
+    cy.origin(INBUCKET_URL, {args: {email, titre}}, ({email, titre}) => {
+      cy.visit(`/m/${email}`);
+      cy.get('.message-list').contains(titre);
+    });
+  }
+);

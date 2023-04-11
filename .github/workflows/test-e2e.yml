@@ -14,25 +14,25 @@ jobs:
   end-to-end-test:
     name: End-to-end tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       e2e-directory: ./e2e
       datalayer-directory: ./data_layer
       project-docker-directory: ./
-      CYPRESS_IMAGE: 'cypress/browsers:node12.16.1-chrome80-ff73'
+      CYPRESS_IMAGE: 'cypress/browsers:node16.16.0-chrome107-ff107'
       LANG: 'fr_FR.UTF-8'
-      SUPABASE_KEY: ${{secrets.TEST_ANON_SUPABASE_KEY}}
-      ANON_KEY: ${{secrets.TEST_ANON_SUPABASE_KEY}}
-      SERVICE_ROLE_KEY: ${{secrets.TEST_SERVICE_SUPABASE_KEY}}
       REACT_APP_CRISP_WEBSITE_ID: 96fe7866-d005-4623-80b1-bd772e99855c
-      SUPABASE_SERVICE_ROLE_KEY: ${{secrets.TEST_SERVICE_SUPABASE_KEY}}
-      SUPABASE_ANON_KEY: ${{secrets.TEST_ANON_SUPABASE_KEY}}
       GIT_HEAD_REF: ${{github.head_ref}}
       GIT_SHA: ${{github.sha}}
 
     steps:
-      # cf. https://github.com/actions/checkout
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: earthly/actions/setup-earthly@v1
+        with:
+          version: v0.7.0
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 1.46.5
 
       # fixe la langue de l'environnement de test : permet de faire passer les
       # tests de composant utilisant des fonctions telles que toLocaleString()
@@ -41,61 +41,26 @@ jobs:
           sudo locale-gen ${{env.LANG}}
           sudo update-locale LANG=${{env.LANG}}
 
-      # Copy all projet .sample.env into .env with the variables
-      - name: Make .env files
-        run: sh make_dot_env.sh
-
-      # Build docker
-      - name: Build docker
-        run: docker-compose build
-        working-directory: ${{env.project-docker-directory}}
-
-      # Tear down docker
-      - name: Down docker
-        run: docker-compose down
-        working-directory: ${{env.project-docker-directory}}
-
-      # Launch docker
-      - name: Launch docker
-        run: docker-compose up -d
-        working-directory: ${{env.project-docker-directory}}
-        env:
-          # pour que les urls téléchargées depuis le serveur node (front) soit ré-écrites
-          ZIP_ORIGIN_OVERRIDE: http://kong:8000
-
-      # Wait for the rest container
-      - name: Wait for rest
-        run: sh scripts/wait_for_rest.sh
-        working-directory: ${{env.datalayer-directory}}
-
-      # Wait for the front container
-      - name: Wait for front
-        run: sh scripts/wait_for_front.sh
-        working-directory: ${{env.datalayer-directory}}
+      - run: earthly +setup-env
+      - run: earthly +dev --client=yes
+      - run: docker restart supabase_rest_tet
+      - run: earthly +curl-test
 
       # run tests into electron
       - name: Cypress run
-        # utilise la v3 pour être en node 16 et cypress v9
-        uses: cypress-io/github-action@v3
+        uses: cypress-io/github-action@v5
         with:
           working-directory: ${{env.e2e-directory}}
         env:
           # pass GitHub token to allow accurately detecting a build vs a re-run build
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Generate test report
-        if: failure()
-        run: npm run report
-        working-directory: ${{env.e2e-directory}}
-        env:
-          BROWSER: chrome
-
       - name: Upload report to GitHub
         if: failure()
         uses: actions/upload-artifact@master
         with:
           name: report-chrome
-          path: ${{env.e2e-directory}}/report
+          path: ${{env.e2e-directory}}/cucumber-report.html
 
       - name: Collect docker logs on failure
         if: failure()
