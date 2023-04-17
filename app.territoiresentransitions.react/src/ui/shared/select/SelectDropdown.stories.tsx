@@ -19,17 +19,6 @@ export const AucuneOptionSelectionee = () => {
       value={value}
       options={options}
       onSelect={v => setValue(v)}
-    />
-  );
-};
-
-export const AvecPlaceholder = () => {
-  const [value, setValue] = useState(undefined);
-  return (
-    <SelectDropdown
-      value={value}
-      options={options}
-      onSelect={v => setValue(v)}
       placeholderText="Sélectionner une option"
     />
   );
@@ -55,9 +44,9 @@ export const CustomOptionEtSelection = () => {
       options={options}
       onSelect={v => setValue(v)}
       placeholderText="Sélectionner une option"
-      renderOption={value => (
+      renderOption={option => (
         <span className="py-1 px-2 rounded bg-teal-600 text-white">
-          {value}
+          {option.value}
         </span>
       )}
       renderSelection={value => (

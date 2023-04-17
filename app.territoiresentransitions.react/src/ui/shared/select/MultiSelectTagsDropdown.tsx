@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import Tag from 'ui/shared/Tag';
-import {getOptionLabel, TSelectBase} from './commons';
+import {getOptionLabel, getOptions, TSelectBase} from './commons';
 import MultiSelectDropdown from './MultiSelectDropdown';
 
 type TMultiSelectTagsDropdown<T extends string> = TSelectBase & {
@@ -35,13 +35,13 @@ const MultiSelectTagsDropdown = <T extends string>({
           {values.map(v => (
             <Tag
               key={v}
-              title={getOptionLabel(v, options)}
+              title={getOptionLabel(v, getOptions(options))}
               onCloseClick={() => onSelect(values.filter(val => val !== v))}
             />
           ))}
         </div>
       )}
-      renderOption={option => <Tag title={getOptionLabel(option, options)} />}
+      renderOption={option => <Tag title={option.label} />}
     />
   );
 };

@@ -4,6 +4,7 @@ import MultiSelectDropdown, {
   TMultiSelectDropdownProps,
 } from 'ui/shared/select/MultiSelectDropdown';
 import {getIsAllSelected, ITEM_ALL} from '../filters/commons';
+import {getOptions} from './commons';
 
 /** Uncontroled multi select filter */
 export const MultiSelectFilter = <T extends string>({
@@ -20,7 +21,7 @@ export const MultiSelectFilter = <T extends string>({
   const isAllSelected = values && getIsAllSelected(values);
 
   let labels = new Map<string, string>();
-  options.forEach(({label, value}) => labels.set(value, label));
+  getOptions(options).forEach(({label, value}) => labels.set(value, label));
 
   // gère la sélection/déselection d'item dans la liste
   const handleChange = (newValues: T[]) => {
@@ -49,16 +50,16 @@ export const MultiSelectFilter = <T extends string>({
       values={values}
       options={options}
       onSelect={handleChange}
-      renderOption={v =>
+      renderOption={option =>
         renderOption ? (
-          renderOption(v)
+          renderOption(option)
         ) : (
           <span
             className={classNames('pr-4 py-1', {
-              'fr-text-mention--grey': v === ITEM_ALL,
+              'fr-text-mention--grey': option.label === ITEM_ALL,
             })}
           >
-            {labels.get(v)}
+            {option.label}
           </span>
         )
       }

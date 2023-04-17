@@ -4,12 +4,14 @@ import classNames from 'classnames';
 import DropdownFloater from 'ui/shared/floating-ui/DropdownFloater';
 import {TMultiSelectDropdownProps} from 'ui/shared/select/MultiSelectDropdown';
 import Tag from 'ui/shared/Tag';
+import Options from './Options';
 
 import {
   buttonDisplayedClassname,
-  Checkmark,
   ExpandCollapseIcon,
+  filterOptions,
   getOptionLabel,
+  getOptions,
   optionButtonClassname,
   TSelectBase,
   TSelectSelectionButtonBase,
@@ -26,7 +28,6 @@ const SelectCreateTagsDropdown = <T extends string>({
   options,
   onSelect,
   onCreateClick,
-  renderOption,
   placement,
   placeholderText,
   disabled,
@@ -38,13 +39,11 @@ const SelectCreateTagsDropdown = <T extends string>({
     setInputValue(value);
   };
 
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(inputValue.toLowerCase().trim())
-  );
+  const filteredOptions = filterOptions(options, inputValue);
 
   const isNotSimilar =
     inputValue.toLowerCase().trim() !==
-    filteredOptions[0]?.label.toLowerCase().trim();
+    getOptions(filteredOptions)[0]?.label.toLowerCase().trim();
 
   return (
     <DropdownFloater
@@ -52,9 +51,10 @@ const SelectCreateTagsDropdown = <T extends string>({
       toggle={false}
       enterToToggle={false}
       render={() => (
-        <div data-test={`${dataTest}-options`}>
+        <div>
           {inputValue.trim().length > 0 && isNotSimilar && (
             <button
+              data-test={`${dataTest}-creer-tag`}
               className={classNames('pl-10', optionButtonClassname)}
               onClick={() => {
                 onCreateClick(inputValue);
@@ -68,27 +68,13 @@ const SelectCreateTagsDropdown = <T extends string>({
               />
             </button>
           )}
-          {filteredOptions.map(({label, value: v}) => {
-            return (
-              <button
-                key={v}
-                data-test={v}
-                className={optionButtonClassname}
-                onClick={() => {
-                  if (values?.includes(v as T)) {
-                    onSelect(
-                      values.filter(selectedValue => selectedValue !== (v as T))
-                    );
-                  } else {
-                    onSelect([...(values || []), v as T]);
-                  }
-                }}
-              >
-                <Checkmark isSelected={values?.includes(v as T) || false} />
-                {renderOption ? renderOption(v as T) : <Tag title={label} />}
-              </button>
-            );
-          })}
+          <Options
+            dataTest={dataTest}
+            values={values}
+            options={filterOptions(options, inputValue)}
+            onSelect={onSelect}
+            renderOption={option => <Tag title={option.label} />}
+          />
         </div>
       )}
     >
@@ -170,7 +156,7 @@ const SelectCreateTagsButton = forwardRef(
               values.map(v => (
                 <Tag
                   key={v}
-                  title={getOptionLabel(v, options)}
+                  title={getOptionLabel(v, getOptions(options))}
                   onCloseClick={() =>
                     onSelect(values.filter(value => value !== v))
                   }

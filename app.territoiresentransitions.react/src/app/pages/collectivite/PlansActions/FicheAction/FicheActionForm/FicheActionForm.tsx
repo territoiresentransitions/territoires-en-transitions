@@ -28,7 +28,11 @@ import PersonneReferenteDropdown from './PersonneReferenteDropdown';
 import IndicateursDropdown from './IndicateursDropdown';
 import ThematiquesDropdown from './ThematiquesDropdown';
 import SousThematiquesDropdown from './SousThematiquesDropdown';
-import {TSousThematiqueRow, TThematiqueRow} from 'types/alias';
+import {
+  TFicheActionStatuts,
+  TSousThematiqueRow,
+  TThematiqueRow,
+} from 'types/alias';
 import {DSFRbuttonClassname} from 'ui/shared/select/commons';
 import FicheActionRangerModal from '../FicheActionRangerModal/FicheActionRangerModal';
 import {usePlanActionProfondeur} from '../../PlanAction/data/usePlanActionProfondeur';
@@ -36,6 +40,7 @@ import ServicePiloteDropdown from './ServicePiloteDropdown';
 import Financeurs from './Financeurs';
 import PictoLeaf from 'ui/pictogrammes/PictoLeaf';
 import ActionsLiees from './ActionsLiees';
+import FichesLiees from './FichesLiees';
 
 type TFicheActionForm = {
   fiche: FicheAction;
@@ -301,7 +306,9 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
               placeholderText="Sélectionnez une option"
               renderSelection={v => <FicheActionBadgeStatut statut={v} />}
               renderOption={option => (
-                <FicheActionBadgeStatut statut={option} />
+                <FicheActionBadgeStatut
+                  statut={option.value as TFicheActionStatuts}
+                />
               )}
               disabled={isReadonly}
             />
@@ -387,6 +394,12 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
         <ActionsLiees
           actions={fiche.actions}
           onSelect={actions => updateFiche({...fiche, actions})}
+          isReadonly={isReadonly}
+        />
+        <FichesLiees
+          ficheCouranteId={fiche.id}
+          fiches={fiche.fiches_liees}
+          onSelect={fiches_liees => updateFiche({...fiche, fiches_liees})}
           isReadonly={isReadonly}
         />
       </Section>

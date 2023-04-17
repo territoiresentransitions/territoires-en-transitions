@@ -7,13 +7,14 @@ import Tag from 'ui/shared/Tag';
 
 import {
   buttonDisplayedClassname,
-  Checkmark,
   ExpandCollapseIcon,
+  filterOptions,
   getOptionLabel,
-  optionButtonClassname,
+  getOptions,
   TSelectBase,
   TSelectSelectionButtonBase,
 } from './commons';
+import Options from './Options';
 
 /** Sélecteur avec un input dans le bouton d'ouverture pour faire une recherche dans la liste d'options */
 const AutocompleteInputSelect = <T extends string>({
@@ -33,10 +34,6 @@ const AutocompleteInputSelect = <T extends string>({
     setInputValue(value);
   };
 
-  const searchedOptions = options.filter(option =>
-    option.label.toLowerCase().includes(inputValue.toLowerCase())
-  );
-
   return (
     <DropdownFloater
       containerWidthMatchButton={containerWidthMatchButton}
@@ -44,35 +41,16 @@ const AutocompleteInputSelect = <T extends string>({
       toggle={false}
       enterToToggle={false}
       render={() => (
-        <div data-test={`${dataTest}-options`}>
-          {searchedOptions.map(({label, value: v}) => {
-            return (
-              <button
-                key={v}
-                data-test={v}
-                className={optionButtonClassname}
-                onClick={() => {
-                  if (values?.includes(v as T)) {
-                    onSelect(
-                      values.filter(selectedValue => selectedValue !== (v as T))
-                    );
-                    onInputChange('');
-                  } else {
-                    onSelect([...(values || []), v as T]);
-                    onInputChange('');
-                  }
-                }}
-              >
-                <Checkmark isSelected={values?.includes(v as T) || false} />
-                {renderOption ? (
-                  renderOption(v as T)
-                ) : (
-                  <span className="leading-6">{label}</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+        <Options
+          dataTest={dataTest}
+          values={values}
+          options={filterOptions(options, inputValue)}
+          onSelect={values => {
+            onSelect(values);
+            onInputChange('');
+          }}
+          renderOption={renderOption}
+        />
       )}
     >
       <AutocompleteButton
@@ -153,7 +131,7 @@ const AutocompleteButton = forwardRef(
               values.map(v => (
                 <Tag
                   key={v}
-                  title={getOptionLabel(v, options)}
+                  title={getOptionLabel(v, getOptions(options))}
                   onCloseClick={() =>
                     onSelect(values.filter(value => value !== v))
                   }

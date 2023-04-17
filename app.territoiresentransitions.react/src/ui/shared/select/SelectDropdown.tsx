@@ -5,13 +5,13 @@ import DropdownFloater from 'ui/shared/floating-ui/DropdownFloater';
 import {
   buttonDisplayedClassname,
   buttonDisplayedPlaceholderClassname,
-  optionButtonClassname,
-  Checkmark,
   ExpandCollapseIcon,
   TSelectBase,
-  TSelectDropdownBase,
   TSelectSelectionButtonBase,
+  TOption,
+  getOptions,
 } from 'ui/shared/select/commons';
+import Options from './Options';
 
 type TSelectDropdownBaseProps<T extends string> = TSelectBase & {
   /** valeurs des options sélectionnées */
@@ -24,11 +24,12 @@ type TSelectButtonProps<T extends string> = TSelectDropdownBaseProps<T> &
   TSelectSelectionButtonBase;
 
 export type TSelectDropdownProps<T extends string> =
-  TSelectDropdownBaseProps<T> &
-    TSelectDropdownBase<T> & {
-      /** appelée quand l'option sélectionnée change (reçoit la nouvelle valeur) */
-      onSelect: (value: T) => void;
-    };
+  TSelectDropdownBaseProps<T> & {
+    /** fait le rendu d'une option de la liste (optionnel) */
+    renderOption?: (option: TOption) => React.ReactElement;
+    /** appelée quand l'option sélectionnée change (reçoit la nouvelle valeur) */
+    onSelect: (value: T) => void;
+  };
 
 const SelectDropdown = <T extends string>({
   value,
@@ -47,26 +48,18 @@ const SelectDropdown = <T extends string>({
       placement={placement}
       render={({close}) => (
         <div data-test={`${dataTest}-options`}>
-          {options.map(v => {
-            return (
-              <button
-                key={v.value}
-                data-test={v.value}
-                className={optionButtonClassname}
-                onClick={() => {
-                  onSelect(v.value as T);
-                  close();
-                }}
-              >
-                <Checkmark isSelected={value === v.value} />
-                {renderOption ? (
-                  renderOption(v.value as T)
-                ) : (
-                  <span>{v.label}</span>
-                )}
-              </button>
-            );
-          })}
+          <Options
+            dataTest={dataTest}
+            values={value && [value]}
+            options={options}
+            onSelect={values => {
+              // comme les options peuvent etre utilisées pour un select simple ou multiple,
+              // on ne sélectionne que la dernière valeur du tableau
+              onSelect(values[values.length - 1]);
+              close();
+            }}
+            renderOption={renderOption}
+          />
         </div>
       )}
     >
@@ -117,7 +110,7 @@ const SelectButtton = forwardRef(
           renderSelection(value)
         ) : (
           <span className="mr-auto flex line-clamp-1">
-            {options.find(({value: v}) => v === value)?.label || ''}
+            {getOptions(options).find(({value: v}) => v === value)?.label || ''}
           </span>
         )
       ) : (

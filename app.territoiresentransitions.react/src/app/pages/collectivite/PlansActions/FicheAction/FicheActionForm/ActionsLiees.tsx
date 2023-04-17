@@ -8,6 +8,7 @@ import ActionCard from '../../components/ActionCard';
 import {useActionListe} from '../data/options/useActionListe';
 import {useCollectiviteId} from 'core-logic/hooks/params';
 import {TActionRelationInsert} from 'types/alias';
+import {referentielToName} from 'app/labels';
 
 type Props = {
   actions: TActionRelationInsert[] | null;
@@ -51,43 +52,37 @@ const ActionsLiees = ({actions, onSelect, isReadonly}: Props) => {
 
   return (
     <>
-      <FormField label="Actions liées">
+      <FormField label="Actions des référentiels liées">
         <AutocompleteInputSelect
           containerWidthMatchButton
           values={actions?.map((action: TActionRelationInsert) => action.id)}
           options={formatOptions(actionListe)}
           onSelect={values => onSelect(formatSelectActions(values))}
-          placeholderText={
-            actions && actions?.length > 0
-              ? 'Recherchez par mots-clés'
-              : 'Recherchez par mots-clés ou sélectionnez dans la liste'
-          }
+          placeholderText="Recherchez par mots-clés"
           disabled={isReadonly}
         />
       </FormField>
-      <div className="grid grid-cols-2 gap-8 mt-2">
-        {actionsLiees.map(action => (
-          <ActionCard
-            key={action.action_id}
-            link={makeCollectiviteTacheUrl({
-              collectiviteId: collectiviteId,
-              actionId: action.action_id,
-              referentielId: action.referentiel,
-            })}
-            statutBadge={
-              action.avancement && (
-                <ActionStatutBadge statut={action.avancement} small />
-              )
-            }
-            details={`Référentiel ${
-              action.referentiel === 'cae'
-                ? 'Climat Air Énergie'
-                : 'Économie circulaire'
-            }`}
-            title={`${action.identifiant} ${action.nom}`}
-          />
-        ))}
-      </div>
+      {actionsLiees.length > 0 && (
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          {actionsLiees.map(action => (
+            <ActionCard
+              key={action.action_id}
+              link={makeCollectiviteTacheUrl({
+                collectiviteId: collectiviteId,
+                actionId: action.action_id,
+                referentielId: action.referentiel,
+              })}
+              statutBadge={
+                action.avancement && (
+                  <ActionStatutBadge statut={action.avancement} small />
+                )
+              }
+              details={`Référentiel ${referentielToName[action.referentiel]}`}
+              title={`${action.identifiant} ${action.nom}`}
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 };
