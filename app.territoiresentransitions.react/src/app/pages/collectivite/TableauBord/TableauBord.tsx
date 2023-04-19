@@ -4,7 +4,7 @@ import {
   makeCollectiviteReferentielUrl,
   ReferentielParamOption,
 } from 'app/paths';
-import {actionAvancementColors} from 'app/theme';
+import {actionAvancementColors_new} from 'app/theme';
 import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinitionSummaryReadEndpoint';
 import {indicateurResultatRepository} from 'core-logic/api/repositories/AnyIndicateurRepository';
 import {useAllIndicateurDefinitionsForGroup} from 'app/pages/collectivite/Indicateurs/useAllIndicateurDefinitions';
@@ -15,10 +15,7 @@ import {TLabellisationDemande} from 'app/pages/collectivite/ParcoursLabellisatio
 import {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {ActionScore} from 'types/ClientScore';
-import {AxisAvancementSample} from 'ui/charts/chartTypes';
 import {DoughnutWithNumber} from 'ui/charts/DoughnutWithNumber';
-import {ReferentielAxisAvancementStackedBar} from 'ui/charts/ReferentielAxisAvancementStackedBar';
-import {ReferentielAxisScoresPolarArea} from 'ui/charts/ReferentielAxisScoresPolarArea';
 import {Spacer} from 'ui/shared/Spacer';
 import {toFixed} from 'utils/toFixed';
 import {NiveauLabellisation} from './NiveauLabellisation';
@@ -28,32 +25,10 @@ import {
 } from './useLabellisationParNiveau';
 import {useTracker} from 'core-logic/hooks/useTracker';
 import {TLabellisationParcours} from 'app/pages/collectivite/ParcoursLabellisation/types';
+import ProgressionReferentiel from '../EtatDesLieux/Synthese/ProgressionReferentiel';
+import {useProgressionReferentiel} from '../EtatDesLieux/Synthese/data/useProgressionReferentiel';
 
 const remplissageColor = '#2F4077';
-
-const axisLabels: Record<string, string[][]> = {
-  eci_1: [['1. Stratégie globale']],
-  eci_2: [
-    ['2. Services de'],
-    ['réduction,'],
-    ['collecte et'],
-    ['valorisation des déchets'],
-  ],
-  eci_3: [['3. Autres piliers'], ["de l'économie circulaire"]],
-  eci_4: [
-    ['4. Outils'],
-    ['financiers du'],
-    ['changement de'],
-    ['comportement'],
-  ],
-  eci_5: [['5. Coopération'], ['et engagement']],
-  cae_1: [['1. Planification'], ['territoriale']],
-  cae_2: [['2. Patrimoine'], ['de la'], ['collectivité']],
-  cae_3: [['3. Approvisionnement'], ['énergie, eau,'], ['assainissement']],
-  cae_4: [['4. Mobilité']],
-  cae_5: [['5. Organisation'], ['interne']],
-  cae_6: [['6. Coopération,'], ['communication']],
-};
 
 export type IndicateurCounts = {
   nbOfIndicateurswithValue: number;
@@ -177,7 +152,7 @@ const ChiffreCles = ({
                 0
               )} potentiels.`}
               smallText="réalisé"
-              hexColor={actionAvancementColors.fait}
+              hexColor={actionAvancementColors_new.fait} // en attendant l'harmonisation des couleurs
               doughnutFillPercentage={realisePercentage}
               widthPx={widthPx}
             />
@@ -190,7 +165,7 @@ const ChiffreCles = ({
                 0
               )} potentiels.`}
               smallText="programmé"
-              hexColor={actionAvancementColors.programme}
+              hexColor={actionAvancementColors_new.programme} // en attendant l'harmonisation des couleurs
               doughnutFillPercentage={previsionnelPercentage}
               widthPx={widthPx}
             />
@@ -232,6 +207,8 @@ const ReferentielSection = ({
   indicateurCounts: IndicateurCounts;
   collectiviteId: number;
 }) => {
+  const {table: progressionScore} = useProgressionReferentiel(referentielId);
+
   const referentielRoot = actions.find(a => a.type === 'referentiel');
   const tracker = useTracker();
   if (!referentielRoot) return null;
@@ -266,30 +243,8 @@ const ReferentielSection = ({
     );
   }
 
-  const referentielAxes: ActionDefinitionSummary[] = actions.filter(
-    a => a.type === 'axe'
-  );
-  const axisAvancementSamples: AxisAvancementSample[] = referentielAxes
-    .map(axe => {
-      const axisScore = scores.find(score => score.action_id === axe.id);
-      if (!axisScore) return null;
-      const sample: AxisAvancementSample = {
-        label: axisLabels[axe.id],
-        potentielPoints: toFixed(axisScore?.point_potentiel, 0),
-        percentages: {
-          fait: (axisScore.point_fait / axisScore.point_potentiel) * 100,
-          programme:
-            (axisScore.point_programme / axisScore.point_potentiel) * 100,
-          pas_fait:
-            (axisScore.point_pas_fait / axisScore.point_potentiel) * 100,
-          non_renseigne:
-            (axisScore.point_non_renseigne / axisScore.point_potentiel) * 100,
-        },
-      };
-      return sample;
-    })
-    .filter((sample): sample is AxisAvancementSample => sample !== null);
   const {realisePercentage} = scoreRealise(rootScore);
+
   return (
     <div className="p-4">
       {labellisationParNiveau ? (
@@ -327,18 +282,15 @@ const ReferentielSection = ({
         />
       )}
       <Spacer />
-      <div className="flex flex-col justify-center items-center">
-        <div>
-          <ReferentielAxisScoresPolarArea
-            data={axisAvancementSamples}
-            referentiel={referentielId}
-          />
-        </div>
-      </div>
-      <Spacer />
-      <ReferentielAxisAvancementStackedBar
-        data={axisAvancementSamples}
+      <ProgressionReferentiel
+        score={progressionScore}
         referentiel={referentielId}
+      />
+      <Spacer />
+      <ProgressionReferentiel
+        score={progressionScore}
+        referentiel={referentielId}
+        percentage
       />
     </div>
   );

@@ -1,8 +1,7 @@
 import {StatusColor} from 'ui/charts/chartsTheme';
-import ChartWrapper from 'ui/charts/ChartWrapper';
-import DoughnutChart from 'ui/charts/DoughnutChart';
 import {usePlanActionTableauDeBord} from './data/usePlanActionTableauDeBord';
 import PictoLeaf from 'ui/pictogrammes/PictoLeaf';
+import ChartCard from 'ui/charts/ChartCard';
 
 /**
  * Liste des graphes affichés dans la page Synthèse
@@ -86,12 +85,15 @@ const SyntheseGraphsList = ({
         graph =>
           !!graph.data.length && (
             <div key={graph.title} className="fr-col-sm-12 fr-col-xl-6">
-              <ChartWrapper title={graph.title} customClass="border-b-4">
-                <DoughnutChart
-                  data={graph.data}
-                  label={graph.id === 'statuts' || graph.id === 'priorites'}
-                />
-              </ChartWrapper>
+              <ChartCard
+                chartType="donut"
+                chartProps={{
+                  data: graph.data,
+                  label: graph.id === 'statuts' || graph.id === 'priorites',
+                }}
+                chartInfo={{title: graph.title}}
+                customStyle={{height: '350px', borderBottomWidth: '4px'}}
+              />
             </div>
           )
       )}

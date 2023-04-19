@@ -56,7 +56,7 @@ deploy:
 deploy-test:
     ARG --required DB_URL
     ARG network=host
-    ARG tag=v2.14
+    ARG tag=v2.21.0
     LOCALLY
     RUN earthly +sqitch-build
     RUN docker run --rm \
@@ -299,9 +299,14 @@ gen-types:
 setup-env:
     LOCALLY
     RUN earthly +stop
-    RUN npm install
-    RUN npx supabase start
-    RUN npx supabase status -o env > .arg
+    IF [ "$CI" = "true" ]
+        RUN supabase start
+        RUN supabase status -o env > .arg
+    ELSE
+        RUN npm install
+        RUN npx supabase start
+        RUN npx supabase status -o env > .arg
+    END
     RUN export $(cat .arg | xargs) && sh ./make_dot_env.sh
     RUN earthly +stop
 
@@ -354,10 +359,6 @@ stop:
         RUN npx supabase stop
     END
     RUN docker ps --filter name=_tet --filter status=running -aq | xargs docker stop | xargs docker rm || exit 0
-
-stats:
-    LOCALLY
-    RUN docker stats $(docker ps --format '{{.Names}}' --filter name=transitions) || exit 1
 
 test:
     LOCALLY

@@ -24,6 +24,11 @@ export const theme: Theme = {
       border: '1px solid #ccc',
     },
   },
+  labels: {
+    text: {
+      fontFamily: '"Marianne", arial, sans-serif',
+    },
+  },
 };
 
 export const defaultColors = [
