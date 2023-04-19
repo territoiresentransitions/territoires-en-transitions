@@ -116,7 +116,7 @@ const ChartCardModalContent = ({
   );
 };
 
-type ChartCardProps = {
+export type ChartCardProps = {
   chartType: 'bar' | 'donut';
   chartProps: BarChartProps | DonutChartProps;
   chartInfo?: {
