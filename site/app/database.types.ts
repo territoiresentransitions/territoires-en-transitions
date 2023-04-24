@@ -750,14 +750,17 @@ export interface Database {
         Row: {
           actif: boolean
           collectivite_id: number
+          signataire: number | null
         }
         Insert: {
           actif: boolean
           collectivite_id: number
+          signataire?: number | null
         }
         Update: {
           actif?: boolean
           collectivite_id?: number
+          signataire?: number | null
         }
       }
       dcp: {
@@ -3656,13 +3659,13 @@ export interface Database {
       _get_note:
         | {
             Args: {
-              "": string
+              "": number
             }
             Returns: string
           }
         | {
             Args: {
-              "": number
+              "": string
             }
             Returns: string
           }
@@ -6232,6 +6235,7 @@ export interface Database {
         Returns: {
           actif: boolean
           collectivite_id: number
+          signataire: number | null
         }
       }
       test_write_scores: {
