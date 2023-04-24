@@ -1,14 +1,23 @@
 import classNames from 'classnames';
-import {ActionAvancement} from 'generated/dataLayer/action_statut_read';
 import {avancementToLabel} from 'app/labels';
+import {TActionAvancementExt} from 'types/alias';
 
 type Props = {
   className?: string;
-  statut: ActionAvancement;
+  statut: TActionAvancementExt;
   // Indique si le statut est barré
   barre?: boolean;
   // Rend une version plus petite du composant
   small?: boolean;
+};
+
+const statusToClassNames = {
+  non_renseigne: 'text-grey625 bg-white border border-grey925',
+  pas_fait: 'text-error425 bg-[#FFE9E9]',
+  programme: 'text-tDefaultInfo bg-[#E8EDFF]',
+  detaille: 'text-bf500 bg-bf925',
+  fait: 'text-[#18753C] bg-[#B8FEC9]',
+  non_concerne: 'text-grey425 bg-[#EEEEEE]',
 };
 
 const ActionStatutBadge = ({className, statut, barre, small}: Props) => {
@@ -17,14 +26,15 @@ const ActionStatutBadge = ({className, statut, barre, small}: Props) => {
       data-test="ActionStatutBadge"
       className={classNames(
         className,
+        // styles communs
         'w-max py-0.5 px-2 font-bold text-sm uppercase whitespace-nowrap rounded-md',
-        {'line-through': barre},
-        {'!text-xs !px-1': small},
-        {'text-yellow-800 bg-yellow-100': statut === 'non_renseigne'},
-        {'text-red-600 bg-pink-100': statut === 'pas_fait'},
-        {'text-blue-600 bg-blue-100': statut === 'programme'},
-        {'text-gray-600 bg-pink-100': statut === 'detaille'},
-        {'text-green-700 bg-green-200': statut === 'fait'}
+        // couleurs (et bordures) en fonction du statut
+        statusToClassNames[statut],
+        // variantes
+        {
+          'line-through': barre,
+          '!text-xs !px-1': small,
+        }
       )}
     >
       {avancementToLabel[statut]}

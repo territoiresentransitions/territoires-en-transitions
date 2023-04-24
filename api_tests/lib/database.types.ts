@@ -555,6 +555,7 @@ export interface Database {
         Row: {
           collectivite_id: number
           commentaire: string
+          fiche_id: number
           fichier_id: number | null
           id: number
           lien: Json | null
@@ -566,6 +567,7 @@ export interface Database {
         Insert: {
           collectivite_id: number
           commentaire?: string
+          fiche_id: number
           fichier_id?: number | null
           id?: number
           lien?: Json | null
@@ -577,6 +579,7 @@ export interface Database {
         Update: {
           collectivite_id?: number
           commentaire?: string
+          fiche_id?: number
           fichier_id?: number | null
           id?: number
           lien?: Json | null
@@ -921,20 +924,6 @@ export interface Database {
         }
         Update: {
           action_id?: string
-          fiche_id?: number
-        }
-      }
-      fiche_action_annexe: {
-        Row: {
-          annexe_id: number
-          fiche_id: number
-        }
-        Insert: {
-          annexe_id: number
-          fiche_id: number
-        }
-        Update: {
-          annexe_id?: number
           fiche_id?: number
         }
       }
@@ -2568,6 +2557,20 @@ export interface Database {
           parents: number[] | null
         }
       }
+      bibliotheque_annexe: {
+        Row: {
+          collectivite_id: number | null
+          commentaire: string | null
+          created_at: string | null
+          created_by: string | null
+          created_by_nom: string | null
+          fiche_id: number | null
+          fichier: Json | null
+          id: number | null
+          lien: Json | null
+          plan_ids: number[] | null
+        }
+      }
       bibliotheque_fichier: {
         Row: {
           bucket_id: string | null
@@ -2705,19 +2708,17 @@ export interface Database {
       fiche_resume: {
         Row: {
           collectivite_id: number | null
-          fiche_id: number | null
-          fiche_nom: string | null
-          fiche_statut:
-            | Database["public"]["Enums"]["fiche_action_statuts"]
-            | null
+          id: number | null
+          pilotes: Database["public"]["CompositeTypes"]["personne"][] | null
           plans: unknown[] | null
+          statut: Database["public"]["Enums"]["fiche_action_statuts"] | null
+          titre: string | null
         }
       }
       fiches_action: {
         Row: {
           actions: unknown[] | null
           amelioration_continue: boolean | null
-          annexes: unknown[] | null
           axes: unknown[] | null
           budget_previsionnel: number | null
           calendrier: string | null
@@ -4033,23 +4034,6 @@ export interface Database {
         }
         Returns: undefined
       }
-      ajouter_annexe: {
-        Args: {
-          fiche_id: number
-          annexe: unknown
-        }
-        Returns: {
-          collectivite_id: number
-          commentaire: string
-          fichier_id: number | null
-          id: number
-          lien: Json | null
-          modified_at: string
-          modified_by: string
-          titre: string
-          url: string | null
-        }
-      }
       ajouter_fiche_action_dans_un_axe: {
         Args: {
           fiche_id: number
@@ -4538,14 +4522,6 @@ export interface Database {
         }
         Returns: undefined
       }
-      enlever_annexe: {
-        Args: {
-          fiche_id: number
-          annexe: unknown
-          supprimer: boolean
-        }
-        Returns: undefined
-      }
       enlever_fiche_action_d_un_axe: {
         Args: {
           fiche_id: number
@@ -4651,7 +4627,6 @@ export interface Database {
         Returns: {
           actions: unknown[] | null
           amelioration_continue: boolean | null
-          annexes: unknown[] | null
           axes: unknown[] | null
           budget_previsionnel: number | null
           calendrier: string | null
@@ -5854,6 +5829,12 @@ export interface Database {
         Returns: string
       }
       plan_action: {
+        Args: {
+          id: number
+        }
+        Returns: Json
+      }
+      plan_action_export: {
         Args: {
           id: number
         }
