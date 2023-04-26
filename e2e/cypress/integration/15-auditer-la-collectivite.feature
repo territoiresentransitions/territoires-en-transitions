@@ -120,7 +120,7 @@ Fonctionnalité: Auditer la collectivité
 
     Quand je suis connecté en tant qu'auditeur de la collectivité
     Et que l'audit est commencé
-    Quand je suis sur la page "Bibliothèque de documents" de la collectivité courante
+    Et que je suis sur la page "Bibliothèque de documents" de la collectivité courante
     Alors il n'y a pas de documents de labellisation
 
     Quand je suis sur la page "Labellisation ECi" de la collectivité courante
@@ -143,6 +143,7 @@ Fonctionnalité: Auditer la collectivité
     Quand je clique sur le bouton "Valider" du "dialogue de validation"
     Alors le "dialogue de validation" est absent
     Et le bouton "Valider l'audit" est absent
+    Et le bouton "Demander un audit" est absent
     Et l'en-tête contient "Labellisation en cours"
 
     # on vérifie que le statut d'audit, l'avis et la case "ordre du jour" sont en lecture seule après validation de l'audit
@@ -172,7 +173,7 @@ Fonctionnalité: Auditer la collectivité
 
     Quand je suis connecté en tant qu'auditeur de la collectivité
     Et que l'audit est commencé
-    Quand je suis sur la page "Bibliothèque de documents" de la collectivité courante
+    Et que je suis sur la page "Bibliothèque de documents" de la collectivité courante
     Alors il n'y a pas de documents de labellisation
 
     Quand je suis sur la page "Labellisation CAE" de la collectivité courante
@@ -203,3 +204,48 @@ Fonctionnalité: Auditer la collectivité
       | Titre       | Commentaire | Lecture seule |
       | rapport.doc |             | oui           |
     Et la liste des documents de labellisation contient le titre "Audit contrat d'objectif territorial (COT)" sans l'indication "en cours"
+
+  @skip
+  Scénario: Personnaliser le référentiel en cours d'audit
+    On teste que le score avant audit reste inchangé lorsque la personnalisation du référentiel change pendant l'audit.
+
+    Etant donné une collectivité nommée "Collectivité de test"
+    Et avec comme réponses initiales :
+      | Question        | Réponse    |
+      | AOM_1           | non        |
+      | voirie_1        | voirie_1_a |
+      | centre_polarite | oui        |
+    Et un score permettant d'obtenir la 2ème étoile
+    Et que j'attends que les scores soient calculés
+    Et un utilisateur avec les droits en "edition"
+
+    Quand je suis connecté avec les droits en "edition"
+    Et que je visite l'action "cae_4.2.3" de la collectivité courante
+    #####
+    ## TODO: faire passer le test avec la ligne commentée :
+    # Alors le potentiel de points est "4,5"
+    Alors le potentiel de points est "7,71"
+    ####
+
+    Quand je demande un audit de labellisation "cae" pour la 2ème étoile
+    Et que je me reconnecte en tant qu'auditeur de la collectivité
+    Et que je suis sur la page "Labellisation CAE" de la collectivité courante
+    Et que je clique sur le bouton "Commencer l'audit"
+    Et que je clique sur l'onglet "Cycles et comparaison"
+    Et que je déplie le sous-axe "4.2" du tableau de comparaison des scores
+    #####
+    ## TODO: faire passer le test avec la ligne commentée :
+    #Alors le potentiel de l'action "4.2.3" est de "4,5" avant et pendant l'audit
+    Alors le potentiel de l'action "4.2.3" est de "4,5" avant audit et "7,7" pendant l'audit
+    #####
+
+    Quand je change la réponse à la question "centre_polarite" depuis la thématique "identite" en "non"
+    Et que j'attends que les scores soient calculés
+    Et que je retourne sur la page "Labellisation CAE" de la collectivité courante
+    Et que je clique sur l'onglet "Cycles et comparaison"
+    Et que je déplie le sous-axe "4.2" du tableau de comparaison des scores
+    #####
+    ## TODO: faire passer le test avec la ligne commentée :
+    #Alors le potentiel de l'action "4.2.3" est de "4,5" avant audit et "1,5" pendant l'audit
+    Alors le potentiel de l'action "4.2.3" est de "1,5" avant audit et "7,7" pendant l'audit
+

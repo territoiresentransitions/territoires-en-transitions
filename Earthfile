@@ -56,7 +56,7 @@ deploy:
 deploy-test:
     ARG --required DB_URL
     ARG network=host
-    ARG tag=v2.21.0
+    ARG tag=v2.24.0
     LOCALLY
     RUN earthly +sqitch-build
     RUN docker run --rm \
@@ -261,7 +261,8 @@ api-test-build:
     COPY ./api_tests .
     RUN deno cache tests/smoke.test.ts
     CMD deno test --allow-net --allow-env --allow-read tests/smoke.test.ts --location 'http://localhost' && \
-        deno test --allow-net --allow-env --allow-read tests/test/utilisateur.test.ts --location 'http://localhost'
+        deno test --allow-net --allow-env --allow-read tests/test/utilisateur.test.ts --location 'http://localhost' && \
+        deno test --allow-net --allow-env --allow-read tests/labellisation/audit.test.ts --location 'http://localhost'
     SAVE IMAGE api-test:latest
 
 api-test:

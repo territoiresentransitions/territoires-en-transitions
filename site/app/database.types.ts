@@ -224,6 +224,13 @@ export interface Database {
         }
         Returns: Record<string, unknown>
       }
+      audit_personnalisation_payload: {
+        Args: {
+          audit_id: number
+          scores_table: string
+        }
+        Returns: Json
+      }
       critere_action: {
         Args: {
           collectivite_id: number
@@ -296,6 +303,12 @@ export interface Database {
           scores_table: string
         }
         Returns: number
+      }
+      pre_audit_reponses: {
+        Args: {
+          audit: unknown
+        }
+        Returns: Json
       }
       pre_audit_service_statuts: {
         Args: {
@@ -3659,13 +3672,13 @@ export interface Database {
       _get_note:
         | {
             Args: {
-              "": number
+              "": string
             }
             Returns: string
           }
         | {
             Args: {
-              "": string
+              "": number
             }
             Returns: string
           }
@@ -6169,6 +6182,13 @@ export interface Database {
         }
         Returns: Json
       }
+      test_max_fulfill: {
+        Args: {
+          collectivite_id: number
+          referentiel: Database["public"]["Enums"]["referentiel"]
+        }
+        Returns: undefined
+      }
       test_remove_user: {
         Args: {
           email: string
@@ -6225,17 +6245,6 @@ export interface Database {
           audit_id: number
           auditeur: string
           created_at: string | null
-        }
-      }
-      test_set_cot: {
-        Args: {
-          collectivite_id: number
-          actif: boolean
-        }
-        Returns: {
-          actif: boolean
-          collectivite_id: number
-          signataire: number | null
         }
       }
       test_write_scores: {
