@@ -3,6 +3,7 @@ import {
   makeCollectiviteBibliothequeUrl,
   makeCollectiviteIndicateursUrl,
   makeCollectiviteJournalUrl,
+  makeCollectiviteLabellisationRootUrl,
   makeCollectiviteLabellisationUrl,
   makeCollectivitePersoRefUrl,
   makeCollectivitePlansActionsBaseUrl,
@@ -11,8 +12,6 @@ import {
   makeCollectiviteUsersUrl,
 } from 'app/paths';
 import {TNavDropdown, TNavItem, TNavItemsList} from './types';
-import {Referentiel} from 'types/litterals';
-import {referentielToName} from 'app/labels';
 
 /** Génère les liens de navigation pour une collectivité donnée */
 export const makeNavItems = (
@@ -31,21 +30,94 @@ const makeNavItemsBase = (collectivite: CurrentCollectivite): TNavItemsList => {
       label: 'Tableau de bord',
       to: makeCollectiviteTableauBordUrl({collectiviteId}),
     },
-    menuReferentiel({collectiviteId, referentielId: 'cae', acces_restreint}),
-    menuReferentiel({collectiviteId, referentielId: 'eci', acces_restreint}),
     {
       acces_restreint,
-      title: 'Pilotage',
+      title: 'État des lieux',
+      // Chemin de base pour garder le menu actif quand un change d'onglet
+      urlPrefix: [
+        makeCollectiviteReferentielUrl({
+          collectiviteId,
+          referentielId: 'cae',
+          referentielVue: '',
+        }),
+        makeCollectiviteReferentielUrl({
+          collectiviteId,
+          referentielId: 'eci',
+          referentielVue: '',
+        }),
+        makeCollectiviteLabellisationRootUrl({
+          collectiviteId,
+          referentielId: 'cae',
+        }),
+        makeCollectiviteLabellisationRootUrl({
+          collectiviteId,
+          referentielId: 'eci',
+        }),
+      ],
       items: [
         {
-          label: "Plans d'action",
-          to: makeCollectivitePlansActionsBaseUrl({
+          label: 'Personnalisation des référentiels',
+          to: makeCollectivitePersoRefUrl({
             collectiviteId,
           }),
         },
         {
-          label:
-            'Indicateurs contrat de relance et de transition écologique (CRTE)',
+          label: 'Référentiel Climat-Air-Énergie',
+          to: makeCollectiviteReferentielUrl({
+            collectiviteId,
+            referentielId: 'cae',
+          }),
+        },
+        {
+          label: 'Labellisation Climat-Air-Énergie',
+          to: makeCollectiviteLabellisationUrl({
+            collectiviteId,
+            referentielId: 'cae',
+          }),
+        },
+        {
+          label: 'Référentiel Économie Circulaire',
+          to: makeCollectiviteReferentielUrl({
+            collectiviteId,
+            referentielId: 'eci',
+          }),
+        },
+        {
+          label: 'Labellisation Économie Circulaire',
+          to: makeCollectiviteLabellisationUrl({
+            collectiviteId,
+            referentielId: 'eci',
+          }),
+        },
+      ],
+    },
+    {
+      acces_restreint,
+      label: "Plans d'action",
+      to: makeCollectivitePlansActionsBaseUrl({
+        collectiviteId,
+      }),
+    },
+    {
+      acces_restreint,
+      title: 'Indicateurs',
+      items: [
+        {
+          label: 'Indicateurs Climat-Air-Énergie',
+          to: makeCollectiviteIndicateursUrl({
+            collectiviteId,
+            indicateurView: 'cae',
+          }),
+        },
+        {
+          label: 'Indicateurs Économie Circulaire',
+          to: makeCollectiviteIndicateursUrl({
+            collectiviteId,
+            indicateurView: 'eci',
+          }),
+        },
+        {
+          label: 'Indicateurs Contrat de Relance Transition Écologique',
           to: makeCollectiviteIndicateursUrl({
             collectiviteId,
             indicateurView: 'crte',
@@ -74,12 +146,6 @@ const makeNavItemsBase = (collectivite: CurrentCollectivite): TNavItemsList => {
       title: 'Paramètres',
       items: [
         {
-          label: 'Personnalisation des référentiels',
-          to: makeCollectivitePersoRefUrl({
-            collectiviteId,
-          }),
-        },
-        {
           label: 'Gestion des membres',
           to: makeCollectiviteUsersUrl({
             collectiviteId,
@@ -101,49 +167,6 @@ const makeNavItemsBase = (collectivite: CurrentCollectivite): TNavItemsList => {
     },
   ];
 };
-
-// items d'un sous-menu référentiel
-const menuReferentiel = ({
-  collectiviteId,
-  referentielId,
-  acces_restreint,
-}: {
-  collectiviteId: number;
-  referentielId: Referentiel;
-  acces_restreint?: boolean;
-}) => ({
-  title: referentielToName[referentielId],
-  // chemin de base pour garder le menu actif quand un change d'onglet dans la vue Référentiel
-  urlPrefix: makeCollectiviteReferentielUrl({
-    collectiviteId,
-    referentielId,
-    referentielVue: '',
-  }),
-  items: [
-    {
-      label: 'Référentiel',
-      to: makeCollectiviteReferentielUrl({
-        collectiviteId,
-        referentielId,
-      }),
-    },
-    {
-      acces_restreint,
-      label: 'Indicateurs',
-      to: makeCollectiviteIndicateursUrl({
-        collectiviteId,
-        indicateurView: referentielId,
-      }),
-    },
-    {
-      label: 'Labellisation',
-      to: makeCollectiviteLabellisationUrl({
-        collectiviteId,
-        referentielId,
-      }),
-    },
-  ],
-});
 
 // filtre les items (et sous-items) marqués comme étant en accès restreint (la
 // collectivité a le flag acces_restreint et l'utilisateur courant n'est pas
