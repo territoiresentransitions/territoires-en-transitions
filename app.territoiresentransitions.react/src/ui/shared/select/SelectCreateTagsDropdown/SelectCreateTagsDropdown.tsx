@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import DropdownFloater from 'ui/shared/floating-ui/DropdownFloater';
 import {TMultiSelectDropdownProps} from 'ui/shared/select/MultiSelectDropdown';
 import Tag from 'ui/shared/Tag';
-import Options from './Options';
+import Options from '../Options';
 
 import {
   buttonDisplayedClassname,
@@ -12,14 +12,25 @@ import {
   filterOptions,
   getOptionLabel,
   getOptions,
+  isOption,
   optionButtonClassname,
+  sortOptionByAlphabet,
+  TOption,
   TSelectBase,
   TSelectSelectionButtonBase,
-} from './commons';
+} from '../commons';
+import OptionMenu from './OptionMenu';
+
+const isUserCreatedOption = (optionValue: string, options?: string[]) =>
+  options?.some(o => o === optionValue);
 
 type TSelectCreateTagsDropdown<T extends string> =
   TMultiSelectDropdownProps<T> & {
     onCreateClick: (value: string) => void;
+    onDeleteClick?: (id: string) => void;
+    onUpdateTagName?: (tag_id: string, tag_name: string) => void;
+    /** tableau d'id des options crées par un utilisateur */
+    userCreatedTagIds?: string[];
   };
 
 /** Sélecteur de Tag(s) avec un input dans le bouton d'ouverture pour créer un tag */
@@ -28,6 +39,9 @@ const SelectCreateTagsDropdown = <T extends string>({
   options,
   onSelect,
   onCreateClick,
+  onDeleteClick,
+  onUpdateTagName,
+  userCreatedTagIds,
   placement,
   placeholderText,
   disabled,
@@ -71,9 +85,28 @@ const SelectCreateTagsDropdown = <T extends string>({
           <Options
             dataTest={dataTest}
             values={values}
-            options={filterOptions(options, inputValue)}
+            options={sortOptionByAlphabet(filterOptions(options, inputValue))}
             onSelect={onSelect}
-            renderOption={option => <Tag title={option.label} />}
+            renderOption={option => (
+              <Tag
+                title={option.label}
+                isUserCreated={isUserCreatedOption(
+                  option.value,
+                  userCreatedTagIds
+                )}
+              />
+            )}
+            renderOptionMenu={({option, close}) =>
+              !disabled &&
+              isUserCreatedOption(option.value, userCreatedTagIds) ? (
+                <OptionMenu
+                  option={option}
+                  onDeleteClick={onDeleteClick}
+                  onUpdateTagName={onUpdateTagName}
+                  close={close}
+                />
+              ) : null
+            }
           />
         </div>
       )}
@@ -88,6 +121,7 @@ const SelectCreateTagsDropdown = <T extends string>({
         onSelect={onSelect as (values: string[]) => void}
         placeholderText={placeholderText}
         disabled={disabled}
+        userCreatedTagIds={userCreatedTagIds}
       />
     </DropdownFloater>
   );
@@ -103,6 +137,8 @@ export type TSelectCreateTagsButtonProps<T extends string> = TSelectBase &
     onInputChange: (value: string) => void;
     // onInputChange: (evt: ChangeEvent<HTMLInputElement>) => void;
     onSelect: (values: T[]) => void;
+    /** tableau d'id des options crées par un utilisateur */
+    userCreatedTagIds?: string[];
   };
 
 /**
@@ -115,6 +151,7 @@ const SelectCreateTagsButton = forwardRef(
       isOpen,
       values,
       options,
+      userCreatedTagIds,
       buttonClassName,
       placeholderText,
       'data-test': dataTest,
@@ -127,6 +164,22 @@ const SelectCreateTagsButton = forwardRef(
     ref?: Ref<HTMLDivElement>
   ) => {
     const inputRef: Ref<HTMLInputElement> = useRef(null);
+
+    const valuesAsOptions = options.filter(
+      o => isOption(o) && values?.some(v => v === o.value)
+    ) as TOption[];
+
+    const sortedValues = valuesAsOptions
+      .sort((a, b) => {
+        if (a.label.toUpperCase() < b.label.toUpperCase()) {
+          return -1;
+        }
+        if (a.label.toUpperCase() > b.label.toUpperCase()) {
+          return 1;
+        }
+        return 0;
+      })
+      .map(o => o.value) as T[];
 
     const handleWrapperClick = () => {
       inputRef?.current?.focus();
@@ -151,15 +204,16 @@ const SelectCreateTagsButton = forwardRef(
           onClick={handleWrapperClick}
         >
           <div className="flex items-center flex-wrap gap-2 grow">
-            {values &&
-              values?.length !== 0 &&
-              values.map(v => (
+            {sortedValues &&
+              sortedValues?.length !== 0 &&
+              sortedValues.map(v => (
                 <Tag
                   key={v}
                   title={getOptionLabel(v, getOptions(options))}
                   onCloseClick={() =>
-                    onSelect(values.filter(value => value !== v))
+                    onSelect(sortedValues.filter(value => value !== v))
                   }
+                  isUserCreated={isUserCreatedOption(v, userCreatedTagIds)}
                 />
               ))}
             {!disabled && (

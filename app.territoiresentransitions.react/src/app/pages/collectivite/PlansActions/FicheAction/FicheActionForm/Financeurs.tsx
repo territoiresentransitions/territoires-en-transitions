@@ -5,6 +5,9 @@ import {useFinanceurListe} from '../data/options/useFinanceurListe';
 import {formatNewTag} from '../data/utils';
 import FicheActionFormBudgetInput from './FicheActionFormBudgetInput';
 import {FicheAction, Financeur} from '../data/types';
+import {useDeleteTag} from '../data/options/useTagDelete';
+import {useCollectiviteId} from 'core-logic/hooks/params';
+import {useTagUpdate} from '../data/options/useTagUpdate';
 
 type Props = {
   fiche: FicheAction;
@@ -13,7 +16,20 @@ type Props = {
 };
 
 const Financeurs = ({fiche, onUpdate, isReadonly}: Props) => {
+  const collectivite_id = useCollectiviteId();
+
   const {data: financeurTagListe} = useFinanceurListe();
+
+  const {mutate: updateTag} = useTagUpdate({
+    key: ['financeurs', collectivite_id],
+    tagTableName: 'financeur_tag',
+    keysToInvalidate: [['fiche_action', fiche.id?.toString()]],
+  });
+
+  const {mutate: deleteTag} = useDeleteTag({
+    key: ['financeurs', collectivite_id],
+    tagTableName: 'financeur_tag',
+  });
 
   // On invalide la liste des options dans useEditFicheAction
   const options: TOption[] = financeurTagListe
@@ -21,6 +37,10 @@ const Financeurs = ({fiche, onUpdate, isReadonly}: Props) => {
         value: financeur.id?.toString(),
         label: financeur.nom,
       }))
+    : [];
+
+  const userCreatedTagIds = financeurTagListe
+    ? financeurTagListe.map(f => f.id.toString())
     : [];
 
   /** Cette fonction est utilisée aussi bien pour mettre à jour un tag financeur que le montant associé */
@@ -73,19 +93,20 @@ const Financeurs = ({fiche, onUpdate, isReadonly}: Props) => {
     <div>
       {/** Liste des financeurs */}
       {fiche.financeurs?.map((financeur: Financeur, i) => (
-        <div key={financeur.id} className="grid grid-cols-2 gap-4">
+        <div key={financeur.id ?? i} className="grid grid-cols-2 gap-4">
           <FormField label={`Financeur ${i + 1}`}>
             <SelectCreateTagsDropdown
               // On affiche une seule valeur
               values={
                 financeur.financeur_tag.id
-                  ? [financeur.financeur_tag.id?.toString()]
+                  ? [financeur.financeur_tag.id.toString()]
                   : []
               }
               options={options}
               onSelect={values => onSelect(values, financeur)}
               disabled={(financeur.financeur_tag && true) || isReadonly}
               onCreateClick={() => null}
+              userCreatedTagIds={userCreatedTagIds}
             />
           </FormField>
           <FormField label={`Montant engagé financeur ${i + 1}`}>
@@ -124,6 +145,24 @@ const Financeurs = ({fiche, onUpdate, isReadonly}: Props) => {
                 financeur_tag: formatNewTag(inputValue, fiche.collectivite_id!),
               })
             }
+            onUpdateTagName={(tag_id, tag_name) =>
+              updateTag({
+                collectivite_id: collectivite_id!,
+                id: parseInt(tag_id),
+                nom: tag_name,
+              })
+            }
+            onDeleteClick={tag_id => {
+              deleteTag(parseInt(tag_id));
+              onUpdate({
+                ...fiche,
+                financeurs:
+                  fiche.financeurs?.filter(
+                    (f: Financeur) => f.financeur_tag.id !== parseInt(tag_id)
+                  ) ?? null,
+              });
+            }}
+            userCreatedTagIds={userCreatedTagIds}
             placeholderText="Sélectionnez ou créez un tag"
             disabled={isReadonly}
           />
