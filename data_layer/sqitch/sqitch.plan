@@ -331,3 +331,9 @@ stats/amplitude 2023-04-14T08:17:31Z Florian <florian@derfurth.com> # Envoie des
 plan_action/plan_action [plan_action/plan_action@v2.24.0] 2023-04-25T09:47:28Z Florian <florian@derfurth.com> # Nouvelle fonction pour des plans plus performants
 plan_action/tags 2023-04-18T14:20:39Z Florian <florian@derfurth.com> # Ajoute la possibilité de supprimer des tags
 @v2.26.0 2023-04-27T14:53:56Z Florian <florian@derfurth.com> # Améliorations des plans d'action
+
+stats/export 2023-04-26T13:09:53Z Amandine Jacquelin <conta@LanceLibre> # Ajoute une fonction pour lister les utilisateurs par collectivité et en colonne
+plan_action/plan_action [plan_action/plan_action@v2.26.0] 2023-04-28T13:41:39Z Amandine Jacquelin <conta@LanceLibre> # Ajout cibles
+retool/plan_action [retool/plan_action@v2.23.0] 2023-04-24T15:17:53Z Amandine Jacquelin <conta@LanceLibre> # Ajoute une vue
+cron/refresh_retool_plan_action_premier_usage 2023-05-02T13:06:59Z Amandine Jacquelin <conta@LanceLibre> # Refresh pour vue retool_plan_action_premier_usage
+@v2.27.0 2023-05-02T14:15:35Z Florian <florian@derfurth.com> # Améliore les plans d'action et les stats

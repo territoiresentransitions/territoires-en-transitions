@@ -95,6 +95,7 @@ load-json-build:
     ENV SERVICE_ROLE_KEY
     ENV API_URL
     COPY ./data_layer/content /content
+    COPY ./data_layer/scripts/load_json_content.sh /content/load.sh
     ENTRYPOINT sh ./content/load.sh
     SAVE IMAGE load-json:latest
 
@@ -166,6 +167,14 @@ business-test:
         --env SUPABASE_URL=$url \
         --env SUPABASE_KEY=$SERVICE_ROLE_KEY \
         business-test:latest
+
+business-parse:
+    FROM +business-build
+    COPY ./markdown /markdown
+    RUN mkdir /content
+    RUN sh ./referentiel_parse_all.sh
+    SAVE ARTIFACT /content AS LOCAL ./data_layer/content
+    SAVE ARTIFACT /content AS LOCAL ./business/tests/data/dl_content
 
 client-deps:
     FROM node:16
