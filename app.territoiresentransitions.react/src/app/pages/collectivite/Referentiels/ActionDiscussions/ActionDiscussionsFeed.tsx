@@ -14,7 +14,10 @@ const ActionDiscussionsFeed = ({vue, discussions}: Props) => {
   } pour l’instant`;
 
   return (
-    <div data-test="ActionDiscussionsFeed">
+    <div
+      data-test="ActionDiscussionsFeed"
+      className="overflow-y-auto h-[calc(100vh-12.7rem)]"
+    >
       {discussions.length === 0 ? (
         <ActionDiscussionsFeedVide message={messageFeedVide} />
       ) : (
@@ -29,7 +32,7 @@ const ActionDiscussionsFeed = ({vue, discussions}: Props) => {
 export default ActionDiscussionsFeed;
 
 const ActionDiscussionsFeedVide = ({message}: {message: string}) => (
-  <div className="mt-32 text-sm text-center text-gray-400">
+  <div className="mt-32 text-sm text-center text-gray-400 p-10">
     <img
       src={noCommentIllustration}
       alt="illustration commentaire vide"

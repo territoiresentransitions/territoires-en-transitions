@@ -81,7 +81,7 @@ actions:
 ```
 Preuve identique à la eci_4.2.1 -->
 
-# Délibération de principe sur la mise en place de la Tarification incitative
+# Délibération de principe sur la mise en place de la Tarification Incitative (TI)
 ```yaml
 actions: 
   - eci_4.2.4
@@ -116,7 +116,7 @@ actions:
 id: com_externe_financements
 ```
 ## Description
-Exemple: Page internet, Newsletter, Journaux, Blog, etc.
+Exemple: Page internet, Newsletter, Journal, Blog, etc.
 
 # Preuve des démarches proactives de recherche d'acteurs intéressés 
 ```yaml

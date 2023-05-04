@@ -5,7 +5,7 @@ actions:
 id: participation_formation_grandpublic_eci
 ```
 ## Description
-Attestations de formation, compteur de participation aux MOOC, nombre de vues sur les vidéos pédagogiques, etc.
+Documents de communication, supports de sensibilisation, attestations de formation, compteur de participation aux MOOC, nombre de vues sur les vidéos pédagogiques, etc.
 
 # Fiches actions sur Optigede
 ```yaml
@@ -72,7 +72,7 @@ actions:
 id: enjeux_collectivités
 ```
 
-# Conventions de partenariat
+# Conventions ou accords de partenariat
 ```yaml
 actions: 
   - eci_5.2.3
@@ -86,7 +86,7 @@ actions:
 id: com_acteurseco_eci
 ```
 
-# Historique des supports de présentations des réunions d'informations et les listes de participants
+# Historique des supports de présentation des réunions d'information et les listes de participants
 ```yaml
 actions: 
   - eci_5.3.1
