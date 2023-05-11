@@ -341,3 +341,8 @@ cron/refresh_retool_plan_action_premier_usage 2023-05-02T13:06:59Z Amandine Jacq
 stats/reporting [stats/reporting@v2.26.0] 2023-04-28T14:16:10Z Florian <florian@derfurth.com> # Ajoute les indicateurs
 stats/vues_BI [stats/vues_BI@v2.26.0] 2023-04-28T14:57:00Z Florian <florian@derfurth.com> # Corrige engagement_collectivite pour ne prendre en compte que les dernières labellisation
 @v2.28.0 2023-05-03T07:30:42Z Florian <florian@derfurth.com> # Ajoute des vues stats
+
+utilisateur/visite [utilisateur/visite@v2.28.0] 2023-05-10T08:22:35Z Florian <florian@derfurth.com> # Ajoute les panneaux comme onglets
+stats/amplitude [stats/amplitude@v2.28.0] 2023-05-09T09:26:11Z Florian <florian@derfurth.com> # Améliore l'intégration à Amplitude
+cron/send_to_amplitude 2023-05-09T09:41:49Z Florian <florian@derfurth.com> # Envoie quotidiennement les événements de la veille à Amplitude
+@v2.29.0 2023-05-11T07:32:43Z Florian <florian@derfurth.com> # Améliore les statistiques et le tracking
