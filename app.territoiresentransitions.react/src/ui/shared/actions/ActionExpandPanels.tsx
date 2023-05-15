@@ -3,18 +3,13 @@ import {
   CrossExpandPanelBase,
   CrossExpandPanelWithNode,
 } from 'ui/shared/CrossExpandPanelWithHtmlContent';
-import {
-  useActionContexte,
-  useActionExemples,
-  useActionPerimetreEvaluation,
-  useActionReductionPotentiel,
-  useActionResources,
-} from 'core-logic/hooks/referentiel';
+import {useActionExemples} from 'core-logic/hooks/referentiel';
 import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinitionSummaryReadEndpoint';
 import {ActionPreuvePanel} from './ActionPreuvePanel';
 import {useToggle} from '../useToggle';
 import {ChangeEvent} from 'react';
 import DOMPurify from 'dompurify';
+import {useActionPreuvesCount} from '../preuves/Bibliotheque/usePreuves';
 
 const ActionExpandPanelAdemeContent = (props: {
   content?: string;
@@ -42,24 +37,6 @@ const ActionExpandPanelAdemeContent = (props: {
   );
 };
 
-export const ActionContexteExpandPanel = ({
-  action,
-}: {
-  action: ActionDefinitionSummary;
-}) => {
-  const [opened, handleToggle] = useToggle(false);
-  const contexte = useActionContexte(action.id, opened);
-
-  return (
-    <ActionExpandPanelAdemeContent
-      content={contexte}
-      title="Contexte et réglementation"
-      opened={opened}
-      onToggle={handleToggle}
-    />
-  );
-};
-
 export const ActionExemplesExpandPanel = ({
   action,
 }: {
@@ -83,70 +60,22 @@ export const ActionPreuvesExpandPanel = ({
 }: {
   action: ActionDefinitionSummary;
 }) => {
+  const preuvesCount = useActionPreuvesCount(action);
+
   return (
     <div
       className="ActionExpandPanelAdemeContent"
       data-test={`PreuvesPanel-${action.identifiant}`}
     >
       <div className="border-gray-300">
-        <CrossExpandPanelWithNode title="Preuves">
+        <CrossExpandPanelWithNode
+          title={`Documents${
+            preuvesCount !== undefined ? ` (${preuvesCount})` : ''
+          }`}
+        >
           <ActionPreuvePanel action={action} showWarning />
         </CrossExpandPanelWithNode>
       </div>
     </div>
-  );
-};
-
-export const ActionRessourcesExpandPanel = ({
-  action,
-}: {
-  action: ActionDefinitionSummary;
-}) => {
-  const [opened, handleToggle] = useToggle(false);
-  const ressources = useActionResources(action.id, opened);
-
-  return (
-    <ActionExpandPanelAdemeContent
-      content={ressources}
-      title="Ressources"
-      opened={opened}
-      onToggle={handleToggle}
-    />
-  );
-};
-
-export const ActionReductionPotentielExpandPanel = ({
-  action,
-}: {
-  action: ActionDefinitionSummary;
-}) => {
-  const [opened, handleToggle] = useToggle(false);
-  const reductionPotentiel = useActionReductionPotentiel(action.id, opened);
-
-  return (
-    <ActionExpandPanelAdemeContent
-      content={reductionPotentiel}
-      title="Réduction de potentiel"
-      opened={opened}
-      onToggle={handleToggle}
-    />
-  );
-};
-
-export const ActionPerimetreEvaluationExpandPanel = ({
-  action,
-}: {
-  action: ActionDefinitionSummary;
-}) => {
-  const [opened, handleToggle] = useToggle(false);
-  const perimetreEvaluation = useActionPerimetreEvaluation(action.id, opened);
-
-  return (
-    <ActionExpandPanelAdemeContent
-      content={perimetreEvaluation}
-      title="Renvois-limite"
-      opened={opened}
-      onToggle={handleToggle}
-    />
   );
 };

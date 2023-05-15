@@ -103,3 +103,36 @@ const groupByType = (preuves: TPreuve[]) => {
     {} as TPreuvesParType
   );
 };
+
+const fetchActionPreuvesCount = async (
+  collectivite_id: number,
+  action: TActionDef
+) => {
+  const query = supabaseClient
+    .from('preuve')
+    .select(undefined, {head: true, count: 'exact'})
+    .eq('collectivite_id', collectivite_id)
+    .eq('action->>referentiel' as 'action', action.referentiel)
+    .ilike('action->>identifiant' as 'action', `${action.identifiant}%`)
+    .in('preuve_type', ['reglementaire', 'complementaire'])
+    .or('lien->>titre.not.is.null, fichier->>filename.not.is.null');
+
+  const {count, error} = await query;
+
+  if (error || !count) return 0;
+  return count;
+};
+
+/**
+ * Renvoie le nombre de preuves renseignées pour un filtre donné
+ * (exclusion des preuves réglementaires non fournies)
+ */
+export const useActionPreuvesCount = (action: TActionDef) => {
+  const collectivite_id = useCollectiviteId();
+  const {data} = useQuery(['preuve_count', collectivite_id, action], () => {
+    return collectivite_id
+      ? fetchActionPreuvesCount(collectivite_id, action)
+      : 0;
+  });
+  return data;
+};
