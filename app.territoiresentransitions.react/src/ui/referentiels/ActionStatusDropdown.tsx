@@ -7,8 +7,7 @@ import {
   useEditActionStatutIsDisabled,
   useSaveActionStatut,
 } from 'core-logic/hooks/useActionStatut';
-import {toPercentString} from 'utils/score';
-import {CloseDialogButton} from '../shared/CloseDialogButton';
+import {CloseDialogButton} from '../buttons/CloseDialogButton';
 import {DetailedScore} from '../shared/DetailedScore/DetailedScore';
 import {AvancementValues} from '../shared/DetailedScore/DetailedScoreSlider';
 import {TActionAvancement, TActionAvancementExt} from 'types/alias';
@@ -16,6 +15,8 @@ import {
   ITEMS_AVEC_NON_CONCERNE,
   SelectActionStatut,
 } from 'ui/shared/actions/SelectActionStatut';
+import ActionProgressBar from './ActionProgressBar';
+import AnchorAsButton from 'ui/buttons/AnchorAsButton';
 
 // valeurs par défaut de l'avancement détaillé par statut d'avancement
 const AVANCEMENT_DETAILLE_PAR_STATUT: Record<
@@ -29,7 +30,13 @@ const AVANCEMENT_DETAILLE_PAR_STATUT: Record<
   detaille: [0.3, 0.4, 0.3],
 };
 
-export const ActionStatusDropdown = ({actionId}: {actionId: string}) => {
+export const ActionStatusDropdown = ({
+  actionId,
+  isDisabled = false,
+}: {
+  actionId: string;
+  isDisabled?: boolean;
+}) => {
   const [opened, setOpened] = useState(false);
 
   const collectivite = useCurrentCollectivite();
@@ -47,7 +54,8 @@ export const ActionStatusDropdown = ({actionId}: {actionId: string}) => {
   const {saveActionStatut} = useSaveActionStatut(args);
 
   // détermine si l'édition du statut est désactivée
-  const disabled = useEditActionStatutIsDisabled(actionId);
+  // isDisabled : prop provisoire en attendant le select du statut à la sous-action
+  const disabled = useEditActionStatutIsDisabled(actionId) || isDisabled;
 
   const handleChange = (value: TActionAvancementExt) => {
     const {avancement, concerne, avancement_detaille} =
@@ -81,7 +89,10 @@ export const ActionStatusDropdown = ({actionId}: {actionId: string}) => {
   }
 
   return (
-    <div className="flex flex-col items-end w-full">
+    <div
+      className="flex flex-col gap-3 items-end w-full"
+      onClick={evt => evt.stopPropagation()}
+    >
       <SelectActionStatut
         items={ITEMS_AVEC_NON_CONCERNE}
         disabled={disabled}
@@ -89,32 +100,17 @@ export const ActionStatusDropdown = ({actionId}: {actionId: string}) => {
         onChange={handleChange}
       />
 
-      {avancement === 'detaille' && !score?.desactive ? (
-        <div className="flex flex-col items-start w-full">
-          {avancement_detaille?.length === 3 ? (
-            <ul className="mt-6 text-sm">
-              <li>
-                Fait :&nbsp;
-                {toPercentString(avancement_detaille[0])}
-              </li>
-              <li>
-                Programmé :&nbsp;
-                {toPercentString(avancement_detaille[1])}
-              </li>
-              <li>
-                Pas fait :&nbsp;
-                {toPercentString(avancement_detaille[2])}
-              </li>
-            </ul>
-          ) : null}
-          {disabled ? null : (
-            <>
-              <button
-                className="fr-btn fr-btn--sm"
+      {avancement === 'detaille' && !score?.desactive && (
+        <div className="flex flex-col gap-3 items-end w-full pr-1">
+          <ActionProgressBar actionId={actionId} />
+          {!disabled && (
+            <div className="text-right">
+              <AnchorAsButton
+                className="underline_href fr-link fr-link--sm"
                 onClick={() => setOpened(true)}
               >
-                Préciser l'avancement
-              </button>
+                Détailler l'avancement
+              </AnchorAsButton>
               <Dialog
                 open={opened}
                 onClose={() => setOpened(false)}
@@ -136,10 +132,10 @@ export const ActionStatusDropdown = ({actionId}: {actionId: string}) => {
                   </div>
                 </div>
               </Dialog>
-            </>
+            </div>
           )}
         </div>
-      ) : null}
+      )}
     </div>
   );
 };

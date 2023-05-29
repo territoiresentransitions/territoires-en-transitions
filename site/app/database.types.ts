@@ -5861,7 +5861,7 @@ export interface Database {
         Args: {
           id: number
         }
-        Returns: Json
+        Returns: Database["public"]["CompositeTypes"]["fiche_action_export"][]
       }
       plan_action_profondeur: {
         Args: {
@@ -6763,6 +6763,12 @@ export interface Database {
         | "personnalise"
     }
     CompositeTypes: {
+      fiche_action_export: {
+        axe_id: number
+        axe_nom: string
+        axe_path: unknown
+        fiche: Json
+      }
       financeur_montant: {
         financeur_tag: unknown
         montant_ttc: number

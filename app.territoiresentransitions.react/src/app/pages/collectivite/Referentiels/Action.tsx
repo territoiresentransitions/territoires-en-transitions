@@ -1,15 +1,9 @@
-import {useState} from 'react';
 import {Link, useHistory} from 'react-router-dom';
 import {IndicateurReferentielCard} from 'app/pages/collectivite/Indicateurs/IndicateurReferentielCard';
 import {addTargetToContentAnchors} from 'utils/content';
 import {Tabs, Tab} from 'ui/shared/Tabs';
-import {ActionCommentaire} from 'ui/shared/actions/ActionCommentaire';
-import {ActionReferentielAvancementRecursiveCard} from 'ui/referentiels/ActionReferentielAvancementRecursiveCard';
-import {Switch} from '@material-ui/core';
-import {useActionSummaryChildren} from 'core-logic/hooks/referentiel';
 import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinitionSummaryReadEndpoint';
 import {OrientationQuickNav} from 'app/pages/collectivite/Referentiels/QuickNav';
-import {useActionScore} from 'core-logic/hooks/scoreHooks';
 import {
   ActionVueParamOption,
   makeCollectiviteActionUrl,
@@ -17,8 +11,8 @@ import {
 } from 'app/paths';
 import {useActionVue, useReferentielId} from 'core-logic/hooks/params';
 import HistoriqueListe from 'app/pages/collectivite/Historique/HistoriqueListe';
-import ScrollTopButton from 'ui/shared/ScrollTopButton';
 import {ActionBottomNav} from './ActionNav';
+import ScrollTopButton from 'ui/buttons/ScrollTopButton';
 import ActionPreuvePanel from 'ui/shared/actions/ActionPreuvePanel/ActionPreuvePanel';
 import {DownloadDocs} from './DownloadDocs';
 import ActionAuditStatut from '../Audit/ActionAuditStatut';
@@ -29,6 +23,7 @@ import Alerte from 'ui/shared/Alerte';
 import {usePrevAndNextActionLinks} from './usePrevAndNextActionLinks';
 import {ActionHeader} from './ActionHeader';
 import {useActionPreuvesCount} from 'ui/shared/preuves/Bibliotheque/usePreuves';
+import ActionFollowUp from '../EtatDesLieux/Referentiel/SuiviAction/ActionFollowUp';
 
 // index des onglets de la page Action
 const TABS_INDEX: Record<ActionVueParamOption, number> = {
@@ -38,18 +33,7 @@ const TABS_INDEX: Record<ActionVueParamOption, number> = {
   historique: 3,
 };
 
-const useIsFullyRenseigne = (action: ActionDefinitionSummary): boolean => {
-  const actionScore = useActionScore(action.id);
-  return (
-    !!actionScore &&
-    (actionScore.completed_taches_count === actionScore.total_taches_count ||
-      actionScore.desactive)
-  );
-};
-
 const Action = ({action}: {action: ActionDefinitionSummary}) => {
-  const [showOnlyActionWithData, setShowOnlyActionWithData] = useState(false);
-  const children = useActionSummaryChildren(action);
   const actionVue = useActionVue();
   const history = useHistory();
   const collectivite = useCurrentCollectivite();
@@ -108,7 +92,8 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
         <OrientationQuickNav action={action} />
         <ActionAuditStatut action={action} />
         <ActionAuditDetail action={action} />
-        <Alerte state="information" classname="fr-my-5v">
+
+        <Alerte state="information" classname="fr-my-9v">
           <div
             className="htmlContent"
             dangerouslySetInnerHTML={{
@@ -116,33 +101,10 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
             }}
           />
         </Alerte>
+
         <Tabs defaultActiveTab={activeTab} onChange={handleChange}>
           <Tab label="Suivi de l'action" icon="seedling">
-            <section>
-              <ActionCommentaire action={action} />
-
-              <h4 className="text-xl fr-mt-4w">
-                Détail des sous-actions et des tâches
-              </h4>
-              <div className="flex items-center fr-text--sm fr-m-0">
-                Afficher uniquement les actions non-renseignées
-                <Switch
-                  color="primary"
-                  checked={showOnlyActionWithData}
-                  inputProps={{'aria-label': 'controlled'}}
-                  onChange={() => {
-                    setShowOnlyActionWithData(!showOnlyActionWithData);
-                  }}
-                />
-              </div>
-              {children.map(action => (
-                <ActionAvancement
-                  action={action}
-                  key={action.id}
-                  showOnlyActionWithData={showOnlyActionWithData}
-                />
-              ))}
-            </section>
+            <ActionFollowUp action={action} />
           </Tab>
           <Tab
             label={`Documents${
@@ -189,34 +151,10 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
           prevActionLink={prevActionLink}
           nextActionLink={nextActionLink}
         />
-        <div className="mt-8">
-          <ScrollTopButton />
-        </div>
+        <ScrollTopButton className="mt-8" />
       </main>
     </>
   );
 };
 
 export default Action;
-
-const ActionAvancement = ({
-  action,
-  showOnlyActionWithData,
-}: {
-  action: ActionDefinitionSummary;
-  showOnlyActionWithData: boolean;
-}) => {
-  const isFullyRenseigne = useIsFullyRenseigne(action);
-
-  if (showOnlyActionWithData && isFullyRenseigne) {
-    return null;
-  }
-
-  return (
-    <ActionReferentielAvancementRecursiveCard
-      action={action}
-      displayAddFicheActionButton={true}
-      displayProgressStat={true}
-    />
-  );
-};

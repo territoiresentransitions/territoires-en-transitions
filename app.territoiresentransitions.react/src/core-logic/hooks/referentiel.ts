@@ -1,7 +1,6 @@
 import {useEffect, useState} from 'react';
 import {
   actionDownToTache,
-  actionExemples,
   actionPreuve,
   referentielDownToAction,
 } from 'core-logic/api/procedures/referentielProcedures';
@@ -49,24 +48,6 @@ export const useReferentielDownToAction = (
     );
   }, [referentiel]);
   return summaries;
-};
-
-/**
- * Returns action exemples html contents
- */
-export const useActionExemples = (
-  actionId: string,
-  opened: boolean
-): string => {
-  const [exemples, setExemples] = useState<string>('...');
-
-  useEffect(() => {
-    if (opened) {
-      actionExemples(actionId).then(exemples => setExemples(exemples.exemples));
-    }
-  }, [actionId, opened]);
-
-  return exemples;
 };
 
 /**
@@ -122,6 +103,34 @@ export const useActionSummaryChildren = (
   }, [action.id]);
 
   return children;
+};
+
+export const useSortedActionSummaryChildren = (
+  action: ActionDefinitionSummary
+): {
+  sortedActions: {
+    [id: string]: ActionDefinitionSummary[];
+  };
+  count: number;
+} => {
+  const actions = useActionSummaryChildren(action);
+
+  let sortedActions: {
+    [id: string]: ActionDefinitionSummary[];
+  } = {};
+
+  actions.forEach(act => {
+    if (sortedActions[act.phase]) {
+      sortedActions[act.phase].push(act);
+    } else {
+      sortedActions = {
+        ...sortedActions,
+        [act.phase]: [act],
+      };
+    }
+  });
+
+  return {sortedActions, count: actions.length};
 };
 
 /**

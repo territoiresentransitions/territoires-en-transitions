@@ -5,7 +5,7 @@ exports[`Storyshots ui/shared/preuves/Bibliotheque/PreuvesAction Avec Message Av
   data-test="preuves-cae_1.2.4"
 >
   <p
-    className="fr-text--sm"
+    className="fr-text--sm !mb-0 py-4"
   >
     Il n'y a pas de document attendu pour cette
      
@@ -106,7 +106,7 @@ exports[`Storyshots ui/shared/preuves/Bibliotheque/PreuvesAction Avec Message Av
     className="border-solid border-t border-[#FCC63A] my-4"
   />
   <p
-    className="text-xs grey625 py-4"
+    className="text-xs grey625 py-4 mb-0"
   >
     Tous les documents ajoutés seront visibles par les membres de la communauté Territoires en Transitions
   </p>
@@ -633,7 +633,7 @@ exports[`Storyshots ui/shared/preuves/Bibliotheque/PreuvesAction Sans Preuves At
   data-test="preuves-cae_1.2.3"
 >
   <p
-    className="fr-text--sm"
+    className="fr-text--sm !mb-0 py-4"
   >
     Il n'y a pas de document attendu pour cette
      
@@ -656,10 +656,6 @@ exports[`Storyshots ui/shared/preuves/Bibliotheque/PreuvesAction Sans Preuves At
     >
       Ajouter un document complémentaire
     </button>
-    <div
-      className="flex flex-col gap-3"
-      data-test="complementaires"
-    />
   </div>
 </div>
 `;
@@ -1045,10 +1041,6 @@ exports[`Storyshots ui/shared/preuves/Bibliotheque/PreuvesAction Sans Preuves Co
     >
       Ajouter un document complémentaire
     </button>
-    <div
-      className="flex flex-col gap-3"
-      data-test="complementaires"
-    />
   </div>
 </div>
 `;
