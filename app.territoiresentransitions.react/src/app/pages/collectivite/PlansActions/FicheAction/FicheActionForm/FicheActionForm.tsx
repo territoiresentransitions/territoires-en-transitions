@@ -6,7 +6,6 @@ import PictoInformation from 'ui/pictogrammes/PictoInformation';
 import Checkbox from 'ui/shared/form/Checkbox';
 import FormField from 'ui/shared/form/FormField';
 import TextareaControlled from 'ui/shared/form/TextareaControlled';
-import MultiSelectDropdown from 'ui/shared/select/MultiSelectDropdown';
 import MultiSelectTagsDropdown from 'ui/shared/select/MultiSelectTagsDropdown';
 import SelectDropdown from 'ui/shared/select/SelectDropdown';
 import {
@@ -59,35 +58,11 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <Section isDefaultOpen icon={<PictoInformation />} title="Présentation">
-        {!isReadonly &&
-          plansProfondeur?.plans &&
-          plansProfondeur.plans.length > 0 && (
-            <FicheActionRangerModal fiche={fiche} />
-          )}
-        <FormField
-          label="Nom de la fiche"
-          hint="Exemple : 1.3.2.5 Limiter les émissions liées au chauffage résidentiel au bois"
-          htmlFor="title"
-        >
-          <TextareaControlled
-            id="title"
-            initialValue={fiche.titre ?? ''}
-            onBlur={e => {
-              if (fiche.titre) {
-                e.target.value !== fiche.titre &&
-                  updateFiche({...fiche, titre: e.target.value.trim()});
-              } else {
-                e.target.value.trim().length > 0 &&
-                  updateFiche({...fiche, titre: e.target.value.trim()});
-              }
-            }}
-            placeholder="Écrire ici..."
-            maxLength={300}
-            className="outline-transparent resize-none"
-            disabled={isReadonly}
-          />
-        </FormField>
+      <Section
+        dataTest="section-presentation"
+        icon={<PictoInformation />}
+        title="Présentation"
+      >
         <FormField label="Description de l'action" htmlFor="description">
           <TextareaControlled
             id="description"
@@ -128,6 +103,11 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
             isReadonly={isReadonly}
           />
         </FormField>
+        {!isReadonly &&
+          plansProfondeur?.plans &&
+          plansProfondeur.plans.length > 0 && (
+            <FicheActionRangerModal fiche={fiche} />
+          )}
       </Section>
 
       <Section icon={<PictoDataViz />} title="Objectifs et indicateurs">
@@ -155,7 +135,7 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
           isReadonly={isReadonly}
         />
         <FormField label="Résultats attendus">
-          <MultiSelectDropdown
+          <MultiSelectTagsDropdown
             buttonClassName={DSFRbuttonClassname}
             values={fiche.resultats_attendus ?? []}
             options={ficheActionResultatsAttendusOptions}
@@ -357,18 +337,20 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
                 })
               }
             />
-            <Checkbox
-              label="Action en amélioration continue, sans date de fin"
-              onCheck={() => {
-                updateFiche({
-                  ...fiche,
-                  amelioration_continue: !fiche.amelioration_continue,
-                  date_fin_provisoire: null,
-                });
-              }}
-              checked={fiche.amelioration_continue ?? false}
-              disabled={isReadonly}
-            />
+            <div className="mt-2">
+              <Checkbox
+                label="Action en amélioration continue, sans date de fin"
+                onCheck={() => {
+                  updateFiche({
+                    ...fiche,
+                    amelioration_continue: !fiche.amelioration_continue,
+                    date_fin_provisoire: null,
+                  });
+                }}
+                checked={fiche.amelioration_continue ?? false}
+                disabled={isReadonly}
+              />
+            </div>
           </FormField>
         </div>
         <FormField
@@ -408,7 +390,7 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
           isReadonly={isReadonly}
         />
       </Section>
-      <Section icon={<PictoDocument />} title="Notes">
+      <Section icon={<PictoBook />} title="Notes">
         <FormField
           label="Notes complémentaires"
           hint="Évaluation ou autres informations sur l’action "
@@ -439,7 +421,7 @@ const FicheActionForm = ({fiche, isReadonly}: TFicheActionForm) => {
           />
         </FormField>
       </Section>
-      <Section icon={<PictoBook />} title="Documents et liens">
+      <Section icon={<PictoDocument />} title="Documents et liens">
         {annexes?.map(doc => (
           <PreuveDoc preuve={doc as unknown as TPreuve} />
         ))}

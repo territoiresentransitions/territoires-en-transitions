@@ -163,7 +163,7 @@ const Financeurs = ({fiche, onUpdate, isReadonly}: Props) => {
               });
             }}
             userCreatedTagIds={userCreatedTagIds}
-            placeholderText="Sélectionnez ou créez un tag"
+            closeOptionsOnSelect
             disabled={isReadonly}
           />
         </FormField>

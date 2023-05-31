@@ -1,5 +1,6 @@
+import {useQuery} from 'react-query';
 import {supabaseClient} from 'core-logic/api/supabase';
-import {CollectiviteCarteRead} from 'generated/dataLayer/collectivite_carte_read';
+import {TCollectiviteCarte} from './types';
 import {TCollectivitesFilters} from 'app/pages/ToutesLesCollectivites/filtreLibelles';
 
 const screenIsMobile = () =>
@@ -11,6 +12,27 @@ export const NB_CARDS_PER_PAGE = screenIsMobile() ? 5 : 16;
 type FilterOperator = 'in' | 'ov';
 
 /**
+ * Renvoi une liste de collectivités en fonction d'un ensemble de filtres
+ */
+export const useFilteredCollectivites = (
+  args: TCollectivitesFilters
+): {
+  isLoading: boolean;
+  collectivites: TCollectiviteCarte[];
+  collectivitesCount: number;
+} => {
+  const {data, isLoading} = useQuery(['collectivite_card', args], () =>
+    fetchCollectiviteCards(args)
+  );
+
+  return {
+    isLoading,
+    collectivites: data?.collectivites || [],
+    collectivitesCount: data?.collectivitesCount || 0,
+  };
+};
+
+/**
  * Construit la query en ajoutant des opérateurs Postgrest pour chaque filtre.
  */
 const buildQueryFromFilters = (filters: TCollectivitesFilters) => {
@@ -19,17 +41,20 @@ const buildQueryFromFilters = (filters: TCollectivitesFilters) => {
     .select('*', {count: 'exact'});
 
   const filter = (
-    column: keyof CollectiviteCarteRead,
+    column: keyof TCollectiviteCarte,
     operator: FilterOperator,
     possibleValues: string[] | number[]
   ) => {
-    if (possibleValues.length > 0) {
+    const values = (possibleValues as string[])?.filter(
+      (s: string) => s !== ''
+    );
+    if (values.length > 0) {
       switch (operator) {
         case 'in':
-          query = query.in(column, possibleValues);
+          query = query.in(column, values);
           break;
         case 'ov':
-          query = query.overlaps(column, possibleValues);
+          query = query.overlaps(column, values);
           break;
       }
     }
@@ -96,9 +121,9 @@ const buildQueryFromFilters = (filters: TCollectivitesFilters) => {
   }
 
   //  Trier par
-  let orderBy: keyof CollectiviteCarteRead;
+  let orderBy: keyof TCollectiviteCarte;
   let ascending: boolean;
-  switch (filters.trierPar) {
+  switch (filters.trierPar?.[0]) {
     case 'nom':
       orderBy = 'nom';
       ascending = true;
@@ -143,7 +168,7 @@ const buildQueryFromFilters = (filters: TCollectivitesFilters) => {
 export const fetchCollectiviteCards = async (
   filters: TCollectivitesFilters
 ): Promise<{
-  collectivites: CollectiviteCarteRead[];
+  collectivites: TCollectiviteCarte[];
   collectivitesCount: number;
 }> => {
   // la requête
@@ -159,29 +184,4 @@ export const fetchCollectiviteCards = async (
     collectivites: data || [],
     collectivitesCount: count ?? 0,
   };
-};
-
-/**
- * Télécharge toutes les régions, pour les afficher dans le filtre.
- */
-export const fetchAllRegions = async () => {
-  const query = supabaseClient.from('region').select();
-  const {error, data} = await query;
-
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data || [];
-};
-
-/**
- * Télécharge tous les départements, pour les afficher dans le filtre.
- */
-export const fetchAllDepartements = async () => {
-  const query = supabaseClient.from('departement').select();
-  const {error, data} = await query;
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data || [];
 };

@@ -52,8 +52,9 @@ export const PlanAction = ({plan}: PlanActionProps) => {
       />
       <div className="max-w-4xl mx-auto px-10">
         <PlanActionHeader
-          plan={plan}
           collectivite_id={collectivite?.collectivite_id!}
+          plan={plan}
+          isReadonly={isReadonly}
         />
         {/** On vérifie si le plan contient des fiches pour afficher les filtres de fiche */}
         {checkAxeHasFiche(plan) && (
@@ -87,7 +88,7 @@ export const PlanAction = ({plan}: PlanActionProps) => {
             </div>
           )
         ) : // Affiche les fiches et sous-axes s'il y en a, sinon un état vide
-        plan.children || plan.fiches ? (
+        plan.children.length > 0 || plan.fiches ? (
           <>
             <div className="mb-4">
               {!isReadonly && (

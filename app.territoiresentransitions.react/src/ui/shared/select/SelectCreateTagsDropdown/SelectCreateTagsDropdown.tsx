@@ -8,6 +8,7 @@ import Options from '../Options';
 
 import {
   buttonDisplayedClassname,
+  DSFRbuttonClassname,
   ExpandCollapseIcon,
   filterOptions,
   getOptionLabel,
@@ -31,6 +32,7 @@ type TSelectCreateTagsDropdown<T extends string> =
     onUpdateTagName?: (tag_id: string, tag_name: string) => void;
     /** tableau d'id des options crées par un utilisateur */
     userCreatedTagIds?: string[];
+    closeOptionsOnSelect?: boolean;
   };
 
 /** Sélecteur de Tag(s) avec un input dans le bouton d'ouverture pour créer un tag */
@@ -45,6 +47,8 @@ const SelectCreateTagsDropdown = <T extends string>({
   placement,
   placeholderText,
   disabled,
+  closeOptionsOnSelect,
+  containerWidthMatchButton = true,
   'data-test': dataTest,
 }: TSelectCreateTagsDropdown<T>) => {
   const [inputValue, setInputValue] = useState('');
@@ -61,10 +65,11 @@ const SelectCreateTagsDropdown = <T extends string>({
 
   return (
     <DropdownFloater
+      containerWidthMatchButton={containerWidthMatchButton}
       placement={placement}
       toggle={false}
       enterToToggle={false}
-      render={() => (
+      render={({close}) => (
         <div>
           {inputValue.trim().length > 0 && isNotSimilar && (
             <button
@@ -86,7 +91,10 @@ const SelectCreateTagsDropdown = <T extends string>({
             dataTest={dataTest}
             values={values}
             options={sortOptionByAlphabet(filterOptions(options, inputValue))}
-            onSelect={onSelect}
+            onSelect={values => {
+              onSelect(values);
+              closeOptionsOnSelect && close();
+            }}
             renderOption={option => (
               <Tag
                 title={option.label}
@@ -113,7 +121,7 @@ const SelectCreateTagsDropdown = <T extends string>({
     >
       <SelectCreateTagsButton
         data-test={dataTest}
-        buttonClassName="fr-select !bg-none !flex !px-4"
+        buttonClassName={DSFRbuttonClassname}
         options={options}
         values={values}
         inputValue={inputValue}
@@ -153,7 +161,7 @@ const SelectCreateTagsButton = forwardRef(
       options,
       userCreatedTagIds,
       buttonClassName,
-      placeholderText,
+      placeholderText = 'Sélectionnez ou créez un tag',
       'data-test': dataTest,
       inputValue,
       onInputChange,
@@ -221,9 +229,11 @@ const SelectCreateTagsButton = forwardRef(
                 data-test={`${dataTest}-input`}
                 type="text"
                 ref={inputRef}
-                className={`grow text-sm placeholder:text-gray-500 placeholder:italic`}
+                className={`grow placeholder:text-grey425`}
                 value={inputValue}
-                placeholder={placeholderText}
+                placeholder={
+                  sortedValues.length === 0 ? placeholderText : undefined
+                }
                 onChange={e => onInputChange(e.target.value)}
               />
             )}

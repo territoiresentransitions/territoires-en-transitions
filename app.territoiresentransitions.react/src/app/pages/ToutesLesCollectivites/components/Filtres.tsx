@@ -7,11 +7,12 @@ import {
   trierParOptions,
 } from 'app/pages/ToutesLesCollectivites/filtreLibelles';
 import {MultiSelectCheckboxes} from 'app/pages/ToutesLesCollectivites/components/MultiSelectCheckboxes';
-import {MultiSelectDropdown} from 'app/pages/ToutesLesCollectivites/components/MultiSelectDropdown';
-import {SelectDropdown} from 'app/pages/ToutesLesCollectivites/components/SelectDropdown';
+import MultiSelectDropdown from 'ui/shared/select/MultiSelectDropdown';
+import {DSFRbuttonClassname} from 'ui/shared/select/commons';
+import SelectDropdown from 'ui/shared/select/SelectDropdown';
 
-import {RegionRead} from 'generated/dataLayer/region_read';
-import {DepartementRead} from 'generated/dataLayer/departement_read';
+import {TDepartement} from '../useDepartements';
+import {TRegion} from '../useRegions';
 
 export const TypeCollectiviteFiltre = (props: {
   selected: string[];
@@ -82,45 +83,58 @@ export const TrierParFiltre = (props: {
   selected?: string;
   onChange: (selected?: string) => void;
 }) => (
-  <SelectDropdown
-    title="Trier par"
-    options={trierParOptions}
-    onChange={props.onChange}
-    selected={props.selected}
-  />
+  <fieldset>
+    <label className="font-semibold mb-2 ml-0">Trier par</label>
+    <SelectDropdown
+      buttonClassName={DSFRbuttonClassname}
+      options={trierParOptions}
+      onSelect={props.onChange}
+      value={props.selected}
+    />
+  </fieldset>
 );
 
 export const RegionFiltre = (props: {
-  regions: RegionRead[];
+  regions: TRegion[];
   selected: string[];
   onChange: (selected: string[]) => void;
 }) => (
-  <MultiSelectDropdown
-    title="Région"
-    options={props.regions.map(({code, libelle}) => ({id: code, libelle}))}
-    onChange={props.onChange}
-    selected={props.selected}
-  />
+  <fieldset>
+    <label className="font-semibold mb-2 ml-0">Région</label>
+    <MultiSelectDropdown
+      buttonClassName={DSFRbuttonClassname}
+      options={props.regions.map(({code, libelle}) => ({
+        value: code,
+        label: libelle,
+      }))}
+      onSelect={props.onChange}
+      values={props.selected}
+    />
+  </fieldset>
 );
 
 export const DepartementFiltre = (props: {
   regionCodes: string[];
-  departements: DepartementRead[];
+  departements: TDepartement[];
   selected: string[];
   onChange: (selected: string[]) => void;
 }) => {
   return (
-    <MultiSelectDropdown
-      title="Département"
-      options={props.departements
-        .filter(
-          dep =>
-            props.regionCodes.length === 0 ||
-            props.regionCodes.includes(dep.region_code)
-        )
-        .map(({code, libelle}) => ({id: code, libelle}))}
-      onChange={props.onChange}
-      selected={props.selected}
-    />
+    <fieldset>
+      <label className="font-semibold mb-2 ml-0">Département</label>
+      <MultiSelectDropdown
+        buttonClassName={DSFRbuttonClassname}
+        placeholderText="Sélectionnez un ou plusieurs départements"
+        options={props.departements
+          .filter(
+            dep =>
+              props.regionCodes.length === 0 ||
+              props.regionCodes.includes(dep.region_code)
+          )
+          .map(({code, libelle}) => ({value: code, label: libelle}))}
+        onSelect={props.onChange}
+        values={props.selected}
+      />
+    </fieldset>
   );
 };

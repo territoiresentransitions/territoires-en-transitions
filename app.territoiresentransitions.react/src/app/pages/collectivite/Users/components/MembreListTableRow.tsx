@@ -5,13 +5,13 @@ import MultiSelectDropdown from 'ui/shared/select/MultiSelectDropdown';
 import UpdateMemberAccesModal from 'app/pages/collectivite/Users/components/UpdateMembreAccesModal';
 import {
   Membre,
-  TNiveauAcces,
   TRemoveFromCollectivite,
   TUpdateMembre,
 } from 'app/pages/collectivite/Users/types';
 import {Referentiel} from 'types/litterals';
 import {referentielToName} from 'app/labels';
-import {MembreFonction} from 'generated/dataLayer/membres';
+import {TNiveauAcces} from 'types/alias';
+import {TMembreFonction} from 'types/alias';
 
 export type TMembreListTableRowProps = {
   currentUserId: string;
@@ -21,7 +21,7 @@ export type TMembreListTableRowProps = {
   removeFromCollectivite: TRemoveFromCollectivite;
 };
 
-const membreFonctions: {value: MembreFonction; label: string}[] = [
+const membreFonctions: {value: TMembreFonction; label: string}[] = [
   {value: 'referent', label: 'Référent·e'},
   {value: 'technique', label: 'Équipe technique'},
   {value: 'politique', label: 'Équipe politique'},
@@ -250,8 +250,8 @@ const FonctionDropdown = ({
   value,
   onChange,
 }: {
-  value?: MembreFonction;
-  onChange: (value: MembreFonction) => void;
+  value?: TMembreFonction;
+  onChange: (value: TMembreFonction) => void;
 }) => (
   <div data-test="fonction-dropdown">
     <SelectDropdown
