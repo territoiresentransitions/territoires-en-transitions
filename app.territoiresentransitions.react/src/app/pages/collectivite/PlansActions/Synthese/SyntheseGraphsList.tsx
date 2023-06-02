@@ -1,7 +1,60 @@
-import {StatusColor} from 'ui/charts/chartsTheme';
+import {defaultColors, nivoColorsSet, statusColor} from 'ui/charts/chartsTheme';
 import {usePlanActionTableauDeBord} from './data/usePlanActionTableauDeBord';
 import PictoLeaf from 'ui/pictogrammes/PictoLeaf';
 import ChartCard from 'ui/charts/ChartCard';
+
+const getLegendColor = (
+  data: {id: string; value: number; color?: any},
+  dataLength: number,
+  index: number
+) => {
+  if (data.color) {
+    return data.color;
+  }
+  if (dataLength <= defaultColors.length) {
+    return defaultColors[index % defaultColors.length];
+  }
+  return nivoColorsSet[index % nivoColorsSet.length];
+};
+
+const getCustomLegend = (data: {id: string; value: number; color?: any}[]) => {
+  // Limitation du nombre d'éléments visibles dans la légende
+  const legendMaxSize = 9;
+
+  // Légendes associées au données sans label
+  const withoutLabelLegends = [
+    'Sans statut',
+    'Sans pilote',
+    'Sans élu·e référent·e',
+    'Non priorisé',
+  ];
+
+  // Légende réduite à afficher
+  const legend = data.slice(0, legendMaxSize).map((d, index) => ({
+    name: d.id,
+    color: getLegendColor(d, data.length, index),
+  }));
+
+  const lastElement = data[data.length - 1];
+
+  if (
+    withoutLabelLegends.includes(lastElement.id) &&
+    data.length > legendMaxSize
+  ) {
+    legend.push({
+      name: lastElement.id,
+      color: getLegendColor(lastElement, data.length, data.length - 1),
+    });
+  }
+
+  return legend;
+};
+
+type SyntheseGraphsListProps = {
+  collectiviteId: number;
+  selectedPlan: {id: number | null; name: string};
+  withoutPlan: boolean | null;
+};
 
 /**
  * Liste des graphes affichés dans la page Synthèse
@@ -11,35 +64,36 @@ import ChartCard from 'ui/charts/ChartCard';
  * @param withoutPlan - (boolean | null) affichage des données sans plan d'action
  */
 
-type SyntheseGraphsListProps = {
-  collectiviteId: number;
-  planId: number | null;
-  withoutPlan: boolean | null;
-};
-
 const SyntheseGraphsList = ({
   collectiviteId,
-  planId,
+  selectedPlan,
   withoutPlan,
 }: SyntheseGraphsListProps): JSX.Element => {
-  const data = usePlanActionTableauDeBord(collectiviteId, planId, withoutPlan);
+  const data = usePlanActionTableauDeBord(
+    collectiviteId,
+    selectedPlan.id,
+    withoutPlan
+  );
 
-  const graphsData = data
+  const graphsData: {
+    id: string;
+    title: string;
+    data: {id: string; value: number; color?: any}[];
+  }[] = data
     ? [
         {
-          id: 'statuts',
+          id: 'statut-avancement',
           title: "Répartition par statut d'avancement",
           data: data.statuts
             ? data.statuts.map(st => ({
                 ...st,
                 id: st.id !== 'NC' ? st.id : 'Sans statut',
-                // @ts-ignore
-                color: StatusColor[st.id],
+                color: statusColor[st.id],
               }))
             : [],
         },
         {
-          id: 'pilotes',
+          id: 'personne-pilote',
           title: 'Répartition par personne pilote',
           data: data.pilotes
             ? data.pilotes.map(pi => ({
@@ -49,7 +103,7 @@ const SyntheseGraphsList = ({
             : [],
         },
         {
-          id: 'referents',
+          id: 'elu-referent',
           title: 'Répartition par élu·e référent·e',
           data: data.referents
             ? data.referents.map(ref => ({
@@ -59,7 +113,7 @@ const SyntheseGraphsList = ({
             : [],
         },
         {
-          id: 'priorites',
+          id: 'niveau-priorite',
           title: 'Répartition par niveau de priorité',
           data: data.priorites
             ? data.priorites.map(pr => ({
@@ -89,9 +143,19 @@ const SyntheseGraphsList = ({
                 chartType="donut"
                 chartProps={{
                   data: graph.data,
-                  label: graph.id === 'statuts' || graph.id === 'priorites',
+                  label:
+                    graph.id === 'statut-avancement' ||
+                    graph.id === 'niveau-priorite',
                 }}
-                chartInfo={{title: graph.title}}
+                chartInfo={{
+                  title: graph.title,
+                  extendedTitle: `${selectedPlan.name} - ${graph.title}`,
+                  legend: getCustomLegend(graph.data),
+                  expandable: true,
+                  downloadedFileName: `repartition-${
+                    graph.id
+                  }-${selectedPlan.name.toLowerCase().split(' ').join('-')}`,
+                }}
                 customStyle={{height: '350px', borderBottomWidth: '4px'}}
               />
             </div>

@@ -1,6 +1,35 @@
 import {PieTooltipProps, ResponsivePie} from '@nivo/pie';
 import {defaultColors, nivoColorsSet, theme} from './chartsTheme';
 
+/**
+ * Suppression des arcLinkLabels si deux tranches de faible
+ * valeur se succèdent dans le graphe
+ * Permet d'éviter le chevauchement des labels
+ */
+const skipArcLinkLabel = (
+  data: {
+    id: string;
+    value: number;
+    color?: string;
+  }[]
+) => {
+  const total = data.reduce(
+    (total, currentValue) => total + currentValue.value,
+    0
+  );
+
+  return data.reduce((isLabelSkipped, currentValue, index) => {
+    if (
+      currentValue.value / total < 0.05 &&
+      index > 0 &&
+      data[index - 1].value / total < 0.1
+    ) {
+      return true;
+    }
+    return isLabelSkipped;
+  }, false);
+};
+
 const getTooltip = (
   {datum: {id, value, color}}: PieTooltipProps<{}>,
   isDefaultData: boolean,
@@ -95,7 +124,9 @@ const DonutChart = ({data, label = false}: DonutChartProps) => {
       activeOuterRadiusOffset={8}
       borderWidth={1}
       borderColor={{from: 'color', modifiers: [['darker', 0.2]]}}
-      enableArcLinkLabels={label || isDefaultData()}
+      enableArcLinkLabels={
+        (label || isDefaultData()) && !skipArcLinkLabel(data)
+      }
       arcLinkLabelsDiagonalLength={10}
       arcLinkLabelsStraightLength={5}
       arcLinkLabelsTextColor="#333"
