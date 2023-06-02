@@ -37,7 +37,7 @@ export const emailValidator = Yup.string()
   .required('Champ requis');
 
 const phoneRegExp =
-  /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+  /^((\+?[0-9]{1,4}[-.\s]*)|(\\[0-9]{2,3}\\[-.\s]*))([0-9]{1,4}[-.\s]*){2,4}$/;
 const phoneValidator = Yup.string().matches(
   phoneRegExp,
   "Ce numéro de téléphone n'est pas valide"
@@ -145,7 +145,10 @@ const RegistrationForm = () => {
   };
 
   const register = (data: InscriptionUtilisateur) => {
-    registerUser(data)
+    registerUser({
+      ...data,
+      telephone: data.telephone?.split(/[-.\s]+/).join(''),
+    })
       .then(() => {
         setState('success');
       })
