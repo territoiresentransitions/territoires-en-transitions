@@ -2782,6 +2782,7 @@ export interface Database {
         Row: {
           collectivite_id: number | null
           id: number | null
+          modified_at: string | null
           pilotes: Database["public"]["CompositeTypes"]["personne"][] | null
           plans: unknown[] | null
           statut: Database["public"]["Enums"]["fiche_action_statuts"] | null
@@ -4759,7 +4760,8 @@ export interface Database {
       }
       flat_axes: {
         Args: {
-          plan_id: number
+          axe_id: number
+          max_depth?: number
         }
         Returns: Database["public"]["CompositeTypes"]["flat_axe_node"][]
       }
@@ -5831,6 +5833,12 @@ export interface Database {
         }
         Returns: string
       }
+      navigation_plans: {
+        Args: {
+          collectivite_id: number
+        }
+        Returns: Database["public"]["CompositeTypes"]["flat_axe_node"][]
+      }
       no_plan: {
         Args: Record<PropertyKey, never>
         Returns: boolean[]
@@ -6837,6 +6845,7 @@ export interface Database {
         fiches: unknown
         ancestors: unknown
         depth: number
+        sort_path: string
       }
       graphique_tranche: {
         id: string

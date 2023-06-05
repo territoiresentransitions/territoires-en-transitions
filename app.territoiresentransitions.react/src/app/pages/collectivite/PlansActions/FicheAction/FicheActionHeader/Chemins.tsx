@@ -10,6 +10,7 @@ import {
 import {TAxeInsert, TAxeRow} from 'types/alias';
 import {useState} from 'react';
 import classNames from 'classnames';
+import {generateTitle} from '../data/utils';
 
 type Props = {
   fiche: FicheAction;
@@ -20,7 +21,7 @@ const Chemins = ({fiche}: Props) => {
     <div data-test="FicheFilAriane" className="flex items-center">
       {!fiche.axes || fiche.axes.length === 0 ? (
         <Link
-          className="p-1 text-xs text-gray-500 !shadow-none hover:text-gray-600"
+          className="p-1 text-xs text-gray-500 underline !bg-none !shadow-none hover:text-gray-600"
           to={() =>
             makeCollectiviteFichesNonClasseesUrl({
               collectiviteId: fiche.collectivite_id!,
@@ -33,13 +34,13 @@ const Chemins = ({fiche}: Props) => {
         <Chemin
           collectiviteId={fiche.collectivite_id!}
           axe_id={fiche.axes[0].id!}
-          titreFiche={fiche.titre ?? 'Sans titre'}
+          titreFiche={generateTitle(fiche.titre)}
         />
       ) : (
         <CheminPlusieursPlans
           collectiviteId={fiche.collectivite_id!}
           axes={fiche.axes}
-          titreFiche={fiche.titre ?? 'Sans titre'}
+          titreFiche={generateTitle(fiche.titre)}
         />
       )}
     </div>
@@ -65,7 +66,7 @@ const Chemin = ({collectiviteId, axe_id, titreFiche}: CheminProps) => {
           ? generateFilArianeLinks({
               collectiviteId,
               chemin: data.chemin as TAxeRow[],
-              titreFiche: titreFiche ?? 'Sans titre',
+              titreFiche: generateTitle(titreFiche),
             })
           : []
       }
@@ -110,7 +111,7 @@ const CheminPlusieursPlans = ({
               key={axe.id}
               collectiviteId={collectiviteId}
               axe_id={axe.id!}
-              titreFiche={titreFiche ?? 'Sans titre'}
+              titreFiche={generateTitle(titreFiche)}
             />
           ))}
         </div>

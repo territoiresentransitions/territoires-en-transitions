@@ -56,6 +56,10 @@ defineStep(/la fiche "([^"]*)" n'est plus présente/, titre => {
   cy.contains(titre).should('not.exist');
 });
 
+defineStep(/je navigue vers "([^"]*)" du fil d'ariane de la fiche/, axe => {
+  cy.get('[data-test=FicheFilAriane]').contains(axe).click();
+});
+
 /** PLAN D'ACTION */
 
 defineStep(
@@ -75,16 +79,13 @@ defineStep(/j'ajoute un nouveau titre/, () => {
   cy.get('[data-test=AjouterAxe]').click();
   // attends que le dernier axe ajouté (celui avec un titre vide) soit visible
   // autorise un timeout un peu plus long car le back peut être lent à répondre en CI
-  cy.get('[data-test=Axe]:nth(-1) textarea', {timeout: 10000}).should(
-    'have.text',
-    ''
-  );
+  cy.get('[data-test=Axe]').first().find('textarea').should('have.text', '');
 });
 
 defineStep(/je le nomme "([^"]*)"/, titre => {
   // sélectionne le dernier axe ajouté
   cy.get('[data-test=Axe]')
-    .last()
+    .first()
     .within(() => {
       cy.get('[data-test=TitreAxeInput]').type(
         '{selectall}{backspace}' + titre
@@ -115,8 +116,8 @@ defineStep(/je reviens sur le plan d'action "([^"]*)"/, titre => {
   cy.get('[data-test=PlansActionNavigation]').contains(titre).click();
 });
 
-defineStep(/je veux supprimer le dernier axe/, () => {
-  cy.get('[data-test=SupprimerAxeBouton]').last().click({force: true});
+defineStep(/je veux supprimer le dernier axe créé/, () => {
+  cy.get('[data-test=SupprimerAxeBouton]').first().click({force: true});
 });
 
 defineStep(/le texte "([^"]*)" est visible/, texte => {
@@ -173,3 +174,45 @@ defineStep(
     cy.get('[data-test=PlanChemin]').contains(axe).should('be.visible');
   }
 );
+
+/** PAGE AXE ET FILTRES */
+
+defineStep(
+  /j'ouvre "([^"]*)" dans la navigation latérale et que je navigue vers "([^"]*)"/,
+  (section, axe) => {
+    // ouvre la section correspondant au plan donné
+    cy.get('[data-test=SideNav-section]')
+      .contains(section)
+      .parent()
+      .parent()
+      .within(() => {
+        // le déplie
+        cy.root().get('[data-test=SideNav-section-toggle-button]').click();
+      });
+    // et navigue vers l'axe donné
+    cy.get('[data-test=SideNav-section-liens]').contains(axe).click();
+  }
+);
+
+defineStep(/j'ouvre les filtres/, () => {
+  cy.get('[data-test=FiltrerFiches]').contains('Filtrer').click();
+});
+
+defineStep(
+  /je filtre les fiches par "([^"]*)" du filtre "([^"]*)"/,
+  (value, filtre) => {
+    cy.get(`[data-test=filtre-${filtre}]`).click();
+    cy.root().contains(value).click();
+    cy.get('body').click(10, 10);
+  }
+);
+
+defineStep(/aucune fiche n'est présente/, () => {
+  cy.root()
+    .contains('Aucune fiche ne correspond à votre recherche')
+    .should('be.visible');
+});
+
+defineStep(/la fiche contenant "([^"]*)" est visible/, value => {
+  cy.get('[data-test=ActionCarte]').contains(value).should('be.visible');
+});

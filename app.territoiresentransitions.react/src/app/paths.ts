@@ -59,10 +59,13 @@ export const collectiviteJournalPath = `${collectivitePath}/historique`;
 
 const ficheParam = 'ficheUid';
 const planParam = 'planUid';
+const axeParam = 'axeUid';
 export const CollectivitePlansActionsBasePath = `${collectivitePath}/plans`;
 export const collectivitePlansActionsSynthesePath = `${CollectivitePlansActionsBasePath}/synthese`;
 export const collectivitePlanActionPath = `${CollectivitePlansActionsBasePath}/plan/:${planParam}`;
 export const collectivitePlanActionFichePath = `${collectivitePlanActionPath}/fiche/:${ficheParam}`;
+export const collectivitePlanActionAxePath = `${collectivitePlanActionPath}/:${axeParam}`;
+export const collectivitePlanActionAxeFichePath = `${collectivitePlanActionAxePath}/fiche/:${ficheParam}`;
 export const CollectiviteFichesNonClasseesPath = `${CollectivitePlansActionsBasePath}/fiches`;
 export const collectiviteFicheNonClasseePath = `${CollectiviteFichesNonClasseesPath}/:${ficheParam}`;
 
@@ -227,6 +230,37 @@ export const makeCollectivitePlanActionUrl = ({
   collectivitePlanActionPath
     .replace(`:${collectiviteParam}`, collectiviteId.toString())
     .replace(`:${planParam}`, planActionUid);
+
+export const makeCollectivitePlanActionAxeFicheUrl = ({
+  collectiviteId,
+  ficheUid,
+  planActionUid,
+  axeUid,
+}: {
+  collectiviteId: number;
+  ficheUid: string;
+  planActionUid: string;
+  axeUid: string;
+}) =>
+  collectivitePlanActionAxeFichePath
+    .replace(`:${collectiviteParam}`, collectiviteId.toString())
+    .replace(`:${planParam}`, planActionUid)
+    .replace(`:${axeParam}`, axeUid)
+    .replace(`:${ficheParam}`, ficheUid);
+
+export const makeCollectivitePlanActionAxeUrl = ({
+  collectiviteId,
+  planActionUid,
+  axeUid,
+}: {
+  collectiviteId: number;
+  planActionUid: string;
+  axeUid: string;
+}) =>
+  collectivitePlanActionAxePath
+    .replace(`:${collectiviteParam}`, collectiviteId.toString())
+    .replace(`:${planParam}`, planActionUid)
+    .replace(`:${axeParam}`, axeUid);
 
 export const makeCollectiviteTableauBordUrl = ({
   collectiviteId,

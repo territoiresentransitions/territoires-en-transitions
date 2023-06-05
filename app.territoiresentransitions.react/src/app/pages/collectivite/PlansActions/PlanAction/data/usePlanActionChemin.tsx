@@ -2,8 +2,12 @@ import {useQuery} from 'react-query';
 
 import {supabaseClient} from 'core-logic/api/supabase';
 import {TFilArianeLink} from 'ui/shared/FilAriane';
-import {makeCollectivitePlanActionUrl} from 'app/paths';
+import {
+  makeCollectivitePlanActionAxeUrl,
+  makeCollectivitePlanActionUrl,
+} from 'app/paths';
 import {TAxeRow} from 'types/alias';
+import {generateTitle} from '../../FicheAction/data/utils';
 
 type FilArianeArgs = {
   collectiviteId: number;
@@ -19,23 +23,38 @@ export const generateFilArianeLinks = ({
   noLinks,
 }: FilArianeArgs): TFilArianeLink[] => {
   return [
-    ...chemin.map((axe, i) =>
-      i === 0
-        ? {
-            displayedName:
-              axe.nom && axe.nom.length > 0 ? axe.nom : 'Sans titre',
-            path: !noLinks
-              ? makeCollectivitePlanActionUrl({
-                  collectiviteId,
-                  planActionUid: chemin[0].id.toString(),
-                })
-              : undefined,
-          }
-        : {
-            displayedName: axe.nom ?? 'Sans titre',
-          }
-    ),
-    {displayedName: titreFiche ?? 'Sans titre'},
+    ...chemin.map((axe, i) => {
+      // Lien plan d'action
+      if (i === 0) {
+        return {
+          displayedName: generateTitle(axe.nom),
+          path: !noLinks
+            ? makeCollectivitePlanActionUrl({
+                collectiviteId,
+                planActionUid: chemin[0].id.toString(),
+              })
+            : undefined,
+        };
+      }
+      // Lien axe niveau 1
+      if (i === 1) {
+        return {
+          displayedName: generateTitle(axe.nom),
+          path: !noLinks
+            ? makeCollectivitePlanActionAxeUrl({
+                collectiviteId,
+                planActionUid: chemin[0].id.toString(),
+                axeUid: axe.id.toString(),
+              })
+            : undefined,
+        };
+      }
+      // Autres axes
+      return {
+        displayedName: generateTitle(axe.nom),
+      };
+    }),
+    {displayedName: generateTitle(titreFiche)},
   ];
 };
 
