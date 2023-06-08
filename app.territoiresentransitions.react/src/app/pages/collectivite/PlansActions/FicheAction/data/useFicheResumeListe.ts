@@ -13,7 +13,7 @@ const fetchFicheResumeListe = async (
     .from('fiche_resume')
     .select()
     .match({collectivite_id})
-    .order('plans', {ascending: true});
+    .order('titre', {ascending: true});
 
   const {error, data} = await query;
 

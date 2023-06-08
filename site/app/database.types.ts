@@ -97,6 +97,7 @@ export interface Database {
         Row: {
           collectivite_id: number
           date: string
+          demandeur: string | null
           en_cours: boolean
           envoyee_le: string | null
           etoiles: Database["labellisation"]["Enums"]["etoile"] | null
@@ -108,6 +109,7 @@ export interface Database {
         Insert: {
           collectivite_id: number
           date?: string
+          demandeur?: string | null
           en_cours?: boolean
           envoyee_le?: string | null
           etoiles?: Database["labellisation"]["Enums"]["etoile"] | null
@@ -119,6 +121,7 @@ export interface Database {
         Update: {
           collectivite_id?: number
           date?: string
+          demandeur?: string | null
           en_cours?: boolean
           envoyee_le?: string | null
           etoiles?: Database["labellisation"]["Enums"]["etoile"] | null
@@ -933,6 +936,7 @@ export interface Database {
         Row: {
           action_id: string
           fiche_id: number
+          fiche_resume: unknown | null
         }
         Insert: {
           action_id: string
@@ -3116,6 +3120,12 @@ export interface Database {
         Row: {
           collectivite_id: number | null
           date: string | null
+          demandeur_email: string | null
+          demandeur_fonction:
+            | Database["public"]["Enums"]["membre_fonction"]
+            | null
+          demandeur_nom: string | null
+          demandeur_prenom: string | null
           en_cours: boolean | null
           envoyee_le: string | null
           etoiles: Database["labellisation"]["Enums"]["etoile"] | null
@@ -4690,6 +4700,19 @@ export interface Database {
             Args: Record<PropertyKey, never>
             Returns: string
           }
+      fiche_resume: {
+        Args: {
+          "": unknown
+        }
+        Returns: {
+          collectivite_id: number | null
+          id: number | null
+          pilotes: Database["public"]["CompositeTypes"]["personne"][] | null
+          plans: unknown[] | null
+          statut: Database["public"]["Enums"]["fiche_action_statuts"] | null
+          titre: string | null
+        }[]
+      }
       filter_fiches_action: {
         Args: {
           collectivite_id: number
@@ -5733,6 +5756,7 @@ export interface Database {
         Returns: {
           collectivite_id: number
           date: string
+          demandeur: string | null
           en_cours: boolean
           envoyee_le: string | null
           etoiles: Database["labellisation"]["Enums"]["etoile"] | null
@@ -5776,6 +5800,7 @@ export interface Database {
         Returns: {
           collectivite_id: number
           date: string
+          demandeur: string | null
           en_cours: boolean
           envoyee_le: string | null
           etoiles: Database["labellisation"]["Enums"]["etoile"] | null
@@ -6064,6 +6089,10 @@ export interface Database {
       }
       runtests:
         | {
+            Args: Record<PropertyKey, never>
+            Returns: string[]
+          }
+        | {
             Args: {
               "": unknown
             }
@@ -6073,10 +6102,6 @@ export interface Database {
             Args: {
               "": string
             }
-            Returns: string[]
-          }
-        | {
-            Args: Record<PropertyKey, never>
             Returns: string[]
           }
       save_reponse: {

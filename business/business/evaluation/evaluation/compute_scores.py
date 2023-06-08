@@ -1,17 +1,9 @@
 from copy import copy
-from typing import Dict, List
-
-from business.utils.models.action_statut import (
-    ActionStatut,
-)
-from business.utils.models.action_score import ActionScore
-from .action_point_tree import ActionPointTree, ActionTree
-from business.utils.models.actions import ActionId
-from business.utils.models.personnalisation import ActionPersonnalisationConsequence
 from business.evaluation.personnalisation.execute_score_personnalisation_factor_regle import (
     execute_score_personnalisation_override_regle,
 )
 from .compute_scores_utils import *
+from .action_point_tree import ActionTree
 
 
 def compute_scores(
@@ -36,15 +28,16 @@ def compute_scores(
             + action_desactive_ids
     )
 
+    # 2. Deuxième et troisième passes, on propage les potentiels
+    # - en partant des tâches vers les parents
+    # - puis en partant des actions vers les enfants
     potentiels = compute_potentiels(
         personnalise_tree,
         action_non_concerne_ids,
         action_level,
     )
 
-    # 2. Estimate tache points based on statuses
     action_personnalises_ids = list(personnalisation_consequences.keys())
-
     status_by_action_id: Dict[str, ActionStatut] = {
         action_status.action_id: action_status
         for action_status in statuses
@@ -53,33 +46,27 @@ def compute_scores(
 
     scores: Dict[ActionId, ActionScore] = {}
 
-    referentiel_tree.map_on_taches(
-        lambda tache: update_scores_from_tache_given_statuses(
+    # 3. Dernière passe Propagation des scores des taches vers les parents
+    # - on calcule le score des taches
+    # - puis on propage aux parents
+    #   - le score de chaque parent est calculé :
+    #     - s'il n'a pas de statut : à partir de ses enfants
+    #     - s'il a un statut : à partir de lui-même
+    referentiel_tree.map_from_taches_to_root(
+        lambda action_id: update_action_scores(
             referentiel_tree,
             personnalise_tree,
             scores,
             potentiels,
-            tache,
+            action_id,
             status_by_action_id,
             action_non_concerne_ids,
             action_personnalises_ids,
             action_desactive_ids,
         )
     )
-    # 3. Infer all action points based on their children's
-    referentiel_tree.map_from_sous_actions_to_root(
-        lambda action_id: update_scores_for_action_given_children_scores(
-            referentiel_tree,
-            personnalise_tree,
-            scores,
-            potentiels,
-            action_personnalises_ids,
-            action_desactive_ids,
-            action_id,
-        )
-    )
 
-    # 4. Apply potentiel reduction a posteriori (from formules)
+    # Dernière pour la fonction de personnalisation scores.
     for (
             action_id,
             personnalisation_consequence,

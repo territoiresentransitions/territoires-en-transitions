@@ -13,32 +13,68 @@ from business.utils.models.personnalisation import ActionPersonnalisationConsequ
 logger = logging.getLogger()
 
 
-def update_scores_from_tache_given_statuses(
+def update_action_scores(
+        referentiel_tree: ActionPointTree,
+        personnalise_tree: ActionPointTree,
+        scores: Dict[ActionId, ActionScore],
+        potentiels: Dict[ActionId, float],
+        action_id: ActionId,
+        status_by_action_id: Dict[str, ActionStatut],
+        action_non_concerne_ids: List[ActionId],
+        action_personnalise_ids: List[ActionId],
+        action_desactive_ids: List[ActionId],
+):
+    if referentiel_tree.is_leaf(action_id) or action_id in status_by_action_id.keys():
+        update_action_scores_from_status(
+            referentiel_tree,
+            personnalise_tree,
+            scores,
+            potentiels,
+            action_id,
+            status_by_action_id,
+            action_non_concerne_ids,
+            action_personnalise_ids,
+            action_desactive_ids,
+        )
+    else:
+        update_action_score_from_children_scores(
+            referentiel_tree,
+            personnalise_tree,
+            scores,
+            potentiels,
+            action_personnalise_ids,
+            action_desactive_ids,
+            action_id,
+        )
+
+
+def update_action_scores_from_status(
         point_tree_referentiel: ActionPointTree,
         point_tree_personnalise: ActionPointTree,
         scores: Dict[ActionId, ActionScore],
         potentiels: Dict[ActionId, float],
-        tache_id: ActionId,
+        action_id: ActionId,
         status_by_action_id: Dict[str, ActionStatut],
         actions_non_concernes_ids: List[ActionId],
         action_personnalises_ids: List[ActionId],
         actions_desactivees_ids: List[ActionId],
 ):
-    tache_points_personnalise = point_tree_personnalise.get_action_point(tache_id)
-    tache_points_referentiel = point_tree_referentiel.get_action_point(tache_id)
+    """Utilise les statuts d'une tâche ou sous-action pour mettre à jour son score"""
+    tache_points_personnalise = point_tree_personnalise.get_action_point(action_id)
+    tache_points_referentiel = point_tree_referentiel.get_action_point(action_id)
 
     assert tache_points_referentiel is not None
     assert tache_points_personnalise is not None
 
-    tache_point_potentiel = potentiels[tache_id]
+    tache_point_potentiel = potentiels[action_id]
 
-    tache_concerne = tache_id not in actions_non_concernes_ids + actions_desactivees_ids
-    tache_is_personnalise = tache_id in action_personnalises_ids
-    tache_is_desactive = tache_id in actions_desactivees_ids
+    tache_concerne = action_id not in actions_non_concernes_ids + actions_desactivees_ids
+    tache_is_personnalise = action_id in action_personnalises_ids
+    tache_is_desactive = action_id in actions_desactivees_ids
 
     if not tache_concerne:
-        scores[tache_id] = ActionScore(
-            action_id=tache_id,
+        scores[action_id] = ActionScore(
+            action_id=action_id,
             point_fait=0.0,
             point_pas_fait=0.0,
             point_programme=0.0,
@@ -60,7 +96,7 @@ def update_scores_from_tache_given_statuses(
         )
         return
 
-    tache_status = status_by_action_id.get(tache_id)
+    tache_status = status_by_action_id.get(action_id)
     if tache_status and tache_status.detailed_avancement:
         point_fait = (
             tache_point_potentiel * tache_status.detailed_avancement.fait
@@ -92,8 +128,8 @@ def update_scores_from_tache_given_statuses(
             programme_taches_avancement
         ) = pas_fait_taches_avancement = pas_concerne_taches_avancement = 0
 
-    scores[tache_id] = ActionScore(
-        action_id=tache_id,
+    scores[action_id] = ActionScore(
+        action_id=action_id,
         point_pas_fait=point_pas_fait,
         point_programme=point_programme,
         point_non_renseigne=point_non_renseigne,
@@ -115,7 +151,7 @@ def update_scores_from_tache_given_statuses(
     )
 
 
-def update_scores_for_action_given_children_scores(
+def update_action_score_from_children_scores(
         point_tree_referentiel: ActionPointTree,
         point_tree_personnalise: ActionPointTree,
         scores: Dict[ActionId, ActionScore],
@@ -262,7 +298,7 @@ def compute_actions_desactivees_ids(
     return list(action_desactive_ids)
 
 
-def _get_action_potentiel_after_redistribution_for_level_greater_than_action_level(
+def _action_potentiel_with_redistribution_remainder(
         action_id: ActionId,
         original_action_potentiel: float,
         actions_non_concernes_ids: List[ActionId],
@@ -328,7 +364,7 @@ def compute_potentiels(
             )
 
         if this_level > action_level:
-            potentiel = _get_action_potentiel_after_redistribution_for_level_greater_than_action_level(
+            potentiel = _action_potentiel_with_redistribution_remainder(
                 action_id,
                 original_action_potentiel,
                 actions_non_concernes_ids,

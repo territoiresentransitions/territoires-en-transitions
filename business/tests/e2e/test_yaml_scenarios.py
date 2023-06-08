@@ -8,7 +8,7 @@ from business.utils.models.action_statut import (
 
 yaml_tests_dir = "../markdown/tests"
 yaml_tests_glob = "**/*.test.yml"
-paths = [(str(path).split('/')[-1], path) for path in list(Path(yaml_tests_dir).glob(yaml_tests_glob))]
+paths = [('/'.join(str(path).split('/')[-2:]), path) for path in list(Path(yaml_tests_dir).glob(yaml_tests_glob))]
 
 
 def test_yaml_files_should_be_present():
@@ -64,6 +64,8 @@ def test_scores_should_match_yaml_expectations(test_post_personnalize, test_post
                     avancement = DetailedAvancement(fait=0.0, programme=1.0, pas_fait=0.0)
                 elif statut == 'pas_fait':
                     avancement = DetailedAvancement(fait=0.0, programme=0.0, pas_fait=1.0)
+                elif isinstance(statut, list):
+                    avancement = DetailedAvancement(fait=statut[0], programme=statut[1], pas_fait=statut[2])
                 statuts.append(ActionStatut(
                     action_id=action_id,
                     detailed_avancement=avancement,
