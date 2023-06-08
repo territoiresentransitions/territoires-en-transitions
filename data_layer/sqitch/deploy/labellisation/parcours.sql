@@ -3,8 +3,7 @@
 
 BEGIN;
 
-drop function labellisation_parcours;
-create function
+create or replace function
     labellisation_parcours(collectivite_id integer)
     returns table
             (
@@ -69,7 +68,9 @@ begin
                    'etoiles', cs.etoile_objectif)          as critere_score,
 
            criteres.liste                                  as criteres_action,
-           criteres.atteints and cs.atteint and cf.atteint as rempli,
+           criteres.atteints and cs.atteint and
+           -- Pas de document nécessaire pour une demande cot 1ère étoile
+           (case when demande.sujet = 'cot' and demande.etoiles = '1' then true else cf.atteint end) as rempli,
            calendrier.information,
 
            to_jsonb(demande),

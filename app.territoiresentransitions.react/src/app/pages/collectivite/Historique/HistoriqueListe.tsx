@@ -8,6 +8,7 @@ import {THistoriqueItem, THistoriqueItemProps, THistoriqueProps} from './types';
 import HistoriqueItemReponse from './reponse/HistoriqueItemReponse';
 import {NB_ITEMS_PER_PAGE} from './filters';
 import HistoriqueFiltres from './HistoriqueFiltres/HistoriqueFiltres';
+import HistoriqueItemJustification from './reponse/HistoriqueItemJustification';
 
 /**
  * Affiche l'historique des modifications
@@ -36,7 +37,7 @@ export const HistoriqueListe = ({
         {items.map(item => {
           const {type} = item;
           const Item = historiqueParType[type];
-          return <Item key={makeKey(item)} item={item} />;
+          return Item ? <Item key={makeKey(item)} item={item} /> : null;
         })}
       </div>
       {total !== 0 && (
@@ -67,6 +68,7 @@ const historiqueParType: {[k: string]: FC<THistoriqueItemProps>} = {
   action_statut: HistoriqueItemActionStatut,
   action_precision: HistoriqueItemActionPrecision,
   reponse: HistoriqueItemReponse,
+  justification: HistoriqueItemJustification,
 };
 
 // construit une clé d'identification d'un item de l'historique
@@ -78,12 +80,16 @@ const makeKey = (item: THistoriqueItem): string => {
     type === 'action_statut' ||
     type === 'action_precision' ||
     type === 'preuve'
-  )
+  ) {
     return `${type}-${action_id}-${timestamp}`;
-  if (type === 'reponse') return `${type}-${question_id}-${timestamp}`;
+  }
+
+  if (type === 'reponse' || type === 'justification') {
+    return `${type}-${question_id}-${timestamp}`;
+  }
 
   // TODO: gérer les autres types de modification
-  return 'TODO';
+  return type;
 };
 
 export default HistoriqueListeConnected;
