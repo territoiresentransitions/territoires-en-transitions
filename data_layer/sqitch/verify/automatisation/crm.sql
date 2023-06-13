@@ -2,35 +2,28 @@
 
 BEGIN;
 
-select key, user_id, prenom, nom, email, telephone
-from crm_personnes
-where false;
-
-select key,
-       collectivite_id,
-       nom,
-       type_collectivite,
-       nature_collectivite,
-       code_siren_insee,
-       region_name,
-       region_code,
-       departement_name,
-       departement_code,
-       population_totale,
-       cot
-from crm_collectivites
-where false;
-
-select key,
-       user_id,
-       user_key,
-       collectivite_id,
+select id,
        collectivite_key,
-       niveau_acces,
-       fonction,
-       details_fonction,
-       champ_intervention
-from crm_droits
+       referentiel,
+       obtenue_le,
+       annee,
+       etoiles,
+       score_realise,
+       score_programme
+from crm_labellisations
+where false;
+
+select collectivite_id,
+       key,
+       completude_eci,
+       completude_cae,
+       fiches,
+       plans,
+       resultats_indicateurs,
+       indicateurs_perso,
+       resultats_indicateurs_perso,
+       premier_rattachement
+from crm_usages
 where false;
 
 ROLLBACK;

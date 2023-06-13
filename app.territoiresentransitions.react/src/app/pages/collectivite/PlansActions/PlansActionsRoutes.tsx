@@ -5,16 +5,22 @@ import {PlanActionPage} from './PlanAction/PlanActionPage';
 import FichesNonClassees from 'app/pages/collectivite/PlansActions/FichesNonClassees';
 import {
   collectiviteFicheNonClasseePath,
-  CollectiviteFichesNonClasseesPath,
+  collectiviteFichesNonClasseesPath,
   collectivitePlanActionAxeFichePath,
   collectivitePlanActionAxePath,
   collectivitePlanActionFichePath,
   collectivitePlanActionPath,
-  CollectivitePlansActionsBasePath,
+  collectivitePlansActionsBasePath,
+  collectivitePlansActionsCreerPath,
+  collectivitePlansActionsImporterPath,
+  collectivitePlansActionsNouveauPath,
   collectivitePlansActionsSynthesePath,
   makeCollectivitePlansActionsSyntheseUrl,
 } from 'app/paths';
 import {SynthesePage} from './Synthese/SynthesePage';
+import {SelectionPage} from './ParcoursCreationPlan/SelectionPage';
+import {ImporterPlanPage} from './ParcoursCreationPlan/ImporterPlanPage';
+import {CreerPlanPage} from './ParcoursCreationPlan/CreerPlanPage';
 
 type Props = {
   collectivite_id: number;
@@ -26,7 +32,7 @@ type Props = {
 export const PlansActionsRoutes = ({collectivite_id}: Props) => {
   return (
     <>
-      <Route exact path={[CollectivitePlansActionsBasePath]}>
+      <Route exact path={[collectivitePlansActionsBasePath]}>
         {/* Redirection vers la page de synthèse */}
         <Redirect
           to={makeCollectivitePlansActionsSyntheseUrl({
@@ -34,12 +40,22 @@ export const PlansActionsRoutes = ({collectivite_id}: Props) => {
           })}
         />
       </Route>
+      {/* Création */}
+      <Route exact path={collectivitePlansActionsNouveauPath}>
+        <SelectionPage />
+      </Route>
+      <Route exact path={collectivitePlansActionsImporterPath}>
+        <ImporterPlanPage />
+      </Route>
+      <Route exact path={collectivitePlansActionsCreerPath}>
+        <CreerPlanPage />
+      </Route>
       {/* Synthèse */}
       <Route exact path={[collectivitePlansActionsSynthesePath]}>
         <SynthesePage collectiviteId={collectivite_id} />
       </Route>
       {/* <FichesNonClassees /> */}
-      <Route exact path={[CollectiviteFichesNonClasseesPath]}>
+      <Route exact path={[collectiviteFichesNonClasseesPath]}>
         <FichesNonClassees />
       </Route>
       <Route

@@ -19,11 +19,11 @@ export type RenderProps = {
 };
 
 export type ModalProps = {
-  /* où il faut mettre le contenu de la modale */
+  /** où il faut mettre le contenu de la modale */
   render: (props: RenderProps) => React.ReactNode;
-  /* l'élément qui permet d'afficher la modale au click */
+  /** l'élément qui permet d'afficher la modale au click */
   children?: JSX.Element;
-  /* s'il n'y a pas d'élément permettant d'afficher la modale,
+  /** s'il n'y a pas d'élément permettant d'afficher la modale,
      on peut lui passer un booléen mais celui ci doit être accompagné d'un setter (setExternalOpen)
      afin de pouvoir la fermer */
   externalOpen?: boolean;
@@ -31,7 +31,9 @@ export type ModalProps = {
   setExternalOpen?:
     | Dispatch<SetStateAction<boolean>>
     | ((opened: boolean) => void);
-  /* max-width prédéfinies dans le DSFR, valeur par défaut "md" */
+  /** fonction appelée lors de la fermeture de la modale */
+  onClose?: () => void;
+  /** max-width prédéfinies dans le DSFR, valeur par défaut "md" */
   size?: 'sm' | 'md' | 'lg' | 'xl';
   /** désactive la fermeture lors du clic sur le fond */
   disableDismiss?: boolean;
@@ -50,6 +52,7 @@ const Modal = ({
   children,
   externalOpen,
   setExternalOpen,
+  onClose,
   size = 'md',
   disableDismiss,
   noCloseButton,
@@ -57,9 +60,16 @@ const Modal = ({
 }: ModalProps) => {
   const [open, setOpen] = useState(false);
 
-  const {reference, floating, context} = useFloating({
+  const handleOpenChange = () => {
+    setExternalOpen ? setExternalOpen(!externalOpen) : setOpen(!open);
+    if (externalOpen || open) {
+      onClose && onClose();
+    }
+  };
+
+  const {refs, context} = useFloating({
     open: externalOpen ?? open,
-    onOpenChange: setExternalOpen ?? setOpen,
+    onOpenChange: handleOpenChange,
   });
 
   const id = useId();
@@ -72,16 +82,12 @@ const Modal = ({
     useDismiss(context, {enabled: !disableDismiss}),
   ]);
 
-  const handleCloseClick = () => {
-    setExternalOpen ? setExternalOpen(false) : setOpen(false);
-  };
-
   return (
     <>
       {children &&
         cloneElement(
           children,
-          getReferenceProps({ref: reference, ...children.props})
+          getReferenceProps({ref: refs.setReference, ...children.props})
         )}
       <FloatingPortal>
         {(open || externalOpen) && (
@@ -98,7 +104,7 @@ const Modal = ({
               <div
                 data-test="Modal"
                 {...getFloatingProps({
-                  ref: floating,
+                  ref: refs.setFloating,
                   className: classNames(
                     `
                     mt-8 w-full mx-auto self-end
@@ -117,7 +123,7 @@ const Modal = ({
                 <div className="flex flex-col p-4 bg-white md:px-8">
                   {noCloseButton ? null : (
                     <button
-                      onClick={handleCloseClick}
+                      onClick={handleOpenChange}
                       className="flex items-center ml-auto mb-2 pl-2 py-0.5 md:-mr-4 fr-btn--secondary !shadow-none"
                       data-test="close-modal"
                     >
