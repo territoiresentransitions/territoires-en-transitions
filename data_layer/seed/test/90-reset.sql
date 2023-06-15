@@ -23,6 +23,8 @@ $$
     select test_reset_action_statut_and_desc();
 -- 11-plan_action.sql
     select test_reset_plan_action();
+-- 14-indicateur.sql
+    select test_reset_indicateur();
 -- 06-auth.sql
     select test_reset_users();
 -- Supprime toutes les collectivités de test et cot.
