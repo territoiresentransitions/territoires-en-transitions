@@ -207,28 +207,5 @@ comment on view historique_utilisateur
     is 'La liste des utilisateurs ayant apporté des modifications aux données de la collectivité.'
         'Lorsqu''aucun utilisateur est associé, le modified by id est égal à `99999999-9999-9999-9999-999999999999`';
 
-drop index historique.has_idx_cid;
-drop index historique.has_idx_mat;
-drop index historique.has_idx_cid_mby;
-
-drop index historique.hap_idx_cid;
-drop index historique.hap_idx_mat;
-drop index historique.hap_idx_cid_mby;
-
-drop index historique.hj_idx_cid;
-drop index historique.hj_idx_mat;
-drop index historique.hj_idx_cid_mby;
-
-drop index historique.hrb_idx_cid;
-drop index historique.hrb_idx_mat;
-drop index historique.hrb_idx_cid_mby;
-
-drop index historique.hrc_idx_cid;
-drop index historique.hrc_idx_mat;
-drop index historique.hrc_idx_cid_mby;
-
-drop index historique.hrp_idx_cid;
-drop index historique.hrp_idx_mat;
-drop index historique.hrp_idx_cid_mby;
 
 COMMIT;
