@@ -1,14 +1,14 @@
 import {lazy, Suspense} from 'react';
 import {renderLoader} from 'utils/renderLoader';
 
-const TableauBord = lazy(
-  () => import('app/pages/collectivite/TableauBord/TableauBord')
-);
+const Accueil = lazy(() => import('app/pages/collectivite/Accueil/Accueil'));
 
-export const TableauBordPage = () => {
+const AccueilPage = () => {
   return (
     <Suspense fallback={renderLoader()}>
-      <TableauBord />
+      <Accueil />
     </Suspense>
   );
 };
+
+export default AccueilPage;

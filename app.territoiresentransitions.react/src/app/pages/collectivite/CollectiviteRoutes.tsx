@@ -4,7 +4,6 @@ import {
   collectiviteActionPath,
   collectiviteIndicateurPath as collectiviteIndicateursPath,
   collectiviteReferentielPath,
-  collectiviteTableauBordPath,
   collectiviteUsersPath,
   collectivitePersoRefPath,
   collectivitePersoRefThematiquePath,
@@ -13,12 +12,12 @@ import {
   collectiviteJournalPath,
   collectiviteBibliothequePath,
   collectivitePlansActionsBasePath,
-  makeCollectiviteTableauBordUrl,
+  makeCollectiviteAccueilUrl,
+  collectiviteAccueilPath,
 } from 'app/paths';
 import {ReferentielsPage} from 'app/pages/collectivite/Referentiels/ReferentielsPage';
 import {ActionPage} from 'app/pages/collectivite/Referentiels/ActionPage';
 import {IndicateursPage} from 'app/pages/collectivite/Indicateurs/IndicateursPage';
-import {TableauBordPage} from 'app/pages/collectivite/TableauBord/TableauBordPage';
 import {MembresPage} from 'app/pages/collectivite/Users/MembresPage';
 import {PersoReferentielPage} from './PersoReferentiel/PersoReferentielPage';
 import {PersoReferentielThematiquePage} from './PersoReferentielThematique/PersoReferentielThematiquePage';
@@ -28,6 +27,7 @@ import {JournalActivitePage} from './Historique/JournalActivitePage';
 import {BibliothequeDocsPage} from './BibliothequeDocs/BibliothequeDocsPage';
 import {PlansActionsPage} from './PlansActions/PlansActionsPage';
 import {useCurrentCollectivite} from 'core-logic/hooks/useCurrentCollectivite';
+import AccueilPage from './Accueil/AccueilPage';
 
 /**
  * Routes starting with collectivite/:collectiviteId/ see App.ts Router.
@@ -40,8 +40,8 @@ export const CollectiviteRoutes = () => {
       <Route path={collectiviteReferentielPath}>
         <ReferentielsPage />
       </Route>
-      <Route path={collectiviteTableauBordPath}>
-        <TableauBordPage />
+      <Route path={collectiviteAccueilPath}>
+        <AccueilPage />
       </Route>
       <Route path={collectiviteActionPath}>
         <ActionPage />
@@ -94,7 +94,7 @@ const RouteEnAccesRestreint = (props: RouteProps) => {
       render={({location}) =>
         collectivite.acces_restreint && collectivite.readonly ? (
           <Redirect
-            to={makeCollectiviteTableauBordUrl({
+            to={makeCollectiviteAccueilUrl({
               collectiviteId: collectivite.collectivite_id,
             })}
           />

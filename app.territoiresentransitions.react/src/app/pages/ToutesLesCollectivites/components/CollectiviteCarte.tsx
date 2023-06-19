@@ -2,11 +2,11 @@ import {TCollectiviteCarte} from '../types';
 import {Referentiel} from 'types/litterals';
 import {toPercentString} from 'utils/score';
 import {referentielToName} from 'app/labels';
-import {NIVEAUX} from 'app/pages/collectivite/TableauBord/getNiveauInfo';
-import {GreyStar, GreenStar} from 'app/pages/collectivite/TableauBord/Star';
+import {NIVEAUX} from 'ui/labellisation/getNiveauInfo';
+import {GreenStar, GreyStar} from 'ui/labellisation/Star';
 import {Card} from '@material-ui/core';
 import {Link} from 'react-router-dom';
-import {makeCollectiviteTableauBordUrl} from 'app/paths';
+import {makeCollectiviteAccueilUrl} from 'app/paths';
 import classNames from 'classnames';
 import {useFonctionTracker} from 'core-logic/hooks/useFonctionTracker';
 import {CheckIcon} from 'ui/icons/CheckIcon';
@@ -32,7 +32,7 @@ export const CollectiviteCarte = (props: TCollectiviteCarteProps) => {
       onClick={() => tracker({fonction: 'collectivite_carte', action: 'clic'})}
       to={
         props.isCardClickable
-          ? makeCollectiviteTableauBordUrl({
+          ? makeCollectiviteAccueilUrl({
               collectiviteId: collectivite.collectivite_id,
             })
           : '#'

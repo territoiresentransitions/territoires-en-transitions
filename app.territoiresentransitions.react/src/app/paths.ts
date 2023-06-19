@@ -47,7 +47,7 @@ export type LabellisationVueParamOption = 'suivi' | 'cycles' | 'criteres';
 export const collectivitePath = `/collectivite/:${collectiviteParam}`;
 export const collectiviteIndicateurPath = `${collectivitePath}/indicateurs/:${indicateurViewParam}`;
 export const collectiviteReferentielPath = `${collectivitePath}/referentiels/:${referentielParam}/:${referentielVueParam}`;
-export const collectiviteTableauBordPath = `${collectivitePath}/tableau_bord`;
+export const collectiviteAccueilPath = `${collectivitePath}/accueil`;
 export const collectiviteActionPath = `${collectivitePath}/action/:${referentielParam}/:${actionParam}/:${actionVueParam}?`;
 export const collectiviteLabellisationRootPath = `${collectivitePath}/labellisation/:${referentielParam}`;
 export const collectiviteLabellisationPath = `${collectiviteLabellisationRootPath}/:${labellisationVueParam}?`;
@@ -91,18 +91,24 @@ export const makeCollectiviteReferentielUrl = ({
   collectiviteId,
   referentielId,
   referentielVue,
+  axeId,
 }: {
   collectiviteId: number;
   referentielId: ReferentielParamOption;
   referentielVue?: ReferentielVueParamOption | '';
-}) =>
-  collectiviteReferentielPath
+  axeId?: string;
+}) => {
+  let pathName = collectiviteReferentielPath
     .replace(`:${collectiviteParam}`, collectiviteId.toString())
     .replace(`:${referentielParam}`, referentielId)
     .replace(
       `:${referentielVueParam}`,
       referentielVue === undefined ? 'progression' : referentielVue
     );
+
+  if (!!axeId && axeId.length) pathName += `?axe=${axeId}`;
+  return pathName;
+};
 
 export const makeCollectiviteActionUrl = ({
   collectiviteId,
@@ -296,12 +302,12 @@ export const makeCollectivitePlanActionAxeUrl = ({
     .replace(`:${planParam}`, planActionUid)
     .replace(`:${axeParam}`, axeUid);
 
-export const makeCollectiviteTableauBordUrl = ({
+export const makeCollectiviteAccueilUrl = ({
   collectiviteId,
 }: {
   collectiviteId: number;
 }) =>
-  collectiviteTableauBordPath.replace(
+  collectiviteAccueilPath.replace(
     `:${collectiviteParam}`,
     collectiviteId.toString()
   );
