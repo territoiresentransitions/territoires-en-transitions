@@ -92,7 +92,7 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
   }
 
   return (
-    <>
+    <div>
       <ActionHeader
         action={action}
         actionScore={actionScores[action.id]}
@@ -181,7 +181,7 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
         />
         <ScrollTopButton className="mt-8" />
       </main>
-    </>
+    </div>
   );
 };
 
