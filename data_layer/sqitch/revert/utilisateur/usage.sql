@@ -2,6 +2,4 @@
 
 BEGIN;
 
--- on ne revert pas les enums
-
 COMMIT;

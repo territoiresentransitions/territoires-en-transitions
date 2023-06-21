@@ -2,22 +2,9 @@
 
 BEGIN;
 
-create view crm_labellisations
-as
-select l.id,
-       nom || ' (' || collectivite_id || ')' as collectivite_key,
-       l.referentiel,
-       l.obtenue_le,
-       l.annee,
-       l.etoiles,
-       l.score_realise,
-       l.score_programme
-from stats.collectivite
-         join labellisation l using (collectivite_id)
-where is_service_role()
-order by nom, obtenue_le desc;
+drop view crm_usages;
 
-create view crm_usages
+create materialized view stats.crm_usages
 as
 with premier_rattachements as (select collectivite_id,
                                       min(created_at
@@ -63,8 +50,13 @@ from stats.collectivite c
          left join comptes x using (collectivite_id)
          left join stats.pourcentage_completude pc using (collectivite_id)
          left join premier_rattachements pr using (collectivite_id)
-where is_service_role()
 order by c.nom;
+
+create view crm_usages
+as
+select *
+from stats.crm_usages
+where is_service_role();
 
 
 COMMIT;
