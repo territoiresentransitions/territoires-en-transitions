@@ -2,28 +2,11 @@
 
 BEGIN;
 
-drop function stats.amplitude_build_crud_events;
-drop function stats.amplitude_send_yesterday_creations;
-drop type stats.amplitude_content_event;
-drop type stats.amplitude_crud_type;
-
 drop function stats.amplitude_send_yesterday_events;
 drop function stats.amplitude_send_events;
-
-create function
-    stats.amplitude_events(range tstzrange)
-    returns setof stats.amplitude_event
-begin
-    atomic
-    select stats.amplitude_visite(range)
-    union all
-    select stats.amplitude_registered(range);
-end;
-comment on function stats.amplitude_events is
-    'Tous les évènements Amplitude.';
-
-create function
-    stats.amplitude_send_events(range tstzrange, batch_size integer default 1000)
+create
+    function
+    stats.amplitude_send_visites(range tstzrange, batch_size integer default 1000)
     returns void
 as
 $$
@@ -38,8 +21,8 @@ begin
                     from (select to_jsonb(av.*)                                                         as json_array,
                                  -- en divisant le numéro de la ligne obtenu avec `rank`
                                  -- par la taille du batch, on obtient le nombre `g`
-                                 (rank() over (order by time) / amplitude_send_events.batch_size)::int as g
-                          from stats.amplitude_events(amplitude_send_events.range) av) numbered
+                                 (rank() over (order by time) / amplitude_send_visites.batch_size)::int as g
+                          from stats.amplitude_visite(amplitude_send_visites.range) av) numbered
                     group by g)
     select array_agg(events.batch)
     into batches
@@ -76,16 +59,20 @@ $$ language plpgsql
     -- permet d'utiliser pg_net depuis un trigger
     set search_path = public, net;
 
+
 create function
     stats.amplitude_send_yesterday_events()
     returns void
 begin
     atomic
-    select stats.amplitude_send_events(
+    select stats.amplitude_send_visites(
                    range := tstzrange(current_timestamp::date - interval '1 day', current_timestamp::date)
                );
 end;
 comment on function stats.amplitude_send_yesterday_events is
     'Envoi les évènements de la veille à Amplitude.';
+
+drop function stats.amplitude_events;
+drop function stats.amplitude_registered;
 
 COMMIT;
