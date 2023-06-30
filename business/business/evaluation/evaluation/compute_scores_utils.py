@@ -24,7 +24,9 @@ def update_action_scores(
         action_personnalise_ids: List[ActionId],
         action_desactive_ids: List[ActionId],
 ):
-    if referentiel_tree.is_leaf(action_id) or action_id in statuts.keys():
+    if referentiel_tree.is_leaf(action_id) \
+            or action_id in statuts.keys() \
+            or action_id in action_non_concerne_ids:
         update_action_scores_from_status(
             referentiel_tree,
             personnalise_tree,
@@ -71,6 +73,7 @@ def update_action_scores_from_status(
     is_concerne = action_id not in actions_non_concerne_ids
     is_personnalise = action_id in action_personnalise_ids
     is_desactive = action_id in action_desactive_ids
+    tache_count = point_tree_referentiel.leaf_count[action_id]
 
     if not is_concerne:
         scores[action_id] = ActionScore(
@@ -80,12 +83,12 @@ def update_action_scores_from_status(
             point_programme=0.0,
             point_non_renseigne=point_potentiel,
             point_potentiel=point_potentiel,
-            total_taches_count=1,
-            completed_taches_count=1,
+            total_taches_count=tache_count,
+            completed_taches_count=tache_count,
             fait_taches_avancement=0,
             programme_taches_avancement=0,
             pas_fait_taches_avancement=0,
-            pas_concerne_taches_avancement=1,
+            pas_concerne_taches_avancement=tache_count,
             point_referentiel=tache_points_referentiel,
             concerne=is_concerne,
             # perso
@@ -137,7 +140,7 @@ def update_action_scores_from_status(
         point_potentiel=point_potentiel,
         point_referentiel=tache_points_referentiel,
         completed_taches_count=completed_taches_count,
-        total_taches_count=1,
+        total_taches_count=tache_count,
         fait_taches_avancement=fait_taches_avancement,
         programme_taches_avancement=programme_taches_avancement,
         pas_fait_taches_avancement=pas_fait_taches_avancement,
@@ -164,35 +167,32 @@ def update_action_score_from_children_scores(
     action_point_referentiel = point_tree_referentiel.get_action_point(action_id)
     action_point_personnalise = point_tree_personnalise.get_action_point(action_id)
 
-    action_children_with_scores = [
-        child_id for child_id in action_children if child_id in scores
-    ]
-
     point_pas_fait = sum(
-        [scores[child_id].point_pas_fait for child_id in action_children_with_scores]
+        [scores[child_id].point_pas_fait for child_id in action_children]
     )
 
     point_fait = sum(
-        [scores[child_id].point_fait for child_id in action_children_with_scores]
+        [scores[child_id].point_fait for child_id in action_children]
     )
 
     point_programme = sum(
-        [scores[child_id].point_programme for child_id in action_children_with_scores]
+        [scores[child_id].point_programme for child_id in action_children]
     )
     point_non_renseigne = sum(
         [
             scores[child_id].point_non_renseigne
-            for child_id in action_children_with_scores
+            for child_id in action_children
         ]
     )
     point_potentiel = potentiels[action_id]
     concerne = (
-        any([scores[child_id].concerne for child_id in action_children_with_scores])
-        if action_children_with_scores
+        any([scores[child_id].concerne for child_id in action_children])
+        if action_children
         else True
-    )  # concerne if any action children is concerne
+    )
     is_personnalise = action_id in action_personnalise_ids
     is_desactive = action_id in action_desactive_ids
+
     scores[action_id] = ActionScore(
         action_id=action_id,
         point_fait=point_fait,
@@ -203,7 +203,7 @@ def update_action_score_from_children_scores(
         completed_taches_count=sum(
             [
                 scores[child_id].completed_taches_count
-                for child_id in action_children_with_scores
+                for child_id in action_children
             ]
         ),
         total_taches_count=sum(
@@ -215,25 +215,25 @@ def update_action_score_from_children_scores(
         fait_taches_avancement=sum(
             [
                 scores[child_id].fait_taches_avancement
-                for child_id in action_children_with_scores
+                for child_id in action_children
             ]
         ),
         programme_taches_avancement=sum(
             [
                 scores[child_id].programme_taches_avancement
-                for child_id in action_children_with_scores
+                for child_id in action_children
             ]
         ),
         pas_fait_taches_avancement=sum(
             [
                 scores[child_id].pas_fait_taches_avancement
-                for child_id in action_children_with_scores
+                for child_id in action_children
             ]
         ),
         pas_concerne_taches_avancement=sum(
             [
                 scores[child_id].pas_concerne_taches_avancement
-                for child_id in action_children_with_scores
+                for child_id in action_children
             ]
         ),
         point_referentiel=action_point_referentiel,
@@ -265,10 +265,10 @@ def compute_action_non_concerne_ids(
         action_desactive_ids: List[ActionId]
 ):
     action_non_concerne_ids = [
-        action_status.action_id
-        for action_status in statuts
-        if not action_status.concerne
-    ] + action_desactive_ids
+                                  action_status.action_id
+                                  for action_status in statuts
+                                  if not action_status.concerne
+                              ] + action_desactive_ids
 
     point_tree.map_from_taches_to_root(
         lambda action_id: _propagate_non_concerne(
@@ -347,16 +347,15 @@ def compute_potentiels(
     def _add_action_potentiel_after_redistribution(
             action_id: ActionId,
     ):
-        this_level = point_tree_personnalise._depths_by_action_ids[action_id]
+        this_level = point_tree_personnalise.depths[action_id]
         children = point_tree_personnalise.get_children(action_id)
-        if not children:  # tache
-            original_action_potentiel = (
-                0
-                if action_id in actions_non_concernes_ids
-                else point_tree_personnalise.get_action_point(action_id)
-            )
+
+        if action_id in actions_non_concernes_ids:  # non-concerné
+            potentiel = 0
+        elif not children:  # tache
+            potentiel = point_tree_personnalise.get_action_point(action_id)
         else:
-            original_action_potentiel = sum(
+            potentiel = sum(
                 [
                     potentiels[child_id]
                     for child_id in point_tree_personnalise.get_children(action_id)
@@ -366,13 +365,12 @@ def compute_potentiels(
         if this_level > action_level:
             potentiel = _action_potentiel_with_redistribution_remainder(
                 action_id,
-                original_action_potentiel,
+                potentiel,
                 actions_non_concernes_ids,
                 point_tree_personnalise,
             )
-            potentiels[action_id] = potentiel
-        else:
-            potentiels[action_id] = original_action_potentiel
+
+        potentiels[action_id] = potentiel
 
     point_tree_personnalise.map_from_taches_to_root(
         lambda action_id: _add_action_potentiel_after_redistribution(
