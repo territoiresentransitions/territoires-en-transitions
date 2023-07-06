@@ -6,55 +6,73 @@ import {useState} from 'react';
 import {DetailedScoreSlider, AvancementValues} from './DetailedScoreSlider';
 import {actionAvancementColors} from 'app/theme';
 import {toPercentString} from 'utils/score';
+import classNames from 'classnames';
 
 export type TDetailedScoreProps = {
+  actionType: string;
   avancement: AvancementValues;
+  saveAtValidation: boolean;
   onSave: (values: AvancementValues) => void;
 };
 
-export const DetailedScore = (props: TDetailedScoreProps) => {
-  const {avancement, onSave} = props;
+export const DetailedScore = ({
+  actionType,
+  avancement,
+  saveAtValidation,
+  onSave,
+}: TDetailedScoreProps) => {
   const [currentAvancement, setCurrentAvancement] =
     useState<AvancementValues>(avancement);
 
   return (
-    <div className="flex flex-col items-center">
-      <p className="mb-10">
-        Pour faciliter la relecture, pensez à bien préciser les raisons de cette
-        répartition dans le champ "Précisions sur l'état d'avancement"
-      </p>
+    <div className="flex flex-col items-center py-6">
       <DetailedScoreSlider
         value={currentAvancement}
         onChange={setCurrentAvancement}
       />
-      <table className="fr-table fr-table--bordered w-48 mt-14">
-        <tbody>
-          <tr>
-            <td className="font-bold">Fait</td>
-            <td style={{color: actionAvancementColors.fait}}>
-              {toPercentString(currentAvancement[0])}
-            </td>
-          </tr>
-          <tr>
-            <td className="font-bold">Programmé</td>
-            <td style={{color: actionAvancementColors.programme}}>
-              {toPercentString(currentAvancement[1])}
-            </td>
-          </tr>
-          <tr>
-            <td className="font-bold">Pas fait</td>
-            <td style={{color: actionAvancementColors.pas_fait}}>
-              {toPercentString(currentAvancement[2])}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <button
-        className="fr-btn fr-btn--icon-left fr-fi-save-line"
-        onClick={() => onSave(currentAvancement)}
-      >
-        Enregistrer
-      </button>
+      <div className="grid grid-cols-2 gap-y-4 gap-x-3 mt-8 mb-16">
+        <div>Fait</div>
+        <div
+          style={{color: actionAvancementColors.fait}}
+          className="text-right"
+        >
+          {toPercentString(currentAvancement[0])}
+        </div>
+        <div>Programmé</div>
+        <div
+          style={{color: actionAvancementColors.programme}}
+          className="text-right"
+        >
+          {toPercentString(currentAvancement[1])}
+        </div>
+        <div>Pas fait</div>
+        <div
+          style={{color: actionAvancementColors.pas_fait}}
+          className="text-right"
+        >
+          {toPercentString(currentAvancement[2])}
+        </div>
+      </div>
+      {actionType === 'tache' && (
+        <p className="mb-16">
+          Pour faciliter la relecture, vous pouvez préciser les raisons de cette
+          répartition en cliquant sur le bouton{' '}
+          <span className="fr-icon-pencil-line text-bf500" aria-hidden="true" />{' '}
+          situé sous l'intitulé de la tâche.
+        </p>
+      )}
+      <div className="w-full flex justify-end">
+        <button
+          className={classNames('fr-btn', {
+            'fr-btn--icon-left fr-fi-save-line': saveAtValidation,
+          })}
+          onClick={() => onSave(currentAvancement)}
+        >
+          {saveAtValidation
+            ? 'Enregistrer la répartition'
+            : 'Valider la répartition'}
+        </button>
+      </div>
     </div>
   );
 };

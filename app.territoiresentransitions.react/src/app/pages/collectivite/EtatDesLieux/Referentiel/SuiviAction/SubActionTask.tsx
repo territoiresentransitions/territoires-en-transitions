@@ -4,16 +4,26 @@ import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinition
 import {useActionCommentaire} from 'core-logic/hooks/useActionCommentaire';
 import {ActionCommentaire} from 'ui/shared/actions/ActionCommentaire';
 import SubActionHeader from './SubActionHeader';
+import {SuiviScoreRow} from '../data/useScoreRealise';
+import {StatusToSavePayload} from 'ui/referentiels/ActionStatusDropdown';
 
 type SubActionTaskProps = {
   task: ActionDefinitionSummary;
+  actionScores: {[actionId: string]: SuiviScoreRow};
+  hideStatus?: boolean;
+  onSaveStatus?: (payload: StatusToSavePayload) => void;
 };
 
 /**
  * Détail d'une tâche dans l'onglet suivi de l'action
  */
 
-const SubActionTask = ({task}: SubActionTaskProps): JSX.Element => {
+const SubActionTask = ({
+  task,
+  actionScores,
+  hideStatus = false,
+  onSaveStatus,
+}: SubActionTaskProps): JSX.Element => {
   const [openCommentaire, setOpenCommentaire] = useState(false);
   const {actionCommentaire} = useActionCommentaire(task.id);
   const ref = useRef<HTMLDivElement>(null);
@@ -32,7 +42,12 @@ const SubActionTask = ({task}: SubActionTaskProps): JSX.Element => {
   return (
     <div data-test={`task-${task.id}`} ref={ref}>
       {/* Première ligne */}
-      <SubActionHeader action={task} />
+      <SubActionHeader
+        action={task}
+        actionScores={actionScores}
+        hideStatus={hideStatus}
+        onSaveStatus={onSaveStatus}
+      />
 
       {/* Ajout de commentaire */}
       <div className="p-0 pb-4">

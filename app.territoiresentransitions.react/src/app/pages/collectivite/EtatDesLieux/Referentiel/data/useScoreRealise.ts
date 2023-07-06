@@ -5,11 +5,17 @@ import {ActionReferentiel} from 'app/pages/collectivite/ReferentielTable/useRefe
 import {TActionStatutsRow} from 'types/alias';
 import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinitionSummaryReadEndpoint';
 import {Referentiel} from 'types/litterals';
+import {indexBy} from 'utils/indexBy';
 
 export type SuiviScoreRow = ActionReferentiel &
   Pick<
     TActionStatutsRow,
-    'action_id' | 'points_realises' | 'points_max_personnalises'
+    | 'action_id'
+    | 'concerne'
+    | 'desactive'
+    | 'points_realises'
+    | 'points_max_personnalises'
+    | 'points_max_referentiel'
   >;
 
 /**
@@ -19,13 +25,15 @@ export type SuiviScoreRow = ActionReferentiel &
 const fetchScore = async (
   collectivite_id: number | null,
   referentiel: string | null,
-  depth: number
+  action_id: string | null
 ) => {
   const {error, data} = await supabaseClient
     .from('action_statuts')
-    .select('action_id,points_realises,points_max_personnalises')
+    .select(
+      'action_id, concerne, desactive, points_realises, points_max_personnalises, points_max_referentiel'
+    )
     .match({collectivite_id, referentiel})
-    .eq('depth', depth);
+    .like('action_id', `${action_id}%`);
 
   if (error) throw new Error(error.message);
 
@@ -43,17 +51,13 @@ export const useScoreRealise = (action: ActionDefinitionSummary) => {
   const {data} = useQuery(
     [
       ...getScoreRealiseQueryKey(collectiviteId, action.referentiel),
+      action.id,
       action.depth,
     ],
-    () => fetchScore(collectiviteId, action.referentiel, action.depth)
+    () => fetchScore(collectiviteId, action.referentiel, action.id)
   );
 
-  const filteredData = data ? data.filter(d => d.action_id === action.id) : [];
-
-  return {
-    pointsRealises: filteredData[0]?.points_realises ?? null,
-    pointsMax: filteredData[0]?.points_max_personnalises ?? null,
-  };
+  return (data && indexBy(data, 'action_id')) || {};
 };
 
 export const getScoreRealiseQueryKey = (

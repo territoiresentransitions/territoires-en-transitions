@@ -1,11 +1,10 @@
 import classNames from 'classnames';
-import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinitionSummaryReadEndpoint';
 import {CheckIcon} from 'ui/icons/CheckIcon';
 import {toLocaleFixed} from 'utils/toFixed';
-import {useScoreRealise} from '../data/useScoreRealise';
+import {SuiviScoreRow} from '../data/useScoreRealise';
 
 type ScoreDisplayProps = {
-  action: ActionDefinitionSummary;
+  score: SuiviScoreRow;
   legend?: string;
   size?: 'xs' | 'sm';
   className?: string;
@@ -17,23 +16,29 @@ type ScoreDisplayProps = {
  */
 
 const ScoreDisplay = ({
-  action,
+  score,
   legend,
   size,
   className,
-}: ScoreDisplayProps): JSX.Element => {
-  const {pointsRealises, pointsMax} = useScoreRealise(action);
+}: ScoreDisplayProps): JSX.Element | null => {
+  if (!score) return null;
+
+  const {points_realises, points_max_personnalises} = score;
 
   return (
-    <span
-      className={classNames({
-        visible: pointsRealises !== null && pointsMax !== null,
-        invisible: pointsRealises === null || pointsMax === null,
-        'text-xs': size === 'xs',
-        'text-sm': size === 'sm',
-        'text-base': size === undefined,
-        className,
-      })}
+    <div
+      className={classNames(
+        'flex items-center',
+        points_realises !== null && points_max_personnalises !== null
+          ? 'visible'
+          : 'invisible',
+        {
+          'text-xs': size === 'xs',
+          'text-sm': size === 'sm',
+          'text-base': size === undefined,
+          className,
+        }
+      )}
     >
       <CheckIcon
         className={classNames('h-4 inline-block', {
@@ -42,8 +47,10 @@ const ScoreDisplay = ({
         })}
       />
       {legend ? `${legend} : ` : ''}
-      {toLocaleFixed(pointsRealises, 2)} / {toLocaleFixed(pointsMax, 2)} points
-    </span>
+      {toLocaleFixed(points_realises, 2)} /{' '}
+      {toLocaleFixed(points_max_personnalises, 2)} point
+      {points_max_personnalises > 1 ? 's' : ''}
+    </div>
   );
 };
 

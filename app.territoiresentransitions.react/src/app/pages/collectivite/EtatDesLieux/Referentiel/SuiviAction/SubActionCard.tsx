@@ -1,10 +1,11 @@
 import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinitionSummaryReadEndpoint';
+import {useCollectiviteId} from 'core-logic/hooks/params';
 import {useActionSummaryChildren} from 'core-logic/hooks/referentiel';
-// import {useActionStatut} from 'core-logic/hooks/useActionStatut';
-// import {useCurrentCollectivite} from 'core-logic/hooks/useCurrentCollectivite';
+import {useActionStatut} from 'core-logic/hooks/useActionStatut';
 import {useEffect, useState} from 'react';
 import {Accordion} from 'ui/Accordion';
 import {ActionCommentaire} from 'ui/shared/actions/ActionCommentaire';
+import {SuiviScoreRow} from '../data/useScoreRealise';
 import SubActionDescription from './SubActionDescription';
 import SubActionHeader from './SubActionHeader';
 import SubActionPreuvesAccordion from './SubActionPreuvesAccordion';
@@ -12,6 +13,7 @@ import SubActionTasksList from './SubActionTasksList';
 
 type SubActionCardProps = {
   subAction: ActionDefinitionSummary;
+  actionScores: {[actionId: string]: SuiviScoreRow};
   forceOpen: boolean;
   onOpenSubAction: (isOpen: boolean) => void;
 };
@@ -24,16 +26,30 @@ type SubActionCardProps = {
 
 const SubActionCard = ({
   subAction,
+  actionScores,
   forceOpen,
   onOpenSubAction,
 }: SubActionCardProps): JSX.Element => {
-  // const collectivite = useCurrentCollectivite();
-  // const {statut} = useActionStatut({
-  //   action_id: subAction.id,
-  //   collectivite_id: collectivite?.collectivite_id || 0,
-  // });
+  const collectivite_id = useCollectiviteId();
+  const {statut, filled} = useActionStatut({
+    action_id: subAction.id,
+    collectivite_id: collectivite_id ?? 0,
+  });
+  const {avancement, concerne} = statut || {};
   const tasks = useActionSummaryChildren(subAction);
+
+  const shouldDisplayProgressBar =
+    concerne !== false &&
+    (avancement === 'detaille' ||
+      (avancement === 'non_renseigne' && filled === true) ||
+      (statut === null && filled === true));
+
+  const shouldHideTasksStatus =
+    (statut !== null && statut?.avancement !== 'non_renseigne') ||
+    statut?.concerne === false;
+
   const shouldOpen = true;
+
   // Condition à décommenter lorsque le statut à la sous-action sera possible
   // subAction.referentiel === 'eci' ||
   // (subAction.referentiel === 'cae' && statut?.avancement === 'detaille');
@@ -63,8 +79,9 @@ const SubActionCard = ({
       {/* En-tête */}
       <SubActionHeader
         action={subAction}
+        actionScores={actionScores}
+        displayProgressBar={shouldDisplayProgressBar}
         openSubAction={openSubAction}
-        withStatusDropdown={tasks.length === 0}
         onToggleOpen={handleToggleOpen}
       />
 
@@ -92,7 +109,13 @@ const SubActionCard = ({
               dataTest={`TâchesPanel-${subAction.identifiant}`}
               className="fr-mb-3w"
               titre="Tâches"
-              html={<SubActionTasksList tasks={tasks} />}
+              html={
+                <SubActionTasksList
+                  tasks={tasks}
+                  actionScores={actionScores}
+                  hideStatus={shouldHideTasksStatus}
+                />
+              }
               initialState={openTasks}
             />
           )}
