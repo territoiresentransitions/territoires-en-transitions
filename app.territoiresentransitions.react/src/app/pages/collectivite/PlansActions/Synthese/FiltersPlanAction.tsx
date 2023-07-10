@@ -65,7 +65,6 @@ const FiltersPlanAction = ({
     // Filtres affichés si plus d'un plan d'action défini
     filters.length > 2 ? (
       <TagFilters
-        name="plans_actions"
         options={filters}
         className="pb-10"
         onChange={handleChangeFilter}
