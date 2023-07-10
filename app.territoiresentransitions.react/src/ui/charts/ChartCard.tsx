@@ -1,9 +1,11 @@
+import classNames from 'classnames';
 import {useFonctionTracker} from 'core-logic/hooks/useFonctionTracker';
 import {useRef, useState} from 'react';
 import DownloadButton from 'ui/buttons/DownloadButton';
 import Modal from 'ui/shared/floating-ui/Modal';
 import BarChart, {BarChartProps} from './BarChart';
 import DonutChart, {DonutChartProps} from './DonutChart';
+import LineChart, {LineChartProps} from './LineChart';
 
 const Legend = ({
   legend,
@@ -38,8 +40,35 @@ type ChartCardModalContentProps = {
     expandable?: boolean;
     downloadedFileName?: string;
     additionalInfo?: string | string[];
+    chartClassname?: string;
   };
   topElement?: (id?: string) => JSX.Element;
+};
+
+const useDownloadChartButton = (
+  fileName: string | undefined,
+  className: string | undefined
+) => {
+  // Référence utilisée pour le téléchargement du graphe
+  const chartWrapperRef = useRef<HTMLDivElement>(null);
+  const tracker = useFonctionTracker();
+
+  return {
+    chartWrapperRef,
+    DownloadChartButton: () =>
+      fileName ? (
+        <div className={className}>
+          <DownloadButton
+            containerRef={chartWrapperRef}
+            fileName={fileName}
+            fileType="png"
+            onClick={() =>
+              tracker({fonction: 'graphique', action: 'telechargement'})
+            }
+          />
+        </div>
+      ) : null,
+  };
 };
 
 const ChartCardModalContent = ({
@@ -47,26 +76,15 @@ const ChartCardModalContent = ({
   chartInfo,
   topElement,
 }: ChartCardModalContentProps) => {
-  const tracker = useFonctionTracker();
-
   // Référence utilisée pour le téléchargement du graphe
-  const chartWrapperRef = useRef<HTMLDivElement>(null);
+  const {chartWrapperRef, DownloadChartButton} = useDownloadChartButton(
+    chartInfo?.downloadedFileName,
+    'absolute -mr-2 right-0 top-3 z-10'
+  );
 
   return (
     <div className="relative">
-      {/* Bouton de téléchargement, affiché si un nom de fichier est fourni */}
-      {chartInfo?.downloadedFileName && (
-        <div className="absolute -mr-2 right-0 top-3 z-10">
-          <DownloadButton
-            containerRef={chartWrapperRef}
-            fileName={chartInfo.downloadedFileName}
-            fileType="png"
-            onClick={() =>
-              tracker({fonction: 'graphique', action: 'telechargement'})
-            }
-          />
-        </div>
-      )}
+      <DownloadChartButton />
 
       <div ref={chartWrapperRef} className="p-3">
         <div className="pb-4">
@@ -94,7 +112,9 @@ const ChartCardModalContent = ({
         )}
 
         {/* Graphe agrandi */}
-        <div className="w-full h-96">{chart}</div>
+        <div className={classNames('w-full h-96', chartInfo?.chartClassname)}>
+          {chart}
+        </div>
 
         {/* Légende */}
         {chartInfo?.legend && <Legend legend={chartInfo.legend} />}
@@ -116,9 +136,48 @@ const ChartCardModalContent = ({
   );
 };
 
+// variante pour les graphes indicateurs
+export const ChartCardContent = ({
+  chart,
+  chartInfo,
+  topElement,
+}: ChartCardModalContentProps) => {
+  // Référence utilisée pour le téléchargement du graphe
+  const {chartWrapperRef, DownloadChartButton} = useDownloadChartButton(
+    chartInfo?.downloadedFileName,
+    'absolute right-2 -top-3 z-10'
+  );
+
+  return (
+    <div className="relative">
+      {/* Bouton de téléchargement, affiché si un nom de fichier est fourni */}
+      {chartInfo?.downloadedFileName && (
+        <div className="absolute -mr-2 right-0 top-3 z-10">
+          <DownloadChartButton />
+        </div>
+      )}
+
+      <div ref={chartWrapperRef} className="p-3">
+        {/* Titre du graphe */}
+        {chartInfo?.title && <p className="font-bold">{chartInfo.title}</p>}
+
+        {/* Element additionnel optionnel, ajouté entre le titre et le graphe */}
+        <div data-html2canvas-ignore>
+          {!!topElement && topElement('detailled')}
+        </div>
+
+        {/* Graphe agrandi */}
+        <div className={classNames('w-full h-50', chartInfo?.chartClassname)}>
+          {chart}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 type ChartCardProps = {
-  chartType: 'bar' | 'donut';
-  chartProps: BarChartProps | DonutChartProps;
+  chartType: 'bar' | 'donut' | 'line';
+  chartProps: BarChartProps | DonutChartProps | LineChartProps;
   chartInfo?: {
     title?: string;
     subtitle?: string;
@@ -131,13 +190,14 @@ type ChartCardProps = {
   };
   topElement?: (id?: string) => JSX.Element;
   customStyle?: React.CSSProperties;
+  className?: string;
 };
 
 /**
  * Carte affichant un graphe custom
  *
- * @param chartType 'bar' | 'daughnut'
- * @param chartProps BarChartProps | DoughnutChartProps
+ * @param chartType 'bar' | 'donut' | 'line'
+ * @param chartProps BarChartProps | DonutChartProps |
  * @param chartInfo title, legend, expandable, downloadFileName, additionalInfo
  * @param topElement JSX.Element (affiché entre le titre et le graphe)
  * @param customStyle React.CSSProperties
@@ -149,6 +209,7 @@ const ChartCard = ({
   chartInfo,
   topElement,
   customStyle,
+  className,
 }: ChartCardProps) => {
   // Etat d'ouverture de la modale "zoom", disponible si chartInfo.expandable === true
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -162,15 +223,20 @@ const ChartCard = ({
     case 'donut':
       chart = <DonutChart {...(chartProps as DonutChartProps)} />;
       break;
+    case 'line':
+      chart = <LineChart {...(chartProps as LineChartProps)} />;
+      break;
     default:
       break;
   }
 
   return (
     <div
-      className={`border border-gray-200 bg-white flex flex-col w-full h-96 relative ${
-        chartInfo?.title || chartInfo?.expandable ? 'pt-6' : ''
-      }`}
+      className={classNames(
+        'border border-gray-200 bg-white flex flex-col w-full h-96 relative',
+        {'pt-6': chartInfo?.title || chartInfo?.expandable},
+        className
+      )}
       style={customStyle}
     >
       {/* En-tête de la carte */}
