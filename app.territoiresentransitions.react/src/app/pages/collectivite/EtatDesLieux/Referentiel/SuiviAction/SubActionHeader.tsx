@@ -49,7 +49,9 @@ const SubActionHeader = ({
 
   return (
     <div
-      className={classNames('py-4 group', {
+      className={classNames('group grid gap-3 items-start py-4', {
+        'grid-cols-[5rem_1fr_fit-content(10rem)]': isSubAction,
+        'grid-cols-[3rem_1fr_fit-content(10rem)]': !isSubAction,
         'rounded-lg cursor-pointer px-6': isSubAction,
         'px-0': isTask,
         'bg-[#f5f5fE]': isSubAction && open,
@@ -57,25 +59,35 @@ const SubActionHeader = ({
       })}
       onClick={handleOnClick}
     >
-      <div className="grid grid-cols-12 gap-4 items-start">
-        {/* Identifiant de l'action et bouton open / close */}
-        <div
-          className={classNames(
-            'flex justify-between lg:col-span-1 col-span-2',
-            {
-              'font-bold': isSubAction,
-            }
-          )}
-        >
-          {isSubAction && (
-            <span
-              className={classNames('text-bf500', {
-                'fr-icon-arrow-down-s-fill': open,
-                'fr-icon-arrow-right-s-fill': !open,
-              })}
-            />
-          )}
-          {action.identifiant}
+      {/* Identifiant de l'action et bouton open / close */}
+      <div
+        className={classNames('flex gap-3', {
+          'font-bold': isSubAction,
+        })}
+      >
+        {isSubAction && (
+          <span
+            className={classNames('text-bf500', {
+              'fr-icon-arrow-down-s-fill': open,
+              'fr-icon-arrow-right-s-fill': !open,
+            })}
+          />
+        )}
+        {action.identifiant}
+      </div>
+
+      {/* Nom de l'action et score réalisé */}
+      <div className="flex flex-col justify-between gap-3">
+        <div className={classNames({'font-bold': isSubAction})}>
+          {action.nom}
+          {action.description &&
+            ((isSubAction && action.referentiel === 'cae') || isTask) && (
+              <span onClick={evt => evt.stopPropagation()}>
+                <Tooltip label={action.description} activatedBy="click">
+                  <span className="fr-fi-information-line pl-2 text-bf500 cursor-pointer" />
+                </Tooltip>
+              </span>
+            )}
         </div>
 
         {/* Nom de l'action et score réalisé */}
