@@ -1,5 +1,4 @@
 import {Link, useHistory} from 'react-router-dom';
-import {IndicateurReferentielCard} from 'app/pages/collectivite/Indicateurs/IndicateurReferentielCard';
 import {addTargetToContentAnchors} from 'utils/content';
 import {Tabs, Tab} from 'ui/shared/Tabs';
 import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinitionSummaryReadEndpoint';
@@ -19,7 +18,6 @@ import ActionAuditStatut from '../Audit/ActionAuditStatut';
 import {ActionAuditDetail} from '../Audit/ActionAuditDetail';
 import {useShowDescIntoInfoPanel} from '../Audit/useAudit';
 import {useCurrentCollectivite} from 'core-logic/hooks/useCurrentCollectivite';
-import {useActionLinkedIndicateurDefinitions} from './useActionLinkedIndicateurDefinitions';
 import Alerte from 'ui/shared/Alerte';
 import {usePrevAndNextActionLinks} from './usePrevAndNextActionLinks';
 import {ActionHeader} from './ActionHeader';
@@ -27,6 +25,8 @@ import {useActionPreuvesCount} from 'ui/shared/preuves/Bibliotheque/usePreuves';
 import ActionFollowUp from '../EtatDesLieux/Referentiel/SuiviAction/ActionFollowUp';
 import {FichesActionLiees} from './FichesActionLiees';
 import {useScoreRealise} from '../EtatDesLieux/Referentiel/data/useScoreRealise';
+import {useIndicateursAction} from '../Indicateurs/useIndicateurDefinitions';
+import IndicateurChartsGrid from '../Indicateurs/IndicateurChartsGrid';
 
 // index des onglets de la page Action
 const TABS_INDEX: Record<ActionVueParamOption, number> = {
@@ -47,8 +47,7 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
   const preuvesCount = useActionPreuvesCount(action);
   const showDescIntoInfoPanel = useShowDescIntoInfoPanel();
 
-  const actionLinkedIndicateurDefinitions =
-    useActionLinkedIndicateurDefinitions(action?.id);
+  const indicateursLies = useIndicateursAction(action.id);
 
   const actionScores = useScoreRealise(action);
 
@@ -138,16 +137,11 @@ const Action = ({action}: {action: ActionDefinitionSummary}) => {
           <Tab label="Indicateurs" icon="line-chart">
             {activeTab === TABS_INDEX['indicateurs'] && !noIndicateursTab ? (
               <section>
-                {actionLinkedIndicateurDefinitions.length === 0 && (
+                {indicateursLies.length === 0 ? (
                   <p>Cette action ne comporte pas d'indicateur</p>
+                ) : (
+                  <IndicateurChartsGrid definitions={indicateursLies} />
                 )}
-
-                {actionLinkedIndicateurDefinitions.map(definition => (
-                  <IndicateurReferentielCard
-                    key={definition.id}
-                    definition={definition}
-                  />
-                ))}
               </section>
             ) : (
               '...'
