@@ -9,6 +9,7 @@ import {Tooltip} from 'ui/shared/floating-ui/Tooltip';
 import ScoreDisplay from 'ui/referentiels/ScoreDisplay';
 import ActionProgressBar from 'ui/referentiels/ActionProgressBar';
 import {SuiviScoreRow} from '../data/useScoreRealise';
+import {ExpandToggle} from 'ui/icons/ExpandToggle';
 
 type SubActionHeaderProps = {
   action: ActionDefinitionSummary;
@@ -60,14 +61,7 @@ const SubActionHeader = ({
           'font-bold': isSubAction,
         })}
       >
-        {isSubAction && (
-          <span
-            className={classNames('text-bf500', {
-              'fr-icon-arrow-down-s-fill': open,
-              'fr-icon-arrow-right-s-fill': !open,
-            })}
-          />
-        )}
+        {isSubAction && <ExpandToggle open={open} />}
         {action.identifiant}
       </div>
 
