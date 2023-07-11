@@ -13,9 +13,11 @@ import {referentielToName} from 'app/labels';
 export const IndicateursNav = () => {
   const collectivite_id = useCollectiviteId();
   return collectivite_id ? (
-    <div>
+    <div className="max-w-[21rem] mt-6 ml-6 border-r border-gray-100">
       <SideNav links={generateLinks(collectivite_id)} />
-      <IndicateurPersonnaliseCreationDialog />
+      <div className="mt-8">
+        <IndicateurPersonnaliseCreationDialog />
+      </div>
     </div>
   ) : null;
 };
