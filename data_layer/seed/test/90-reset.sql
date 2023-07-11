@@ -21,6 +21,8 @@ $$
     select test_reset_reponse();
 -- 10-action.sql
     select test_reset_action_statut_and_desc();
+-- 11-scores.sql
+    select test_reset_scores();
 -- 11-plan_action.sql
     select test_reset_plan_action();
 -- 14-indicateur.sql
