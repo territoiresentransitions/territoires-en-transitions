@@ -3,12 +3,18 @@
 BEGIN;
 
 alter type visite_tag
-    add value if not exists 'clef';
+    add value if not exists 'statuts';
 
 alter type visite_tag
-    add value if not exists 'tous';
+    add value if not exists 'pilotes';
 
-alter type visite_page
-    add value if not exists 'indicateurs';
+alter type visite_tag
+    add value if not exists 'referents';
+
+alter type visite_tag
+    add value if not exists 'priorites';
+
+alter type visite_tag
+    add value if not exists 'echeances';
 
 COMMIT;

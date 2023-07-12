@@ -6,7 +6,7 @@ import {
   StatusToSavePayload,
 } from 'ui/referentiels/ActionStatusDropdown';
 import {Tooltip} from 'ui/shared/floating-ui/Tooltip';
-import ScoreDisplay from 'app/pages/collectivite/EtatDesLieux/Referentiel/SuiviAction/ScoreDisplay';
+import ScoreDisplay from 'ui/referentiels/ScoreDisplay';
 import ActionProgressBar from 'ui/referentiels/ActionProgressBar';
 import {SuiviScoreRow} from '../data/useScoreRealise';
 
@@ -88,7 +88,13 @@ const SubActionHeader = ({
         {isSubAction && (
           <div className="flex gap-2">
             <div className="w-[140px]">
-              <ScoreDisplay score={actionScores[action.id]} size="xs" />
+              <ScoreDisplay
+                score={actionScores[action.id]?.points_realises ?? null}
+                scoreMax={
+                  actionScores[action.id]?.points_max_personnalises ?? null
+                }
+                size="xs"
+              />
             </div>
 
             {displayProgressBar && (

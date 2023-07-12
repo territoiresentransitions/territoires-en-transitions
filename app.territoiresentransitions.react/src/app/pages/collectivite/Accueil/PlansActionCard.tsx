@@ -13,7 +13,7 @@ import {usePlansActionsListe} from '../PlansActions/PlanAction/data/usePlansActi
 import {usePlanActionTableauDeBord} from '../PlansActions/Synthese/data/usePlanActionTableauDeBord';
 import AccueilCard from './AccueilCard';
 import AccueilEmptyCardWithPicto from './AccueilEmptyCardWithPicto';
-import KeyNumbers from './KeyNumbers';
+import KeyNumbers from '../../../../ui/score/KeyNumbers';
 
 type PlanActionCardProps = {
   collectiviteId: number;
@@ -110,7 +110,7 @@ const FilledPlansActionCard = ({
 
       {/* Graphique de répartition par statut */}
       {nbFiches > 0 && (
-        <div className="h-[200px] md:order-last order-first">
+        <div className="h-[200px] w-[246px] md:w-[197px] xl:w-[246px] mx-auto md:order-last order-first">
           <DonutChart
             data={
               planActionsStats && planActionsStats.statuts
@@ -124,6 +124,7 @@ const FilledPlansActionCard = ({
             customMargin={{top: 2, right: 0, bottom: 2, left: 0}}
             zoomEffect={false}
             unit="fiche"
+            displayPercentageValue
           />
         </div>
       )}

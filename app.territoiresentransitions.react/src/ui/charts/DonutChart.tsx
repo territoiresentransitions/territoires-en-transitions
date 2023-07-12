@@ -1,5 +1,22 @@
-import {PieTooltipProps, ResponsivePie} from '@nivo/pie';
+import {
+  DefaultRawDatum,
+  PieCustomLayerProps,
+  PieTooltipProps,
+  ResponsivePie,
+} from '@nivo/pie';
 import {defaultColors, nivoColorsSet, theme} from './chartsTheme';
+
+/**
+ * Conversion d'une valeur en %
+ */
+const getPercentage = (value: number, data: number[]) => {
+  let percentage = value / data.reduce((sum, curVal) => sum + curVal, 0);
+  if (percentage < 0.01) {
+    return Math.round(percentage * 10000) / 100;
+  } else {
+    return Math.round(percentage * 100);
+  }
+};
 
 /**
  * Suppression des arcLinkLabels si deux tranches de faible
@@ -42,13 +59,6 @@ const getTooltip = (
 ) => {
   if (isDefaultData) return null;
 
-  let percentage = value / data.reduce((sum, curVal) => sum + curVal.value, 0);
-  if (percentage < 0.01) {
-    percentage = Math.round(percentage * 10000) / 100;
-  } else {
-    percentage = Math.round(percentage * 100);
-  }
-
   return (
     <div
       style={{
@@ -74,12 +84,52 @@ const getTooltip = (
         {id} :{' '}
         <strong>
           {Math.round(value * 10) / 10} {unit}
-          {!!unit && value > 1 ? 's' : ''} ({percentage}%)
+          {!!unit && value > 1 ? 's' : ''} (
+          {getPercentage(
+            value,
+            data.map(d => d.value)
+          )}
+          %)
         </strong>
       </span>
     </div>
   );
 };
+
+const CenteredMetric =
+  ({title, value}: {title: string; value?: string}) =>
+  ({centerX, centerY}: PieCustomLayerProps<DefaultRawDatum>) => {
+    return (
+      <>
+        <text
+          x={centerX}
+          y={centerY - (value !== undefined ? 10 : 0)}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="#666"
+          style={{
+            fontSize: '12px',
+          }}
+        >
+          {title}
+        </text>
+        {value !== undefined && (
+          <text
+            x={centerX}
+            y={centerY + 10}
+            textAnchor="middle"
+            dominantBaseline="central"
+            fill="#666"
+            style={{
+              fontSize: '12px',
+            }}
+          >
+            {value}
+          </text>
+        )}
+      </>
+    );
+  };
 
 export type DonutChartProps = {
   data: {
@@ -88,9 +138,11 @@ export type DonutChartProps = {
     color?: string;
   }[];
   label?: boolean;
+  centeredMetric?: {title: string; value?: string};
   unit?: string;
   customMargin?: {top: number; right: number; bottom: number; left: number};
   zoomEffect?: boolean;
+  displayPercentageValue?: boolean;
 };
 
 /**
@@ -98,17 +150,22 @@ export type DonutChartProps = {
  *
  * @param data - tableau de données à afficher
  * @param label - (optionnel) affichage des labels sur le
+ * @param centeredMetric
+ * @param unit
  * @param customMargin
  * @param zoomEffect
+ * @param displayPercentageValue
  * graphe au lieu de la légende
  */
 
 const DonutChart = ({
   data,
   label = false,
+  centeredMetric,
   unit = '',
   customMargin,
   zoomEffect = true,
+  displayPercentageValue = false,
 }: DonutChartProps) => {
   const defaultData = [{id: 'NA', value: 1, color: '#ccc'}];
 
@@ -146,11 +203,25 @@ const DonutChart = ({
       arcLinkLabelsThickness={2}
       arcLinkLabelsColor={{from: 'color'}}
       enableArcLabels={isDefaultData() ? false : true}
-      arcLabel={d => `${Math.round(d.value)}`}
       arcLabelsSkipAngle={12}
       arcLabelsTextColor={{from: 'color', modifiers: [['darker', 2]]}}
       animate={true}
       tooltip={datum => getTooltip(datum, isDefaultData(), localData, unit)}
+      valueFormat={value =>
+        displayPercentageValue
+          ? `${getPercentage(
+              value,
+              localData.map(d => d.value)
+            )} %`
+          : `${Math.round(value)}`
+      }
+      layers={[
+        'arcs',
+        'arcLabels',
+        'arcLinkLabels',
+        'legends',
+        CenteredMetric(centeredMetric ?? {title: '', value: ''}),
+      ]}
     />
   );
 };

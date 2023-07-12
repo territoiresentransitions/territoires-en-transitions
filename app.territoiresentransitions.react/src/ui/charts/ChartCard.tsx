@@ -32,6 +32,7 @@ type ChartCardModalContentProps = {
   chart: JSX.Element;
   chartInfo?: {
     title?: string;
+    subtitle?: string;
     extendedTitle?: string;
     legend?: {name: string; color: string}[];
     expandable?: boolean;
@@ -68,17 +69,29 @@ const ChartCardModalContent = ({
       )}
 
       <div ref={chartWrapperRef} className="p-3">
-        {/* Titre du graphe */}
-        {chartInfo?.extendedTitle ? (
-          <h4>{chartInfo?.extendedTitle}</h4>
-        ) : (
-          chartInfo?.title && <h4>{chartInfo.title}</h4>
-        )}
+        <div className="pb-4">
+          {/* Titre du graphe */}
+          {chartInfo?.extendedTitle ? (
+            <h4 className="m-0">{chartInfo?.extendedTitle}</h4>
+          ) : (
+            chartInfo?.title && <h4 className="m-0">{chartInfo.title}</h4>
+          )}
+
+          {/* Sous-titre du graphe */}
+          {chartInfo?.subtitle && (
+            <h4 className="m-0 pt-2 font-medium text-[#666]">
+              {chartInfo.subtitle}
+            </h4>
+          )}
+        </div>
 
         {/* Element additionnel optionnel, ajouté entre le titre et le graphe */}
-        <div data-html2canvas-ignore>
-          {!!topElement && topElement('detailled')}
-        </div>
+
+        {!!topElement && (
+          <div data-html2canvas-ignore className="pb-2">
+            {topElement('detailled')}
+          </div>
+        )}
 
         {/* Graphe agrandi */}
         <div className="w-full h-96">{chart}</div>
@@ -88,7 +101,7 @@ const ChartCardModalContent = ({
 
         {/* Info additionelles */}
         {chartInfo?.additionalInfo && (
-          <div className="flex flex-col mt-12 text-slate-500">
+          <div className="flex flex-col mt-12 text-[#666]">
             {Array.isArray(chartInfo.additionalInfo) ? (
               chartInfo.additionalInfo.map((info, index) => (
                 <span key={index}>{info}</span>
@@ -108,6 +121,7 @@ type ChartCardProps = {
   chartProps: BarChartProps | DonutChartProps;
   chartInfo?: {
     title?: string;
+    subtitle?: string;
     extendedTitle?: string;
     legend?: {name: string; color: string}[];
     legendOnOverview?: boolean;
@@ -161,10 +175,18 @@ const ChartCard = ({
     >
       {/* En-tête de la carte */}
       <div className="flex flex-row justify-between px-6">
-        {/* Titre du graphe */}
-        {chartInfo?.title && (
-          <div className="pb-6 font-bold">{chartInfo.title}</div>
-        )}
+        <div className="pb-3">
+          {/* Titre du graphe */}
+          {chartInfo?.title && (
+            <div className="font-bold">{chartInfo.title}</div>
+          )}
+          {/* Sous-titre du graphe */}
+          {chartInfo?.subtitle && (
+            <div className="pt-1 font-medium text-[#666]">
+              {chartInfo.subtitle}
+            </div>
+          )}
+        </div>
 
         {/* Bouton + modale permettant un affichage agrandi du graphe */}
         {chartInfo?.expandable && (
@@ -189,7 +211,7 @@ const ChartCard = ({
       </div>
 
       {/* Element additionnel optionnel, ajouté entre le titre et le graphe */}
-      <div className="absolute top-16 z-10 px-6 w-full">
+      <div className="px-6 w-full">
         {!!topElement && topElement('overview')}
       </div>
 

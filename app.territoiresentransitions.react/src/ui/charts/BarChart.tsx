@@ -1,4 +1,9 @@
-import {BarTooltipProps, ComputedDatum, ResponsiveBar} from '@nivo/bar';
+import {
+  BarDatum,
+  BarTooltipProps,
+  ComputedDatum,
+  ResponsiveBar,
+} from '@nivo/bar';
 import {defaultColors} from './chartsTheme';
 
 const getCustomColor = ({
@@ -6,8 +11,8 @@ const getCustomColor = ({
   data,
 }: {
   id: string | number;
-  data: {[key: string]: string};
-}) => `${data[`${id}_color`]}`;
+  data: BarDatum;
+}): string => `${data[`${id}_color`]}`;
 
 const upperCaseFirstLetter = (value: string): string => {
   return `${value.slice(0, 1).toUpperCase()}${value.slice(1).toLowerCase()}`;
@@ -24,7 +29,8 @@ const getLabel = (d: ComputedDatum<{}>) => {
 const getTooltip = (
   {id, value, index, indexValue, color}: BarTooltipProps<{}>,
   localIndexTitles: string[],
-  unit: string
+  unit: string,
+  clickable: boolean
 ) => {
   return (
     <div
@@ -64,12 +70,15 @@ const getTooltip = (
           </strong>
         </span>
       </div>
+      {clickable && (
+        <div className="text-[#929292] pt-4">Cliquez pour voir le détail</div>
+      )}
     </div>
   );
 };
 
 export type BarChartProps = {
-  data: {}[];
+  data: BarDatum[];
   indexBy: string;
   keys: string[];
   indexTitles?: string[];
@@ -127,16 +136,20 @@ const BarChart = ({
       keys={keys}
       indexBy={indexBy}
       margin={{
-        top: layout === 'horizontal' ? 50 : 85,
+        top: layout === 'horizontal' ? 20 : 85,
         right: 60,
-        bottom: 70,
+        bottom: layout === 'horizontal' ? 80 : 70,
         left: 70,
       }}
       padding={layout === 'horizontal' ? 0.1 : 0.5}
       innerPadding={groupMode === 'grouped' ? 2 : 0}
       layout={layout}
       groupMode={groupMode}
-      colors={customColors ? getCustomColor : defaultColors}
+      colors={
+        customColors
+          ? ({id, data}) => getCustomColor({id, data})
+          : defaultColors
+      }
       borderColor={{from: 'color', modifiers: [['darker', 1.6]]}}
       axisTop={null}
       axisRight={null}
@@ -167,16 +180,37 @@ const BarChart = ({
       enableGridY={layout !== 'horizontal'}
       labelSkipWidth={layout === 'horizontal' ? 10 : 0}
       labelSkipHeight={layout !== 'horizontal' ? 10 : 0}
-      tooltip={d => getTooltip(d, localIndexTitles, unit)}
+      tooltip={d =>
+        getTooltip(
+          d,
+          localIndexTitles,
+          unit,
+          onSelectIndex !== undefined &&
+            ((d.data.hasOwnProperty('clickable') &&
+              d.data.clickable === 'true') ||
+              !d.data.hasOwnProperty('clickable'))
+        )
+      }
       onClick={({indexValue}) => {
         if (onSelectIndex) onSelectIndex(indexValue);
       }}
-      onMouseEnter={() => {
-        if (onSelectIndex)
+      onMouseEnter={value => {
+        if (
+          onSelectIndex &&
+          ((value.data.hasOwnProperty('clickable') &&
+            value.data.clickable === 'true') ||
+            !value.data.hasOwnProperty('clickable'))
+        ) {
           (document.body as HTMLInputElement).style.cursor = 'pointer';
+        }
       }}
-      onMouseLeave={() => {
-        if (onSelectIndex)
+      onMouseLeave={value => {
+        if (
+          onSelectIndex &&
+          ((value.data.hasOwnProperty('clickable') &&
+            value.data.clickable === 'true') ||
+            !value.data.hasOwnProperty('clickable'))
+        )
           (document.body as HTMLInputElement).style.cursor = 'default';
       }}
     />

@@ -1,3 +1,4 @@
+import {referentielToName} from 'app/labels';
 import {useCollectiviteId} from 'core-logic/hooks/params';
 import {useProgressionReferentiel} from '../EtatDesLieux/Synthese/data/useProgressionReferentiel';
 import EtatDesLieuxCard from './EtatDesLieuxCard';
@@ -11,6 +12,8 @@ const Accueil = (): JSX.Element => {
     eciTable: eciProgressionScore,
     caeRepartitionPhases,
     eciRepartitionPhases,
+    caePotentiel,
+    eciPotentiel,
   } = useProgressionReferentiel();
 
   return (
@@ -39,16 +42,18 @@ const Accueil = (): JSX.Element => {
                 collectiviteId={collectiviteId}
                 progressionScore={caeProgressionScore}
                 repartitionPhases={caeRepartitionPhases}
+                potentiel={caePotentiel}
                 referentiel="cae"
-                title="Climat Air Énergie"
+                title={referentielToName.cae}
                 className="order-1"
               />
               <EtatDesLieuxCard
                 collectiviteId={collectiviteId}
                 progressionScore={eciProgressionScore}
                 repartitionPhases={eciRepartitionPhases}
+                potentiel={eciPotentiel}
                 referentiel="eci"
-                title="Économie circulaire"
+                title={referentielToName.eci}
                 className="lg:order-2 order-3"
               />
             </div>

@@ -12,9 +12,11 @@ import DonutChart from 'ui/charts/DonutChart';
 import logoTerritoireEngage from 'ui/logo/logoTerritoireEngage.png';
 import {ProgressionRow} from '../EtatDesLieux/Synthese/data/useProgressionReferentiel';
 import {getAggregatedScore} from '../EtatDesLieux/Synthese/utils';
+import {useCycleLabellisation} from '../ParcoursLabellisation/useCycleLabellisation';
 import AccueilCard from './AccueilCard';
 import EtatDesLieuxGraphs from './EtatDesLieuxGraphs';
-import LabellisationStars from './LabellisationStars';
+import LabellisationInfo from '../../../../ui/labellisation/LabellisationInfo';
+import {toLocaleFixed} from 'utils/toFixed';
 
 type EtatDesLieuxCardProps = {
   collectiviteId: number;
@@ -23,6 +25,7 @@ type EtatDesLieuxCardProps = {
     'data' | 'getRowId' | 'getSubRows' | 'autoResetExpanded'
   >;
   repartitionPhases: {id: string; value: number}[];
+  potentiel: number | undefined;
   referentiel: ReferentielParamOption;
   title: string;
   className?: string;
@@ -44,6 +47,7 @@ type FilledEtatDesLieuxCardProps = {
     TableOptions<ProgressionRow>,
     'data' | 'getRowId' | 'getSubRows' | 'autoResetExpanded'
   >;
+  potentiel: number | undefined;
   className?: string;
 };
 
@@ -62,6 +66,7 @@ const EtatDesLieuxCard = ({
   collectiviteId,
   progressionScore,
   repartitionPhases,
+  potentiel,
   referentiel,
   title,
   className,
@@ -77,6 +82,7 @@ const EtatDesLieuxCard = ({
           referentiel={referentiel}
           title={title}
           progressionScore={progressionScore}
+          potentiel={potentiel}
           className={className}
         />
       ) : (
@@ -110,8 +116,12 @@ const FilledEtatDesLieuxCard = ({
   referentiel,
   title,
   progressionScore,
+  potentiel,
   className,
 }: FilledEtatDesLieuxCardProps): JSX.Element => {
+  const {parcours, status} = useCycleLabellisation(referentiel);
+  const data = getAggregatedScore(progressionScore.data);
+
   return (
     <AccueilCard className={classNames('flex flex-col relative', className)}>
       {/* En-tête */}
@@ -123,8 +133,8 @@ const FilledEtatDesLieuxCard = ({
       {/* Contenu */}
       <div className="h-full grid md:grid-cols-2 gap-8 self-stretch">
         <div className="flex flex-col justify-between">
-          {/* Niveau de labellisation */}
-          <LabellisationStars referentiel={referentiel} />
+          {/* Niveau de labellisation et détails */}
+          <LabellisationInfo parcours={parcours} score={data} />
 
           {/* Call to action */}
           <ButtonWithLink
@@ -133,19 +143,35 @@ const FilledEtatDesLieuxCard = ({
               referentielId: referentiel,
               labellisationVue: 'suivi',
             })}
+            disabled={
+              status === 'audit_en_cours' || status === 'demande_envoyee'
+            }
             rounded
           >
-            Décrocher les étoiles
+            {status === 'audit_en_cours' || status === 'demande_envoyee'
+              ? 'Demande envoyée'
+              : 'Décrocher les étoiles'}
           </ButtonWithLink>
         </div>
 
         {/* Graphe donut */}
-        <div className="h-[200px] md:w-[246px] md:order-last order-first md:absolute md:top-1/2 md:right-8 md:-translate-y-1/2 static">
+        <div className="h-[200px] w-[246px] mx-auto md:order-last order-first md:absolute md:top-1/2 md:right-1/4 md:-translate-y-1/2 md:translate-x-[47%] static">
           <DonutChart
-            data={getAggregatedScore(progressionScore.data)}
+            data={data.array}
+            centeredMetric={
+              potentiel !== undefined
+                ? {
+                    title: 'Potentiel',
+                    value: `${toLocaleFixed(potentiel, 1)} point${
+                      potentiel > 1 ? 's' : ''
+                    }`,
+                  }
+                : undefined
+            }
             customMargin={{top: 2, right: 0, bottom: 2, left: 0}}
             zoomEffect={false}
             unit="point"
+            displayPercentageValue
           />
         </div>
       </div>

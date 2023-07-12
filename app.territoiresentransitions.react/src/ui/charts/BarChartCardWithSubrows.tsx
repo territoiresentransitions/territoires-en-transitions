@@ -31,6 +31,7 @@ type BarChartCardWithSubrowsProps = {
   };
   chartInfo?: {
     title?: string;
+    subtitle?: string;
     legend?: {name: string; color: string}[];
     legendOnOverview?: boolean;
     expandable?: boolean;
@@ -57,7 +58,7 @@ const BarChartCardWithSubrows = ({
 }: BarChartCardWithSubrowsProps): JSX.Element => {
   // Associe la data des scores à un nom d'affichage pour le breadcrumb
   const [scoreBreadcrumb, setScoreBreadcrumb] = useState([
-    {scoreData: score.data, name: 'Vue globale', fileName: 'referentiel'},
+    {scoreData: score.data, name: 'Tous les axes', fileName: 'referentiel'},
   ]);
 
   // Donnée actuellement observée dans le tableau scoreBreadcrumb
@@ -69,7 +70,7 @@ const BarChartCardWithSubrows = ({
   // Mise à jour lors du changement de valeur des scores en props
   useEffect(() => {
     setScoreBreadcrumb([
-      {scoreData: score.data, name: 'Vue globale', fileName: 'referentiel'},
+      {scoreData: score.data, name: 'Tous les axes', fileName: 'referentiel'},
     ]);
     setIndexBy(score.data[0]?.type ?? '');
   }, [score.data]);
@@ -90,7 +91,13 @@ const BarChartCardWithSubrows = ({
         if (!!subRows && subRows.length > 0) {
           setScoreBreadcrumb(prevScoreBreadcrumb => [
             ...prevScoreBreadcrumb,
-            {scoreData: subRows, name: index.toString(), fileName: indexBy},
+            {
+              scoreData: subRows,
+              name: `${
+                indexBy.charAt(0).toUpperCase() + indexBy.slice(1)
+              } ${index.toString()}`,
+              fileName: indexBy,
+            },
           ]);
           setIndexBy(subRows[0].type);
         }
@@ -140,10 +147,11 @@ const BarChartCardWithSubrows = ({
 
   const localChartInfo = {
     title: chartInfo?.title
-      ? `${chartInfo.title} ${!!indexBy ? `par ${indexBy}` : ''} en valeur ${
-          relativeMode ? 'relative' : 'absolue'
-        } - ${referentiel.toUpperCase()}`
+      ? `${chartInfo.title} ${
+          !!indexBy ? `par ${indexBy === 'tache' ? 'tâche' : indexBy}` : ''
+        } : ${relativeMode ? 'pourcentages' : 'nombre de points'}`
       : undefined,
+    subtitle: chartInfo?.subtitle,
     legend: chartInfo?.legend,
     legendOnOverview: chartInfo?.legendOnOverview,
     expandable: chartInfo?.expandable,
