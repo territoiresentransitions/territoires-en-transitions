@@ -1,5 +1,4 @@
-import {useEffect, useState} from 'react';
-import {useLocation} from 'react-router-dom';
+import {useState} from 'react';
 import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinitionSummaryReadEndpoint';
 import {useSortedActionSummaryChildren} from 'core-logic/hooks/referentiel';
 import {ActionCommentaire} from 'ui/shared/actions/ActionCommentaire';
@@ -7,10 +6,12 @@ import ExpandAllButton from 'ui/buttons/ExpandAllButton';
 import SubActionCard from './SubActionCard';
 import {phaseToLabel} from 'ui/referentiels/utils';
 import {SuiviScoreRow} from '../data/useScoreRealise';
+import {TCycleLabellisationStatus} from 'app/pages/collectivite/ParcoursLabellisation/useCycleLabellisation';
 
 type ActionFollowUpProps = {
   action: ActionDefinitionSummary;
   actionScores: {[actionId: string]: SuiviScoreRow};
+  auditStatus: TCycleLabellisationStatus;
 };
 
 /**
@@ -21,6 +22,7 @@ type ActionFollowUpProps = {
 const ActionFollowUp = ({
   action,
   actionScores,
+  auditStatus,
 }: ActionFollowUpProps): JSX.Element => {
   const subActions = useSortedActionSummaryChildren(action);
 
@@ -49,16 +51,6 @@ const ActionFollowUp = ({
     else setOpenedSubActionsCount(prevState => prevState - 1);
   };
 
-  // déplie tout si une tâche est indiquée dans l'url (afin que le
-  // scrollIntoView dans `SubActionTask` fonctionne)
-  const {hash} = useLocation();
-  useEffect(() => {
-    const id = hash.slice(1); // enlève le "#" au début du hash
-    if (id) {
-      setOpenAll(true);
-    }
-  }, [hash]);
-
   return (
     <section>
       {/* Commentaire associé à l'action */}
@@ -85,6 +77,7 @@ const ActionFollowUp = ({
                     key={subAction.id}
                     subAction={subAction}
                     actionScores={actionScores}
+                    auditStatus={auditStatus}
                     forceOpen={openAll}
                     onOpenSubAction={updateOpenedSubActionsCount}
                   />

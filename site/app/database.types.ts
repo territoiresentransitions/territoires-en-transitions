@@ -6909,7 +6909,13 @@ export interface Database {
       role_name: "agent" | "referent" | "conseiller" | "auditeur" | "aucun"
       thematique_completude: "complete" | "a_completer"
       type_collectivite: "EPCI" | "commune" | "syndicat"
-      usage_action: "clic" | "vue" | "telechargement" | "saisie" | "selection"
+      usage_action:
+        | "clic"
+        | "vue"
+        | "telechargement"
+        | "saisie"
+        | "selection"
+        | "agrandissement"
       usage_fonction:
         | "aide"
         | "preuve"
@@ -6932,6 +6938,10 @@ export interface Database {
         | "cta_plan"
         | "cta_indicateur"
         | "cta_labellisation"
+        | "cta_plan_creation"
+        | "cta_plan_maj"
+        | "cta_edl_commencer"
+        | "cta_edl_personnaliser"
       visite_onglet:
         | "progression"
         | "priorisation"

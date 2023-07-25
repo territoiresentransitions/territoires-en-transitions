@@ -1,8 +1,9 @@
+import {TCycleLabellisationStatus} from 'app/pages/collectivite/ParcoursLabellisation/useCycleLabellisation';
 import {ActionDefinitionSummary} from 'core-logic/api/endpoints/ActionDefinitionSummaryReadEndpoint';
-import {useCollectiviteId} from 'core-logic/hooks/params';
 import {useActionSummaryChildren} from 'core-logic/hooks/referentiel';
 import {useActionStatut} from 'core-logic/hooks/useActionStatut';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
+import {useLocation} from 'react-router-dom';
 import {Accordion} from 'ui/Accordion';
 import {ActionCommentaire} from 'ui/shared/actions/ActionCommentaire';
 import {SuiviScoreRow} from '../data/useScoreRealise';
@@ -14,6 +15,7 @@ import SubActionTasksList from './SubActionTasksList';
 type SubActionCardProps = {
   subAction: ActionDefinitionSummary;
   actionScores: {[actionId: string]: SuiviScoreRow};
+  auditStatus: TCycleLabellisationStatus;
   forceOpen: boolean;
   onOpenSubAction: (isOpen: boolean) => void;
 };
@@ -27,14 +29,14 @@ type SubActionCardProps = {
 const SubActionCard = ({
   subAction,
   actionScores,
+  auditStatus,
   forceOpen,
   onOpenSubAction,
 }: SubActionCardProps): JSX.Element => {
-  const collectivite_id = useCollectiviteId();
-  const {statut, filled} = useActionStatut({
-    action_id: subAction.id,
-    collectivite_id: collectivite_id ?? 0,
-  });
+  const ref = useRef<HTMLDivElement>(null);
+
+  const {hash} = useLocation();
+  const {statut, filled} = useActionStatut(subAction.id);
   const {avancement, concerne} = statut || {};
   const tasks = useActionSummaryChildren(subAction);
 
@@ -48,11 +50,17 @@ const SubActionCard = ({
     (statut !== null && statut?.avancement !== 'non_renseigne') ||
     statut?.concerne === false;
 
-  const shouldOpen = true;
-
-  // Condition à décommenter lorsque le statut à la sous-action sera possible
-  // subAction.referentiel === 'eci' ||
-  // (subAction.referentiel === 'cae' && statut?.avancement === 'detaille');
+  // Déplie les tâches si
+  // - référentiel ECI
+  // - référentiel CAE et sous-action au statut "détaillé"
+  // - hash contenu dans l'url pointe vers une tâche de la sous-action
+  const shouldOpen =
+    subAction.referentiel === 'eci' ||
+    (subAction.referentiel === 'cae' &&
+      (avancement === 'detaille' ||
+        (avancement === 'non_renseigne' && filled === true) ||
+        (statut === null && filled === true))) ||
+    (hash.slice(1).includes(subAction.id) && hash.slice(1) !== subAction.id);
 
   const [openTasks, setOpenTasks] = useState(false);
   const [openSubAction, setOpenSubAction] = useState(forceOpen);
@@ -66,6 +74,26 @@ const SubActionCard = ({
     setOpenTasks(openSubAction ? shouldOpen : false);
   }, [openSubAction]);
 
+  useEffect(() => {
+    const id = hash.slice(1); // enlève le "#" au début du hash
+
+    if (id.includes(subAction.id)) {
+      // Ouvre la sous-action indiquée dans l'url
+      setOpenSubAction(true);
+
+      // Scroll jusqu'à la sous-action indiquée dans l'url
+      if (id === subAction.id && ref && ref.current) {
+        setTimeout(() => {
+          ref.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest',
+          });
+        }, 0);
+      }
+    }
+  }, [hash, ref]);
+
   const handleToggleOpen = () => {
     onOpenSubAction(!openSubAction);
     setOpenSubAction(prevState => !prevState);
@@ -73,6 +101,7 @@ const SubActionCard = ({
 
   return (
     <div
+      ref={ref}
       data-test={`SousAction-${subAction.identifiant}`}
       className="border border-[#e5e5e5] rounded-lg"
     >
@@ -81,6 +110,9 @@ const SubActionCard = ({
         action={subAction}
         actionScores={actionScores}
         displayProgressBar={shouldDisplayProgressBar}
+        displayActionCommentaire={
+          auditStatus === 'audit_en_cours' && !openSubAction
+        }
         openSubAction={openSubAction}
         onToggleOpen={handleToggleOpen}
       />
@@ -89,7 +121,9 @@ const SubActionCard = ({
       {openSubAction && (
         <div className="p-6">
           {/* Commentaire associé à la sous-action */}
-          <ActionCommentaire action={subAction} className="mb-10" />
+          {(auditStatus !== 'audit_en_cours' || openSubAction) && (
+            <ActionCommentaire action={subAction} className="mb-10" />
+          )}
 
           {/* Section Description et Exemples */}
           {subAction.referentiel === 'eci' &&
