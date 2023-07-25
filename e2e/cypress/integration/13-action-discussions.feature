@@ -11,9 +11,7 @@ Fonctionnalité: Utiliser les discussions dans une action d'un référentiel
     Et que je clique sur "publier" une nouvelle discussion
     Alors le commentaire "Mon premier commentaire" est visible
 
-  Scénario: Répondre à un commentaire
-    Etant donné que je suis connecté en tant que "yolo"
-    Et que je suis sur la page "Action ECI" de la collectivité "1"
+    Etant donné que je suis sur la page "Action ECI" de la collectivité "1"
     Quand je clique sur l'icône commentaires
 
     Quand je saisis "Ma réponse" dans le champ répondre d'une discussion
@@ -25,9 +23,7 @@ Fonctionnalité: Utiliser les discussions dans une action d'un référentiel
     Et que je clique sur "publier" une nouvelle réponse
     Alors le commentaire "Ma réponse" n'est plus visible
 
-  Scénario: Visualiser les réponses à un commentaire
-    Etant donné que je suis connecté en tant que "yolo"
-    Et que je suis sur la page "Action ECI" de la collectivité "1"
+    Etant donné que je suis sur la page "Action ECI" de la collectivité "1"
     Quand je clique sur l'icône commentaires
     
     Alors un bouton contenant "1 autre réponse" est visible
@@ -35,9 +31,7 @@ Fonctionnalité: Utiliser les discussions dans une action d'un référentiel
     Quand je clique sur le bouton "1 autre réponse" de la 1ère discussion
     Alors le commentaire "Ma réponse" est visible
 
-  Scénario: Fermer et reouvrir une discussion
-    Etant donné que je suis connecté en tant que "yolo"
-    Et que je suis sur la page "Action ECI" de la collectivité "1"
+    Etant donné que je suis sur la page "Action ECI" de la collectivité "1"
     Quand je clique sur l'icône commentaires
 
     Quand je clique sur "Fermer" dans une discussion
@@ -52,9 +46,7 @@ Fonctionnalité: Utiliser les discussions dans une action d'un référentiel
     Quand je change la vue du feed à "Ouverts"
 	  Alors le commentaire "Mon premier commentaire" est visible
 
-  Scénario: Supprimer un commentaire
-    Etant donné que je suis connecté en tant que "yolo"
-    Et que je suis sur la page "Action ECI" de la collectivité "1"
+    Etant donné que je suis sur la page "Action ECI" de la collectivité "1"
     Quand je clique sur l'icône commentaires
   
     Quand je clique sur "Supprimer mon commentaire" du commentaire "Un troisième commentaire"
