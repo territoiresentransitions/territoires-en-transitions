@@ -6275,13 +6275,6 @@ export interface Database {
       skip:
         | {
             Args: {
-              why: string
-              how_many: number
-            }
-            Returns: string
-          }
-        | {
-            Args: {
               "": string
             }
             Returns: string
@@ -6289,6 +6282,13 @@ export interface Database {
         | {
             Args: {
               "": number
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              why: string
+              how_many: number
             }
             Returns: string
           }
