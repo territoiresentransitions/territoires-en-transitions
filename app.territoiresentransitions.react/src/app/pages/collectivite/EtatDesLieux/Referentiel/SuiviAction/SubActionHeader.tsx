@@ -90,52 +90,34 @@ const SubActionHeader = ({
             )}
         </div>
 
-        {/* Nom de l'action et score réalisé */}
-        <div className="lg:col-span-9 col-span-7 flex flex-col gap-3">
-          <div className={classNames({'font-bold': isSubAction})}>
-            {action.nom}
-            {action.description &&
-              ((isSubAction && action.referentiel === 'cae') || isTask) && (
-                <span onClick={evt => evt.stopPropagation()}>
-                  <Tooltip label={action.description} activatedBy="click">
-                    <span className="fr-fi-information-line pl-2 text-bf500 cursor-pointer" />
-                  </Tooltip>
-                </span>
-              )}
-          </div>
-
-          {isSubAction && (
-            <div className="flex gap-2">
-              <div className="w-[140px]">
-                <ScoreDisplay
-                  score={actionScores[action.id]?.points_realises ?? null}
-                  scoreMax={
-                    actionScores[action.id]?.points_max_personnalises ?? null
-                  }
-                  size="xs"
-                />
-              </div>
-
-              {displayProgressBar && (
-                <div className="flex justify-end w-[155px]">
-                  <ActionProgressBar action={action} />
-                </div>
-              )}
+        {isSubAction && (
+          <div className="flex gap-2">
+            <div className="w-[140px]">
+              <ScoreDisplay
+                score={actionScores[action.id]?.points_realises ?? null}
+                scoreMax={
+                  actionScores[action.id]?.points_max_personnalises ?? null
+                }
+                size="xs"
+              />
             </div>
-          )}
-        </div>
 
-        {/* Menu de sélection du statut */}
-        <div className="lg:col-span-2 col-span-3">
-          {!hideStatus && (
-            <ActionStatusDropdown
-              action={action}
-              actionScores={actionScores}
-              onSaveStatus={onSaveStatus}
-            />
-          )}
-        </div>
+            {displayProgressBar && (
+              <div className="flex justify-end w-[155px]">
+                <ActionProgressBar action={action} />
+              </div>
+            )}
+          </div>
+        )}
       </div>
+      {/* Menu de sélection du statut */}
+      {!hideStatus && (
+        <ActionStatusDropdown
+          action={action}
+          actionScores={actionScores}
+          onSaveStatus={onSaveStatus}
+        />
+      )}
       {displayActionCommentaire && (
         <div onClick={evt => evt.stopPropagation()}>
           <ActionCommentaire
