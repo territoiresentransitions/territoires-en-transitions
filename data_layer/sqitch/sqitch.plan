@@ -429,3 +429,7 @@ utilisateur/usage [utilisateur/usage@v2.44.0] 2023-07-11T12:01:48Z Florian <flor
 stats/amplitude [stats/amplitude@v2.44.0] 2023-07-11T13:14:54Z Florian <florian@derfurth.com> # Envoi les événements de création des réponses et des justifications
 plan_action/import 2023-07-03T09:25:01Z Amandine Jacquelin <conta@LanceLibre> # Corrige la fonction d'import pour les cibles et résultats attendus
 @v2.46.0 2023-07-24T15:55:28Z Florian <florian@derfurth.com> # Amélioration du tracking et de l'import des plans
+
+utilisateur/dcp [utilisateur/dcp@v2.28.0] 2023-05-09T14:59:45Z Amandine Jacquelin <conta@LanceLibre> # Ajoute la notion de verifié et de support
+utilisateur/droits_v2 [utilisateur/droits_v2@v2.40.0] 2023-06-22T07:43:28Z Amandine Jacquelin <conta@LanceLibre> # Corrige les fonctionnalités avec les nouveaux droits
+plan_action/fiches [plan_action/fiches@v2.46.0] 2023-07-26T17:09:22Z Amandine Jacquelin <conta@LanceLibre> # Supprime ou passe certaines fonctions en privée
