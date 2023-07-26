@@ -2,11 +2,39 @@ import {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {SwitchLabelLeft} from 'ui/shared/SwitchLabelLeft';
 import {referentielToName} from 'app/labels';
-import {indicateurViewParam, IndicateurViewParamOption} from 'app/paths';
-import {IndicateursNav} from './IndicateursNav';
+import {
+  indicateurViewParam,
+  IndicateurViewParamOption,
+  makeCollectiviteIndicateursUrl,
+} from 'app/paths';
 import {IndicateurPersonnaliseList} from './IndicateurPersonnaliseList';
 import {ConditionnalIndicateurReferentielList} from './ConditionnalIndicateurReferentielList';
 import {UiSearchBar} from 'ui/UiSearchBar';
+import CollectivitePageLayout from '../CollectivitePageLayout/CollectivitePageLayout';
+import {useCollectiviteId} from 'core-logic/hooks/params';
+import {IndicateurPersonnaliseCreationDialog} from './IndicateurPersonnaliseCreationDialog';
+import {SideNavLinks} from 'ui/shared/SideNav';
+
+// correspondances entre item et libellé
+const LABELS: Record<IndicateurViewParamOption, string> = {
+  //  cle: 'Indicateurs-clé',
+  //  tous: 'Tous les indicateurs',
+  perso: 'Indicateurs personnalisés',
+  cae: `Indicateurs ${referentielToName.cae}`,
+  eci: `Indicateurs ${referentielToName.eci}`,
+  crte: 'Indicateurs Contrat de relance et de transition écologique (CRTE)',
+};
+
+// items dans l'ordre de l'affichage voulu
+const ITEMS: IndicateurViewParamOption[] = ['perso', 'cae', 'eci', 'crte'];
+
+// génère les liens à afficher dans la navigation latérale
+const generateIndicateursNavLinks = (collectiviteId: number): SideNavLinks => {
+  return ITEMS.map(indicateurView => ({
+    displayName: LABELS[indicateurView],
+    link: makeCollectiviteIndicateursUrl({collectiviteId, indicateurView}),
+  }));
+};
 
 const viewTitles: Record<IndicateurViewParamOption, string> = {
   perso: 'Indicateurs personnalisés',
@@ -44,6 +72,8 @@ const ConditionnalIndicateurList = (props: {
  * IndicateursList show both indicateurs personnalisés and indicateurs référentiel.
  */
 const Indicateurs = () => {
+  const collectivite_id = useCollectiviteId();
+
   const {vue} = useParams<{
     [indicateurViewParam]?: IndicateurViewParamOption;
   }>();
@@ -54,8 +84,12 @@ const Indicateurs = () => {
   const [pattern, setPattern] = useState('');
 
   return (
-    <div className="fr-container !px-0 flex">
-      <IndicateursNav />
+    <CollectivitePageLayout
+      sideNav={{
+        links: generateIndicateursNavLinks(collectivite_id!),
+        actions: <IndicateurPersonnaliseCreationDialog />,
+      }}
+    >
       <div className="w-full">
         <div className="flex items-center mx-auto py-6 px-10 bg-indigo-700">
           <p className="flex grow py-2 px-3 m-0 font-bold text-white text-[2rem] leading-snug">
@@ -84,7 +118,7 @@ const Indicateurs = () => {
           pattern={pattern}
         />
       </div>
-    </div>
+    </CollectivitePageLayout>
   );
 };
 
